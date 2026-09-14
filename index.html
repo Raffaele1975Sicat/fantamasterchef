@@ -89,6 +89,28 @@
   #card-lightbox{position:fixed; inset:0; background:rgba(0,0,0,.75); display:none; align-items:center; justify-content:center; z-index:999; padding:24px;}
   #card-lightbox.open{display:flex;}
   #card-lightbox img{max-width:min(90vw,420px); max-height:85vh; border-radius:14px; box-shadow:0 10px 40px rgba(0,0,0,.5);}
+  .bottombar button{position:relative;}
+  .chat-badge{position:absolute; top:3px; right:12px; background:var(--penalty); color:#fff; font-size:9.5px; min-width:15px; height:15px; line-height:15px; text-align:center; border-radius:999px; padding:0 3px;}
+  #chat-wrap{display:flex; flex-direction:column; height:calc(100vh - 250px); min-height:320px;}
+  #chat-list{flex:1; overflow-y:auto; padding:4px 2px 10px; display:flex; flex-direction:column; gap:10px;}
+  .chat-msg{max-width:84%; align-self:flex-start; display:flex; flex-direction:column;}
+  .chat-msg.mine{align-self:flex-end; align-items:flex-end;}
+  .chat-bubble{background:var(--panel2); border:1px solid var(--line); border-radius:12px; padding:8px 12px; font-size:14px; line-height:1.4; word-break:break-word;}
+  .chat-msg.mine .chat-bubble{background:rgba(202,162,76,.14); border-color:var(--gold);}
+  .chat-meta{font-size:11px; color:var(--ink-faint); margin:2px 6px;}
+  .chat-reply-preview{border-left:2px solid var(--gold-strong); padding-left:8px; margin-bottom:4px; font-size:12px; color:var(--ink-faint);}
+  .chat-img{max-width:220px; max-height:260px; border-radius:8px; display:block; margin-top:4px; cursor:pointer; object-fit:cover;}
+  .chat-avviso{align-self:center; text-align:center; font-size:12.5px; color:var(--gold-strong); background:rgba(202,162,76,.1); border:1px solid var(--line); border-radius:999px; padding:6px 14px; max-width:92%;}
+  .chat-reactions{display:flex; gap:4px; flex-wrap:wrap; margin-top:4px;}
+  .chat-react-btn{background:var(--panel2); border:1px solid var(--line); border-radius:999px; font-size:11.5px; padding:1px 7px; cursor:pointer; color:var(--ink);}
+  .chat-react-btn.mine{border-color:var(--gold);}
+  .chat-actions{font-size:11px; color:var(--ink-faint); margin-top:2px;}
+  .chat-actions span{cursor:pointer; text-decoration:underline; margin-right:10px;}
+  .chat-emoji-row{display:flex; gap:6px; margin-top:4px;}
+  .chat-emoji-row button{font-size:17px; background:var(--panel2); border:1px solid var(--line); border-radius:8px; padding:2px 6px;}
+  #chat-input-bar{display:flex; gap:8px; align-items:flex-end; padding:8px 2px 2px; border-top:1px solid var(--line);}
+  #chat-input-bar textarea{flex:1; resize:none; min-height:38px; max-height:100px; background:var(--panel2); border:1px solid var(--line); color:var(--ink); border-radius:9px; padding:9px 12px; font-size:14px; font-family:inherit;}
+  #chat-reply-bar{display:flex; justify-content:space-between; align-items:center; font-size:12px; color:var(--ink-faint); background:var(--panel2); border-radius:8px; padding:6px 10px; margin-bottom:6px;}
 </style>
 </head>
 <body>
@@ -127,6 +149,7 @@
     <section class="tab-panel" data-panel="concorrenti" id="panel-concorrenti"></section>
     <section class="tab-panel" data-panel="puntate" id="panel-puntate"></section>
     <section class="tab-panel" data-panel="carte" id="panel-carte"></section>
+    <section class="tab-panel" data-panel="chat" id="panel-chat"></section>
     <section class="tab-panel" data-panel="regolamento" id="panel-regolamento"></section>
     <section class="tab-panel" data-panel="admin" id="panel-admin"></section>
   </main>
@@ -138,6 +161,7 @@
   <button data-tab="concorrenti"><span class="dot"></span>Chef</button>
   <button data-tab="puntate"><span class="dot"></span>Puntate</button>
   <button data-tab="carte"><span class="dot"></span>Carte</button>
+  <button data-tab="chat"><span class="dot"></span>Chat<span class="chat-badge hidden" id="chat-badge">0</span></button>
   <button data-tab="regolamento"><span class="dot"></span>Regole</button>
   <button data-tab="admin" id="admin-nav-btn" style="display:none;"><span class="dot"></span>Admin</button>
 </nav>
@@ -216,6 +240,7 @@
     session: null, profile: null, myTeam: null, profiles: [],
     meta: null, settings: {}, concorrenti: [], teams: [], teamChefs: [],
     episodes: [], events: [], cardTypes: [], purchases: [], activations: [], activationsPublic: [],
+    chatMessages: [], chatReactions: [], chatLastRead: null, chatPollTimer: null,
     activeTab: "home"
   };
 
@@ -338,7 +363,10 @@
       sb.from("card_purchases").select("*"),
       sb.from("card_activations").select("*"),
       sb.from("card_activations_public").select("*"),
-      sb.from("profiles").select("*")
+      sb.from("profiles").select("*"),
+      sb.from("chat_messages").select("*").order("created_at"),
+      sb.from("chat_reactions").select("*"),
+      sb.from("chat_reads").select("*").eq("profile_id", uid).maybeSingle()
     ]).then(function(res){
       var errs = res.filter(function(r){ return r.error; });
       if (errs.length){ console.error(errs); toast("Errore nel caricamento dati: " + errs[0].error.message); }
@@ -355,10 +383,14 @@
       state.activations = res[10].data||[];
       state.activationsPublic = res[11].data||[];
       state.profiles = res[12].data||[];
+      state.chatMessages = res[13].data||[];
+      state.chatReactions = res[14].data||[];
+      state.chatLastRead = (res[15].data && res[15].data.last_read_at) || null;
       state.myTeam = state.teams.filter(function(t){ return t.profile_id===uid; })[0] || null;
       document.getElementById("league-name-display").textContent = state.meta.nome_lega;
       document.getElementById("season-label-display").textContent = "Stagione " + state.meta.stagione_label;
       document.getElementById("admin-nav-btn").style.display = state.profile.is_admin ? "" : "none";
+      sb.rpc("purge_old_chat").then(function(){}, function(){});
       renderAll();
     });
   }
@@ -595,10 +627,22 @@
 
   /* ============ tabs ============ */
   function selectTab(tab){
+    var leavingChat = state.activeTab==="chat" && tab!=="chat";
     state.activeTab = tab;
     document.querySelectorAll(".tab-panel").forEach(function(p){ p.classList.toggle("active", p.getAttribute("data-panel")===tab); });
     document.querySelectorAll(".bottombar button[data-tab]").forEach(function(b){ b.classList.toggle("active", b.getAttribute("data-tab")===tab); });
     window.scrollTo(0,0);
+    if (tab==="chat"){
+      state._chatScrollPending = true;
+      loadChatData();
+      markChatRead();
+      if (state.chatPollTimer) clearInterval(state.chatPollTimer);
+      state.chatPollTimer = setInterval(loadChatData, 20000);
+    } else if (leavingChat && state.chatPollTimer){
+      clearInterval(state.chatPollTimer);
+      state.chatPollTimer = null;
+    }
+    updateChatBadge();
   }
   document.getElementById("bottombar").addEventListener("click", function(e){
     var b = e.target.closest("button[data-tab]");
@@ -975,6 +1019,245 @@
     }
   }
 
+  /* ============ chat + avvisi ============ */
+  var CHAT_EMOJIS = ["👍","❤️","😂","😮","😢","🎉"];
+  function fmtDateTime(iso){
+    if (!iso) return "";
+    var d = new Date(iso);
+    if (isNaN(d)) return iso;
+    var now = new Date();
+    var time = d.toLocaleTimeString("it-IT", {hour:"2-digit", minute:"2-digit"});
+    if (d.toDateString()===now.toDateString()) return time;
+    return d.toLocaleDateString("it-IT", {day:"numeric", month:"short"}) + " " + time;
+  }
+  function chatProfileName(id){
+    var p = state.profiles.filter(function(x){ return x.id===id; })[0];
+    return p ? p.display_name : "Qualcuno";
+  }
+  function chatFindMsg(id){ return state.chatMessages.filter(function(m){ return m.id===id; })[0]; }
+  function chatImageUrl(path){ return sb.storage.from("chat-media").getPublicUrl(path).data.publicUrl; }
+
+  function renderChat(){
+    var el = document.getElementById("panel-chat");
+    updateChatBadge();
+    if (!state.profile){ el.innerHTML = ""; return; }
+
+    var reactionsByMsg = {};
+    state.chatReactions.forEach(function(r){
+      reactionsByMsg[r.message_id] = reactionsByMsg[r.message_id] || {};
+      reactionsByMsg[r.message_id][r.emoji] = reactionsByMsg[r.message_id][r.emoji] || [];
+      reactionsByMsg[r.message_id][r.emoji].push(r.profile_id);
+    });
+
+    var html = '<div class="section-head"><div><h2>Chat</h2><p class="section-sub">Un\'unica chat della lega. I messaggi restano visibili per 20 giorni.</p></div></div>';
+    html += '<div class="card" style="padding:10px 14px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center; gap:10px;">'
+      + '<span class="section-sub" style="margin:0;">Notifiche per gli avvisi importanti</span>'
+      + '<label style="display:flex;align-items:center;gap:6px;font-size:13px;white-space:nowrap;"><input type="checkbox" id="chat-notif-toggle" '+(state.profile.notifiche_attive?"checked":"")+'> Attive</label>'
+      + '</div>';
+
+    html += '<div id="chat-wrap"><div id="chat-list">';
+    if (!state.chatMessages.length){
+      html += '<div class="empty" style="text-align:center;">Nessun messaggio ancora. Scrivi il primo!</div>';
+    }
+    state.chatMessages.forEach(function(m){
+      if (m.is_avviso){
+        html += '<div class="chat-avviso">📣 '+esc(m.testo)+'<div class="chat-meta" style="margin:2px 0 0;">'+fmtDateTime(m.created_at)+'</div></div>';
+        return;
+      }
+      var mine = m.author_id===state.profile.id;
+      var replyMsg = m.reply_to_id ? chatFindMsg(m.reply_to_id) : null;
+      html += '<div class="chat-msg'+(mine?" mine":"")+'" data-msg-id="'+m.id+'">';
+      html += '<div class="chat-meta">'+esc(chatProfileName(m.author_id))+' · '+fmtDateTime(m.created_at)+'</div>';
+      html += '<div class="chat-bubble">';
+      if (replyMsg){
+        var snippet = replyMsg.testo ? (replyMsg.testo.length>60 ? replyMsg.testo.slice(0,60)+"…" : replyMsg.testo) : "📷 foto";
+        html += '<div class="chat-reply-preview">↩ '+esc(chatProfileName(replyMsg.author_id))+': '+esc(snippet)+'</div>';
+      }
+      if (m.testo){ html += '<div>'+esc(m.testo).replace(/\n/g,"<br>")+'</div>'; }
+      if (m.image_path){
+        var url = chatImageUrl(m.image_path);
+        html += '<img class="chat-img" src="'+esc(url)+'" alt="">';
+      }
+      html += '</div>';
+      var reacts = reactionsByMsg[m.id] || {};
+      var reactKeys = Object.keys(reacts);
+      if (reactKeys.length){
+        html += '<div class="chat-reactions">';
+        reactKeys.forEach(function(em){
+          var who = reacts[em].map(chatProfileName).join(", ");
+          var mineReacted = reacts[em].indexOf(state.profile.id)!==-1;
+          html += '<button class="chat-react-btn'+(mineReacted?" mine":"")+'" data-toggle-react="'+m.id+'|'+em+'" title="'+esc(who)+'">'+em+' '+reacts[em].length+'</button>';
+        });
+        html += '</div>';
+      }
+      html += '<div class="chat-actions"><span data-reply-to="'+m.id+'">Rispondi</span><span data-open-react="'+m.id+'">Reagisci</span></div>';
+      if (state._reactingMsg===m.id){
+        html += '<div class="chat-emoji-row">' + CHAT_EMOJIS.map(function(em){ return '<button type="button" data-toggle-react="'+m.id+'|'+em+'">'+em+'</button>'; }).join("") + '</div>';
+      }
+      html += '</div>';
+    });
+    html += '</div>';
+
+    if (state._chatReplyTo){
+      var rm = chatFindMsg(state._chatReplyTo);
+      if (rm){
+        var rsnippet = rm.testo ? (rm.testo.length>60 ? rm.testo.slice(0,60)+"…" : rm.testo) : "📷 foto";
+        html += '<div id="chat-reply-bar"><span>↩ Rispondendo a '+esc(chatProfileName(rm.author_id))+': '+esc(rsnippet)+'</span><span style="cursor:pointer;" id="chat-reply-cancel">✕</span></div>';
+      }
+    }
+    html += '<div id="chat-input-bar">'
+      + '<input type="file" accept="image/*" id="chat-photo-input" class="hidden">'
+      + '<button class="btn sm ghost" id="chat-photo-btn" type="button" title="Allega una foto">📷</button>'
+      + '<textarea id="chat-text-input" placeholder="Scrivi un messaggio…" rows="1"></textarea>'
+      + '<button class="btn sm primary" id="chat-send-btn" type="button">Invia</button>'
+      + '</div>';
+    html += '</div>';
+
+    el.innerHTML = html;
+    bindChatEvents();
+    if (state._chatScrollPending){
+      var list = document.getElementById("chat-list");
+      if (list) list.scrollTop = list.scrollHeight;
+      state._chatScrollPending = false;
+    }
+  }
+
+  function bindChatEvents(){
+    var notifToggle = document.getElementById("chat-notif-toggle");
+    if (notifToggle){
+      notifToggle.addEventListener("change", function(){
+        var next = notifToggle.checked;
+        sb.from("profiles").update({notifiche_attive: next}).eq("id", state.profile.id).then(function(res){
+          if (res.error){ toast("Errore: " + res.error.message); notifToggle.checked = !next; return; }
+          state.profile.notifiche_attive = next;
+          toast(next ? "Notifiche attivate." : "Notifiche disattivate.");
+        });
+      });
+    }
+    document.querySelectorAll("[data-reply-to]").forEach(function(el){
+      el.addEventListener("click", function(){
+        state._chatReplyTo = el.getAttribute("data-reply-to");
+        state._reactingMsg = null;
+        renderChat();
+        var input = document.getElementById("chat-text-input");
+        if (input) input.focus();
+      });
+    });
+    var replyCancel = document.getElementById("chat-reply-cancel");
+    if (replyCancel){ replyCancel.addEventListener("click", function(){ state._chatReplyTo = null; renderChat(); }); }
+
+    document.querySelectorAll("[data-open-react]").forEach(function(el){
+      el.addEventListener("click", function(){
+        var id = el.getAttribute("data-open-react");
+        state._reactingMsg = (state._reactingMsg===id) ? null : id;
+        renderChat();
+      });
+    });
+    document.querySelectorAll("[data-toggle-react]").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        var parts = btn.getAttribute("data-toggle-react").split("|");
+        var msgId = parts[0], emoji = parts[1];
+        var existing = state.chatReactions.filter(function(r){ return r.message_id===msgId && r.profile_id===state.profile.id && r.emoji===emoji; })[0];
+        if (existing){
+          sb.from("chat_reactions").delete().eq("id", existing.id).then(function(res){
+            if (res.error){ toast("Errore: " + res.error.message); return; }
+            loadChatData();
+          });
+        } else {
+          sb.from("chat_reactions").insert({message_id: msgId, profile_id: state.profile.id, emoji: emoji}).then(function(res){
+            if (res.error){ toast("Errore: " + res.error.message); return; }
+            state._reactingMsg = null;
+            loadChatData();
+          });
+        }
+      });
+    });
+
+    var photoBtn = document.getElementById("chat-photo-btn");
+    var photoInput = document.getElementById("chat-photo-input");
+    if (photoBtn && photoInput){
+      photoBtn.addEventListener("click", function(){ photoInput.click(); });
+      photoInput.addEventListener("change", function(){
+        var file = photoInput.files && photoInput.files[0];
+        if (!file) return;
+        if (file.size > 8*1024*1024){ toast("Foto troppo grande (massimo 8 MB)."); photoInput.value=""; return; }
+        var path = state.profile.id + "/" + Date.now() + "-" + file.name.replace(/[^a-zA-Z0-9_.-]/g,"_");
+        toast("Caricamento foto…");
+        sb.storage.from("chat-media").upload(path, file).then(function(res){
+          if (res.error){ toast("Caricamento non riuscito: " + res.error.message); return; }
+          sendChatMessage(null, path);
+        });
+        photoInput.value = "";
+      });
+    }
+
+    var sendBtn = document.getElementById("chat-send-btn");
+    var textInput = document.getElementById("chat-text-input");
+    if (sendBtn && textInput){
+      sendBtn.addEventListener("click", function(){
+        var text = textInput.value.trim();
+        if (!text) return;
+        sendChatMessage(text, null);
+      });
+      textInput.addEventListener("keydown", function(e){
+        if (e.key==="Enter" && !e.shiftKey){ e.preventDefault(); sendBtn.click(); }
+      });
+    }
+  }
+
+  function sendChatMessage(testo, imagePath){
+    var payload = {
+      author_id: state.profile.id,
+      testo: testo || null,
+      image_path: imagePath || null,
+      reply_to_id: state._chatReplyTo || null,
+      is_avviso: false
+    };
+    sb.from("chat_messages").insert(payload).then(function(res){
+      if (res.error){ toast("Invio non riuscito: " + res.error.message); return; }
+      state._chatReplyTo = null;
+      var textInput = document.getElementById("chat-text-input");
+      if (textInput) textInput.value = "";
+      state._chatScrollPending = true;
+      loadChatData();
+    });
+  }
+
+  function loadChatData(){
+    Promise.all([
+      sb.from("chat_messages").select("*").order("created_at"),
+      sb.from("chat_reactions").select("*")
+    ]).then(function(res){
+      if (res[0].error || res[1].error) return;
+      state.chatMessages = res[0].data||[];
+      state.chatReactions = res[1].data||[];
+      if (state.activeTab==="chat"){ renderChat(); } else { updateChatBadge(); }
+    });
+  }
+  function markChatRead(){
+    if (!state.profile) return;
+    var now = new Date().toISOString();
+    state.chatLastRead = now;
+    updateChatBadge();
+    sb.from("chat_reads").upsert({profile_id: state.profile.id, last_read_at: now}).then(function(){});
+  }
+  function updateChatBadge(){
+    var badge = document.getElementById("chat-badge");
+    if (!badge || !state.profile) return;
+    var lastRead = state.chatLastRead ? new Date(state.chatLastRead) : null;
+    var count = state.chatMessages.filter(function(m){
+      if (m.author_id===state.profile.id) return false;
+      if (!lastRead) return true;
+      return new Date(m.created_at) > lastRead;
+    }).length;
+    if (count>0 && state.activeTab!=="chat"){
+      badge.textContent = count>99 ? "99+" : String(count);
+      badge.classList.remove("hidden");
+    } else {
+      badge.classList.add("hidden");
+    }
+  }
+
   /* ============ render: regolamento ============ */
   function renderRegolamento(){
     var maxSpend = regola("costo_stella_eur",10) * regola("max_stelle",5);
@@ -1312,13 +1595,20 @@
       document.getElementById("card-lightbox").classList.add("open");
       return;
     }
+    var ci = ev.target.closest(".chat-img");
+    if (ci){
+      document.getElementById("card-lightbox-img").src = ci.getAttribute("src");
+      document.getElementById("card-lightbox-img").alt = "";
+      document.getElementById("card-lightbox").classList.add("open");
+      return;
+    }
     if (ev.target.closest("#card-lightbox")){
       document.getElementById("card-lightbox").classList.remove("open");
     }
   });
 
   function renderAll(){
-    renderHome(); renderSquadra(); renderConcorrenti(); renderPuntate(); renderCarte(); renderRegolamento(); renderAdmin();
+    renderHome(); renderSquadra(); renderConcorrenti(); renderPuntate(); renderCarte(); renderChat(); renderRegolamento(); renderAdmin();
     selectTab(state.activeTab);
   }
 
