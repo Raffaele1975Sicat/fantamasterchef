@@ -366,6 +366,8 @@
     if (spento) bonus = 0;
     var salvato = findAct(episodeId, function(a){ return (a.card_key==="salvataggio"||a.card_key==="variazione_artusi") && a.team_id===team.id && a.target_concorrente_id===concorrenteId; });
     if (salvato) penalty = 0;
+    // Fornelli Spenti: dopo un eventuale annullamento, un'eventuale penalità residua raddoppia.
+    if (spento && penalty !== 0) penalty *= 2;
     var total = bonus + penalty;
     var raddoppia = findAct(episodeId, function(a){ return a.card_key==="secondo_intuito" && a.team_id===team.id && a.scelta==="x2" && a.target_concorrente_id===concorrenteId; });
     if (raddoppia) total *= 2;
@@ -419,6 +421,132 @@
   }
   function starsRemaining(team){
     return Number(team.stelle_acquistate||1) - starsSpent(team.id);
+  }
+
+  /* ============ stelle / carte: utilizzo ============ */
+  function draftEpisodes(){
+    return state.episodes.filter(function(e){ return !e.confermata; }).slice().sort(function(a,b){ return a.numero-b.numero; });
+  }
+  function ownActionableChefs(){
+    if (!state.myTeam) return [];
+    return teamChefsFor(state.myTeam.id, true).filter(function(tc){
+      var c = byId(state.concorrenti, tc.concorrente_id);
+      return c && !c.eliminato;
+    });
+  }
+  function opponentActionableChefs(){
+    if (!state.myTeam) return [];
+    return state.teamChefs.filter(function(tc){
+      if (tc.team_id===state.myTeam.id || !tc.attivo) return false;
+      if (tc.ruolo==="ombra" && !(state.meta && state.meta.ombra_svelato)) return false;
+      var c = byId(state.concorrenti, tc.concorrente_id);
+      return c && !c.eliminato;
+    });
+  }
+  function artusiTargets(){
+    if (!state.myTeam) return [];
+    var team = state.myTeam;
+    var chefs = teamChefsFor(team.id, true);
+    var confirmed = state.episodes.filter(function(e){ return e.confermata; });
+    var out = [];
+    confirmed.forEach(function(ep){
+      chefs.forEach(function(tc){
+        var ev = eventFor(ep.id, tc.concorrente_id);
+        if (!ev || !ev.penalita) return;
+        var already = findAct(ep.id, function(a){
+          return (a.card_key==="salvataggio"||a.card_key==="variazione_artusi") && a.team_id===team.id && a.target_concorrente_id===tc.concorrente_id;
+        });
+        if (already) return;
+        out.push({episodeId: ep.id, episodeNumero: ep.numero, concorrenteId: tc.concorrente_id});
+      });
+    });
+    return out;
+  }
+  function cardWindowInfo(key){
+    var reasons = [];
+    var draft = draftEpisodes();
+    if (key==="fornelli_spenti" || key==="secondo_intuito" || key==="salvataggio"){
+      if (!draft.length) reasons.push("Nessuna puntata in bozza al momento.");
+    }
+    if (key==="fornelli_spenti"){
+      if (!(state.meta && state.meta.brigate_visibili)) reasons.push("Le Brigate avversarie non sono ancora visibili.");
+      else if (!opponentActionableChefs().length) reasons.push("Nessuno Chef avversario disponibile.");
+    } else if (key==="secondo_intuito"){
+      var hasOwn = ownActionableChefs().length>0;
+      var hasOpp = !!(state.meta && state.meta.brigate_visibili) && opponentActionableChefs().length>0;
+      if (!hasOwn && !hasOpp) reasons.push("Nessuno Chef disponibile, né tuo né avversario.");
+    } else if (key==="salvataggio"){
+      if (!ownActionableChefs().length) reasons.push("La tua Brigata non è ancora stata impostata dall'admin.");
+    } else if (key==="variazione_artusi"){
+      if (!artusiTargets().length) reasons.push("Nessun tuo Chef ha una penalità in attesa di correzione.");
+    }
+    return {open: reasons.length===0, reasons: reasons};
+  }
+  function activationSummary(a){
+    var ep = byId(state.episodes, a.episode_id);
+    var parts = [];
+    if (ep) parts.push("Puntata "+ep.numero);
+    if (a.target_concorrente_id){
+      var name = concorrenteName(a.target_concorrente_id);
+      var t = a.target_team_id ? byId(state.teams, a.target_team_id) : null;
+      parts.push(name + (t ? " ("+displayName(t)+")" : ""));
+    }
+    if (a.scelta) parts.push(a.scelta==="x2" ? "×2" : "÷2");
+    return parts.length ? ('<div class="muted" style="font-size:11.5px;margin-top:2px;">'+esc(parts.join(" · "))+'</div>') : "";
+  }
+  function activationFormHtml(c){
+    var key = c.key;
+    var draft = draftEpisodes();
+    var epOpts = draft.map(function(e){ return '<option value="'+e.id+'">Puntata '+e.numero+'</option>'; }).join("");
+    if (key==="fornelli_spenti"){
+      var opp = opponentActionableChefs();
+      var oppOpts = opp.map(function(tc){
+        var t = byId(state.teams, tc.team_id);
+        return '<option value="'+tc.team_id+'|'+tc.concorrente_id+'">'+esc(concorrenteName(tc.concorrente_id))+' ('+esc(displayName(t))+')</option>';
+      }).join("");
+      return '<div style="display:flex;flex-direction:column;gap:6px;min-width:230px;">'
+        + '<select id="act-ep">'+epOpts+'</select>'
+        + '<select id="act-target">'+oppOpts+'</select>'
+        + '<div><button class="btn sm primary" id="act-confirm">Conferma</button> <button class="btn sm ghost" id="act-cancel">Annulla</button></div>'
+        + '</div>';
+    }
+    if (key==="secondo_intuito"){
+      var own = ownActionableChefs();
+      var opp2 = opponentActionableChefs();
+      var ownOpts = own.map(function(tc){ return '<option value="'+tc.concorrente_id+'">'+esc(concorrenteName(tc.concorrente_id))+'</option>'; }).join("");
+      var oppOpts2 = opp2.map(function(tc){
+        var t = byId(state.teams, tc.team_id);
+        return '<option value="'+tc.team_id+'|'+tc.concorrente_id+'">'+esc(concorrenteName(tc.concorrente_id))+' ('+esc(displayName(t))+')</option>';
+      }).join("");
+      return '<div style="display:flex;flex-direction:column;gap:6px;min-width:250px;">'
+        + '<select id="act-ep">'+epOpts+'</select>'
+        + '<label style="font-size:12.5px;"><input type="radio" name="act-mode" value="x2" checked> Raddoppia un tuo Chef</label>'
+        + '<select id="act-own" '+(own.length?"":"disabled")+'>'+(own.length?ownOpts:'<option value="">Nessuno disponibile</option>')+'</select>'
+        + '<label style="font-size:12.5px;"><input type="radio" name="act-mode" value="dimezza"'+(opp2.length?"":" disabled")+'> Dimezza uno Chef avversario</label>'
+        + '<select id="act-opp" disabled>'+(opp2.length?oppOpts2:'<option value="">Nessuno disponibile</option>')+'</select>'
+        + '<div><button class="btn sm primary" id="act-confirm">Conferma</button> <button class="btn sm ghost" id="act-cancel">Annulla</button></div>'
+        + '</div>';
+    }
+    if (key==="salvataggio"){
+      var own2 = ownActionableChefs();
+      var ownOpts2 = own2.map(function(tc){ return '<option value="'+tc.concorrente_id+'">'+esc(concorrenteName(tc.concorrente_id))+'</option>'; }).join("");
+      return '<div style="display:flex;flex-direction:column;gap:6px;min-width:230px;">'
+        + '<select id="act-ep">'+epOpts+'</select>'
+        + '<select id="act-own">'+ownOpts2+'</select>'
+        + '<div><button class="btn sm primary" id="act-confirm">Conferma</button> <button class="btn sm ghost" id="act-cancel">Annulla</button></div>'
+        + '</div>';
+    }
+    if (key==="variazione_artusi"){
+      var targets = artusiTargets();
+      var opts = targets.map(function(t){
+        return '<option value="'+t.episodeId+'|'+t.concorrenteId+'">Puntata '+t.episodeNumero+' — '+esc(concorrenteName(t.concorrenteId))+'</option>';
+      }).join("");
+      return '<div style="display:flex;flex-direction:column;gap:6px;min-width:230px;">'
+        + '<select id="act-target">'+opts+'</select>'
+        + '<div><button class="btn sm primary" id="act-confirm">Conferma</button> <button class="btn sm ghost" id="act-cancel">Annulla</button></div>'
+        + '</div>';
+    }
+    return "";
   }
 
   /* ============ tabs ============ */
@@ -543,9 +671,20 @@
       var actionHtml = "";
       if (team){
         var owned = myPurchases.some(function(p){ return p.card_key===c.key; });
-        if (owned){
-          var used = state.activations.some(function(a){ return a.team_id===team.id && a.card_key===c.key; });
-          actionHtml = used ? '<span class="badge ok">Utilizzata</span>' : '<span class="badge">Posseduta</span>';
+        if (owned && c.key==="chef_ombra"){
+          actionHtml = '<span class="badge ok">Posseduta</span>';
+        } else if (owned){
+          var myAct = state.activations.filter(function(a){ return a.team_id===team.id && a.card_key===c.key; })[0];
+          if (myAct){
+            actionHtml = '<span class="badge ok">Utilizzata</span>' + activationSummary(myAct);
+          } else if (state._activatingCard===c.key){
+            actionHtml = activationFormHtml(c);
+          } else {
+            var win = cardWindowInfo(c.key);
+            actionHtml = win.open
+              ? ('<button class="btn sm primary" data-activate-card="'+esc(c.key)+'">Usa</button>')
+              : ('<button class="btn sm ghost" disabled title="'+esc(win.reasons.join(" · "))+'">Non disponibile</button>');
+          }
         } else if (c.key==="chef_ombra" && state._pickingOmbra){
           var taken = teamChefsFor(team.id, true).map(function(tc){ return tc.concorrente_id; });
           var eligibili = state.concorrenti.filter(function(x){ return !x.eliminato && taken.indexOf(x.id)===-1; });
@@ -563,7 +702,7 @@
     });
     html += '</tbody></table></div>';
     if (team){
-      html += '<p class="section-sub" style="margin-top:-6px;margin-bottom:20px;">L\'utilizzo delle carte durante le puntate arriverà a breve: per ora puoi acquistarle e, per lo Chef Ombra, scegliere subito il tuo Chef segreto.</p>';
+      html += '<p class="section-sub" style="margin-top:-6px;margin-bottom:20px;">Ogni carta si utilizza una sola volta. La finestra di utilizzo dipende dalla carta: se non è disponibile, il motivo è indicato al posto del pulsante. La conferma è definitiva.</p>';
     }
 
     html += '<div class="section-head"><h3 style="font-size:15px;">Storico attivazioni</h3></div>';
@@ -622,6 +761,83 @@
     var ombraCancel = document.getElementById("ombra-cancel");
     if (ombraCancel){
       ombraCancel.addEventListener("click", function(){ state._pickingOmbra = false; renderCarte(); });
+    }
+
+    document.querySelectorAll("[data-activate-card]").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        state._activatingCard = btn.getAttribute("data-activate-card");
+        renderCarte();
+      });
+    });
+
+    var modeRadios = document.querySelectorAll('input[name="act-mode"]');
+    if (modeRadios.length){
+      var syncIntuitoMode = function(){
+        var checked = document.querySelector('input[name="act-mode"]:checked');
+        var mode = checked ? checked.value : "x2";
+        var ownEl = document.getElementById("act-own");
+        var oppEl = document.getElementById("act-opp");
+        if (ownEl) ownEl.disabled = (mode!=="x2");
+        if (oppEl) oppEl.disabled = (mode!=="dimezza");
+      };
+      modeRadios.forEach(function(r){ r.addEventListener("change", syncIntuitoMode); });
+      syncIntuitoMode();
+    }
+
+    var actConfirm = document.getElementById("act-confirm");
+    if (actConfirm){
+      actConfirm.addEventListener("click", function(){
+        var key = state._activatingCard;
+        var team = state.myTeam;
+        if (!key || !team) return;
+        var def = state.cardTypes.filter(function(c){ return c.key===key; })[0];
+        var payload = null;
+
+        if (key==="fornelli_spenti"){
+          var epEl = document.getElementById("act-ep");
+          var tgEl = document.getElementById("act-target");
+          if (!epEl || !epEl.value || !tgEl || !tgEl.value){ toast("Seleziona puntata e bersaglio."); return; }
+          var parts = tgEl.value.split("|");
+          payload = {team_id:team.id, card_key:key, episode_id:epEl.value, target_team_id:parts[0], target_concorrente_id:parts[1], scelta:null};
+        } else if (key==="secondo_intuito"){
+          var epEl2 = document.getElementById("act-ep");
+          if (!epEl2 || !epEl2.value){ toast("Seleziona la puntata."); return; }
+          var checked = document.querySelector('input[name="act-mode"]:checked');
+          var mode = checked ? checked.value : "x2";
+          if (mode==="x2"){
+            var ownEl = document.getElementById("act-own");
+            if (!ownEl || !ownEl.value){ toast("Seleziona un tuo Chef."); return; }
+            payload = {team_id:team.id, card_key:key, episode_id:epEl2.value, target_team_id:null, target_concorrente_id:ownEl.value, scelta:"x2"};
+          } else {
+            var oppEl = document.getElementById("act-opp");
+            if (!oppEl || !oppEl.value){ toast("Seleziona uno Chef avversario."); return; }
+            var oparts = oppEl.value.split("|");
+            payload = {team_id:team.id, card_key:key, episode_id:epEl2.value, target_team_id:oparts[0], target_concorrente_id:oparts[1], scelta:"dimezza"};
+          }
+        } else if (key==="salvataggio"){
+          var epEl3 = document.getElementById("act-ep");
+          var ownEl2 = document.getElementById("act-own");
+          if (!epEl3 || !epEl3.value || !ownEl2 || !ownEl2.value){ toast("Seleziona puntata e Chef."); return; }
+          payload = {team_id:team.id, card_key:key, episode_id:epEl3.value, target_team_id:null, target_concorrente_id:ownEl2.value, scelta:null};
+        } else if (key==="variazione_artusi"){
+          var tgEl2 = document.getElementById("act-target");
+          if (!tgEl2 || !tgEl2.value){ toast("Seleziona puntata e Chef."); return; }
+          var vparts = tgEl2.value.split("|");
+          payload = {team_id:team.id, card_key:key, episode_id:vparts[0], target_team_id:null, target_concorrente_id:vparts[1], scelta:null};
+        }
+
+        if (!payload) return;
+        if (!confirm('Confermi l\'utilizzo di "'+(def?def.label:key)+'"? L\'utilizzo è definitivo e irrevocabile.')) return;
+        sb.from("card_activations").insert(payload).then(function(res){
+          if (res.error){ toast("Utilizzo non riuscito: " + res.error.message); return; }
+          state._activatingCard = null;
+          afterWrite("Carta utilizzata.")(res);
+        });
+      });
+    }
+    var actCancel = document.getElementById("act-cancel");
+    if (actCancel){
+      actCancel.addEventListener("click", function(){ state._activatingCard = null; renderCarte(); });
     }
   }
 
@@ -719,7 +935,7 @@
 
     var teamOpts = state.teams.map(function(t){return '<option value="'+t.id+'">'+esc(displayName(t))+'</option>';}).join("");
     var epOpts = state.episodes.slice().sort(function(a,b){return b.numero-a.numero;}).map(function(e){return '<option value="'+e.id+'">Puntata '+e.numero+'</option>';}).join("");
-    var cardOpts = state.cardTypes.map(function(c){return '<option value="'+c.key+'">'+esc(c.label)+'</option>';}).join("");
+    var cardOpts = state.cardTypes.filter(function(c){return c.key!=="chef_ombra";}).map(function(c){return '<option value="'+c.key+'">'+esc(c.label)+'</option>';}).join("");
     var concOpts = state.concorrenti.map(function(c){return '<option value="'+c.id+'">'+esc(c.nome)+'</option>';}).join("");
     html += fieldset("Stelle & Carte — attivazione", ''
       + '<div class="field-row">'
