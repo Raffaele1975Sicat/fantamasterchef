@@ -681,6 +681,32 @@
         }).join("")
       + '</div>';
   }
+  function fmtDeadline(d){
+    if (!d || isNaN(d)) return "";
+    var datePart = d.toLocaleDateString("it-IT", {day:"numeric", month:"long", year:"numeric"});
+    if (d.getHours()===0 && d.getMinutes()===0) return datePart;
+    return datePart + " alle " + d.toLocaleTimeString("it-IT", {hour:"2-digit", minute:"2-digit"});
+  }
+  // La Brigata iniziale è modificabile liberamente finché non scatta la
+  // scadenza: quella personale (per chi entra in ritardo, impostata
+  // dall'Admin) se presente, altrimenti l'inizio della prima puntata. In
+  // più, se l'Admin rende le Brigate visibili a tutti, si considera comunque
+  // bloccata da quel momento (coerente con "diventa visibile a tutti
+  // all'inizio della prima puntata").
+  function brigataDeadlineFor(team){
+    if (!team) return null;
+    if (team.brigata_scadenza_personale) return new Date(team.brigata_scadenza_personale + "T00:00:00");
+    var ep1 = state.episodes.filter(function(e){ return e.numero===1 && e.data; })[0];
+    if (!ep1) return null;
+    return epSortKey(ep1);
+  }
+  function brigataLocked(team){
+    if (!team) return true;
+    if (state.meta && state.meta.brigate_visibili) return true;
+    var dl = brigataDeadlineFor(team);
+    if (!dl) return false;
+    return new Date() >= dl;
+  }
 
   /* ============ tabs ============ */
   function selectTab(tab){
@@ -806,14 +832,36 @@
       + '</div>';
 
     html += '<img src="illus-brigata.png" alt="" style="width:100%;max-width:220px;display:block;margin:0 auto 14px;border-radius:12px;">';
-    html += '<div class="card" style="padding:16px; margin-bottom:16px;"><h3 style="font-size:15px;">Brigata</h3><div>';
+    var locked = brigataLocked(team);
+    var dl = brigataDeadlineFor(team);
+    html += '<div class="card" style="padding:16px; margin-bottom:16px;">'
+      + '<div class="section-head" style="margin-bottom:8px;"><h3 style="font-size:15px;margin:0;">Brigata</h3>'
+      + (locked ? '' : '<button class="btn sm ghost" id="sq-edit-brigata">'+(state._editingBrigata?"Annulla":"Modifica")+'</button>')
+      + '</div><div>';
     if (brigata.length){
       brigata.forEach(function(tc){ html += '<span class="chip">'+esc(concorrenteName(tc.concorrente_id))+' <span class="muted">'+fmtNum(concorrenteCumulativo(tc.concorrente_id))+'</span></span>'; });
-    } else { html += '<span class="muted">Non ancora impostata dall\'admin.</span>'; }
+    } else { html += '<span class="muted">Non hai ancora scelto la tua Brigata.</span>'; }
     if (ombra){
       html += '<span class="chip ombra">Chef Ombra: '+(state.meta.ombra_svelato?esc(concorrenteName(ombra.concorrente_id)):"segreto, lo sai solo tu")+'</span>';
     }
-    html += '</div></div>';
+    html += '</div>';
+    if (locked){
+      html += '<p class="section-sub" style="margin-top:10px;">La scelta della Brigata è bloccata'+(dl?(' dal '+esc(fmtDeadline(dl))):'')+'. Per un cambio eccezionale contatta l\'Admin.</p>';
+    } else {
+      html += '<p class="section-sub" style="margin-top:10px;">'+(dl?('Puoi scegliere o cambiare i tuoi 3 Chef fino al '+esc(fmtDeadline(dl))+'.'):'Scegli i tuoi 3 Chef: la scelta resterà modificabile finché l\'Admin non fissa la data della prima puntata.')+'</p>';
+      if (state._editingBrigata){
+        var eligibili = state.concorrenti.filter(function(c){ return !c.eliminato; });
+        var curBrigata = brigata.filter(function(tc){ return tc.ruolo==="brigata"; });
+        var selHtml = [0,1,2].map(function(i){
+          var cur = curBrigata[i] ? curBrigata[i].concorrente_id : "";
+          var opts = eligibili.map(function(c){ return '<option value="'+c.id+'" '+(cur===c.id?"selected":"")+'>'+esc(c.nome)+'</option>'; }).join("");
+          return '<select data-sq-brigata="'+i+'"><option value="">—</option>'+opts+'</select>';
+        }).join("");
+        html += '<div style="margin-top:10px;display:flex;flex-direction:column;gap:8px;max-width:280px;">'+selHtml
+          + '<div><button class="btn sm primary" id="sq-save-brigata">Salva Brigata</button></div></div>';
+      }
+    }
+    html += '</div>';
 
     if (row && row.perEp.length){
       html += '<div class="card" style="padding:16px;"><h3 style="font-size:15px;">Storico puntata per puntata</h3>'
@@ -822,6 +870,24 @@
         + '</tbody></table></div></div>';
     }
     el.innerHTML = html;
+    bindSquadraEvents();
+  }
+  function bindSquadraEvents(){
+    var editBtn = document.getElementById("sq-edit-brigata");
+    if (editBtn){
+      editBtn.addEventListener("click", function(){
+        state._editingBrigata = !state._editingBrigata;
+        renderSquadra();
+      });
+    }
+    var saveBtn = document.getElementById("sq-save-brigata");
+    if (saveBtn){
+      saveBtn.addEventListener("click", function(){
+        if (!state.myTeam) return;
+        var ids = Array.prototype.map.call(document.querySelectorAll("[data-sq-brigata]"), function(sel){ return sel.value; });
+        saveBrigata(state.myTeam.id, ids, "Brigata salvata.");
+      });
+    }
   }
   /* ============ render: concorrenti ============ */
   function renderConcorrenti(){
@@ -1390,21 +1456,31 @@
     );
 
     var teamBlocks = state.teams.map(function(t){
-      var opts = state.concorrenti.map(function(c){ return '<option value="'+c.id+'">'+esc(c.nome)+'</option>'; }).join("");
+      var eligibili = state.concorrenti.filter(function(c){ return !c.eliminato; });
+      var optsFor = function(selectedId){
+        return eligibili.map(function(c){ return '<option value="'+c.id+'" '+(selectedId===c.id?"selected":"")+'>'+esc(c.nome)+'</option>'; }).join("");
+      };
       var cur = state.teamChefs.filter(function(tc){ return tc.team_id===t.id && tc.attivo; });
+      var curBrigata = cur.filter(function(tc){ return tc.ruolo==="brigata"; });
       var b = [0,1,2].map(function(i){
-        var slot = cur.filter(function(tc){return tc.ruolo==="brigata";})[i];
-        return '<select data-brigata="'+i+'" data-team="'+t.id+'"><option value="">—</option>'+opts+'</select>';
+        var slot = curBrigata[i];
+        return '<select data-team-brigata="'+i+'">'
+          + '<option value="">—</option>' + optsFor(slot?slot.concorrente_id:null)
+          + '</select>';
       });
       var ombraSel = cur.filter(function(tc){return tc.ruolo==="ombra";})[0];
-      return '<div class="card" style="padding:14px; margin-bottom:10px;">'
+      return '<div class="card" style="padding:14px; margin-bottom:10px;" data-team-block="'+t.id+'">'
         + '<div class="field-row" style="align-items:flex-end;">'
         + '<label class="field"><span>Nome squadra</span><input data-team-name="'+t.id+'" value="'+esc(t.nome_squadra||"")+'"></label>'
         + '<label class="field"><span>Stelle</span><input type="number" min="0" max="'+regola("max_stelle",5)+'" data-team-stars="'+t.id+'" value="'+(t.stelle_acquistate||1)+'"></label>'
         + '<label class="field"><span>Punti ingresso</span><input type="number" data-team-entry="'+t.id+'" value="'+(t.punti_ingresso||0)+'"></label>'
         + '</div>'
-        + '<div class="field-row"><span class="section-sub" style="align-self:center;">Brigata:</span>' + b.join("") + '</div>'
-        + '<div class="field-row"><span class="section-sub" style="align-self:center;">Chef Ombra:</span><select data-ombra="1" data-team="'+t.id+'"><option value="">Nessuno</option>'+opts+'</select></div>'
+        + '<div class="field-row" style="align-items:flex-end;">'
+        + '<span class="section-sub" style="align-self:center;">Brigata:</span>' + b.join("")
+        + '<button class="btn sm" data-save-team-brigata="'+t.id+'">Salva Brigata</button>'
+        + '</div>'
+        + '<div class="field-row"><span class="section-sub" style="align-self:center;">Chef Ombra:</span><select data-ombra="1" data-team="'+t.id+'"><option value="">Nessuno</option>'+optsFor(ombraSel?ombraSel.concorrente_id:null)+'</select></div>'
+        + '<div class="field-row"><label class="field"><span>Scadenza Brigata personalizzata (facoltativa, per chi entra in ritardo)</span><input type="date" data-team-scadenza-brigata="'+t.id+'" value="'+(t.brigata_scadenza_personale||"")+'"></label></div>'
         + '</div>';
     }).join("");
     html += fieldset("Giocatori & Squadre", teamBlocks);
@@ -1550,10 +1626,17 @@
     document.querySelectorAll("[data-team-entry]").forEach(function(inp){
       inp.addEventListener("change", function(){ sb.from("teams").update({punti_ingresso:Number(inp.value)||0}).eq("id", inp.getAttribute("data-team-entry")).then(afterWrite("Salvato.")); });
     });
-    document.querySelectorAll("[data-brigata]").forEach(function(sel){
-      sel.addEventListener("change", function(){
-        var teamId = sel.getAttribute("data-team");
-        upsertTeamChef(teamId, sel.value, "brigata");
+    document.querySelectorAll("[data-save-team-brigata]").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        var teamId = btn.getAttribute("data-save-team-brigata");
+        var block = btn.closest("[data-team-block]");
+        var ids = Array.prototype.map.call(block.querySelectorAll("[data-team-brigata]"), function(sel){ return sel.value; });
+        saveBrigata(teamId, ids, "Brigata salvata.");
+      });
+    });
+    document.querySelectorAll("[data-team-scadenza-brigata]").forEach(function(inp){
+      inp.addEventListener("change", function(){
+        sb.from("teams").update({brigata_scadenza_personale: inp.value || null}).eq("id", inp.getAttribute("data-team-scadenza-brigata")).then(afterWrite("Salvato."));
       });
     });
     document.querySelectorAll("[data-ombra]").forEach(function(sel){
@@ -1647,11 +1730,31 @@
       return r.json().then(function(body){ return {status:r.status, body:body}; });
     });
   }
-  function upsertTeamChef(teamId, concorrenteId, ruolo){
-    var existing = state.teamChefs.filter(function(tc){ return tc.team_id===teamId && tc.ruolo===ruolo; });
-    Promise.all(existing.map(function(tc){ return sb.from("team_chefs").delete().eq("id", tc.id); })).then(function(){
-      if (!concorrenteId){ afterWrite("Fatto.")(); return; }
-      sb.from("team_chefs").insert({team_id:teamId, concorrente_id:concorrenteId, ruolo:ruolo}).then(afterWrite("Fatto."));
+  // Salva l'intera Brigata (fino a 3 Chef) come insieme coerente: calcola il
+  // differenziale rispetto a quella attuale e rimuove prima, aggiunge dopo,
+  // così il conteggio "massimo 3" lato database non scatta mai per errore
+  // durante il salvataggio. Usata sia dal giocatore (Squadra) sia dall'Admin.
+  function saveBrigata(teamId, rawIds, doneMsg){
+    var seen = {};
+    var wanted = [];
+    (rawIds||[]).forEach(function(id){
+      if (!id || seen[id]) return;
+      seen[id] = true;
+      wanted.push(id);
+    });
+    var current = state.teamChefs.filter(function(tc){ return tc.team_id===teamId && tc.ruolo==="brigata" && tc.attivo; });
+    var toRemove = current.filter(function(tc){ return wanted.indexOf(tc.concorrente_id)===-1; });
+    var toAdd = wanted.filter(function(cid){ return !current.some(function(tc){ return tc.concorrente_id===cid; }); });
+    Promise.all(toRemove.map(function(tc){ return sb.from("team_chefs").delete().eq("id", tc.id); })).then(function(delResults){
+      var delErr = (delResults||[]).filter(function(r){ return r && r.error; })[0];
+      if (delErr){ toast("Errore: " + delErr.error.message); return; }
+      if (!toAdd.length){ state._editingBrigata = false; afterWrite(doneMsg||"Fatto.")(); return; }
+      var rows = toAdd.map(function(cid){ return {team_id:teamId, concorrente_id:cid, ruolo:"brigata"}; });
+      sb.from("team_chefs").insert(rows).then(function(res){
+        if (res.error){ toast("Errore: " + res.error.message); return; }
+        state._editingBrigata = false;
+        afterWrite(doneMsg||"Fatto.")(res);
+      });
     });
   }
 
