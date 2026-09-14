@@ -73,6 +73,9 @@
   .bottombar button{flex:1; background:none; border:none; color:var(--ink-faint); font-size:11px; padding:8px 2px 10px; display:flex; flex-direction:column; align-items:center; gap:3px;}
   .bottombar button.active{color:var(--gold-strong);}
   .bottombar button .dot{width:6px; height:6px; border-radius:50%; background:currentColor;}
+  .more-panel{position:absolute; bottom:100%; right:6px; margin-bottom:8px; background:var(--panel); border:1px solid var(--line); border-radius:12px; box-shadow:0 -8px 24px rgba(0,0,0,.4); padding:6px; display:flex; flex-direction:column; min-width:170px;}
+  .more-panel button{flex:none; flex-direction:row; justify-content:flex-start; gap:8px; padding:11px 12px; font-size:13.5px; border-radius:8px;}
+  .more-panel button:active{background:var(--panel2);}
   .empty{padding:30px 16px; text-align:center; color:var(--ink-faint);}
   #toast-root{position:fixed; top:14px; left:50%; transform:translateX(-50%); z-index:99; display:flex; flex-direction:column; gap:8px;}
   .toast{background:#2a2313; border:1px solid var(--gold); color:var(--ink); padding:10px 16px; border-radius:9px; font-size:13.5px; box-shadow:0 6px 20px rgba(0,0,0,.4);}
@@ -158,12 +161,15 @@
 <nav class="bottombar hidden" id="bottombar">
   <button data-tab="home"><span class="dot"></span>Home</button>
   <button data-tab="squadra"><span class="dot"></span>Squadra</button>
-  <button data-tab="concorrenti"><span class="dot"></span>Chef</button>
-  <button data-tab="puntate"><span class="dot"></span>Puntate</button>
   <button data-tab="carte"><span class="dot"></span>Carte</button>
   <button data-tab="chat"><span class="dot"></span>Chat<span class="chat-badge hidden" id="chat-badge">0</span></button>
-  <button data-tab="regolamento"><span class="dot"></span>Regole</button>
-  <button data-tab="admin" id="admin-nav-btn" style="display:none;"><span class="dot"></span>Admin</button>
+  <button type="button" id="more-nav-btn"><span class="dot"></span>Altro</button>
+  <div class="more-panel hidden" id="more-panel">
+    <button data-tab="concorrenti"><span class="dot"></span>Chef</button>
+    <button data-tab="puntate"><span class="dot"></span>Puntate</button>
+    <button data-tab="regolamento"><span class="dot"></span>Regole</button>
+    <button data-tab="admin" id="admin-nav-btn" style="display:none;"><span class="dot"></span>Pannello Admin</button>
+  </div>
 </nav>
 
 <div id="toast-root"></div>
@@ -709,11 +715,18 @@
   }
 
   /* ============ tabs ============ */
+  // Voci "secondarie" raccolte nel menu a tendina "Altro" del bottombar, per
+  // non affollare la barra su schermi stretti (richiesto dall'utente).
+  var OVERFLOW_TABS = ["concorrenti","puntate","regolamento","admin"];
   function selectTab(tab){
     var leavingChat = state.activeTab==="chat" && tab!=="chat";
     state.activeTab = tab;
     document.querySelectorAll(".tab-panel").forEach(function(p){ p.classList.toggle("active", p.getAttribute("data-panel")===tab); });
     document.querySelectorAll(".bottombar button[data-tab]").forEach(function(b){ b.classList.toggle("active", b.getAttribute("data-tab")===tab); });
+    var moreBtn = document.getElementById("more-nav-btn");
+    if (moreBtn) moreBtn.classList.toggle("active", OVERFLOW_TABS.indexOf(tab)!==-1);
+    var morePanel = document.getElementById("more-panel");
+    if (morePanel) morePanel.classList.add("hidden");
     window.scrollTo(0,0);
     if (tab==="chat"){
       state._chatScrollPending = true;
@@ -730,6 +743,18 @@
   document.getElementById("bottombar").addEventListener("click", function(e){
     var b = e.target.closest("button[data-tab]");
     if (b) selectTab(b.getAttribute("data-tab"));
+  });
+  // Menu "Altro": si apre/chiude al tocco e si chiude da solo toccando
+  // altrove o scegliendo una voce (quest'ultimo già gestito in selectTab).
+  document.getElementById("more-nav-btn").addEventListener("click", function(e){
+    e.stopPropagation();
+    document.getElementById("more-panel").classList.toggle("hidden");
+  });
+  document.addEventListener("click", function(e){
+    var panel = document.getElementById("more-panel");
+    if (!panel || panel.classList.contains("hidden")) return;
+    if (e.target.closest("#more-panel") || e.target.closest("#more-nav-btn")) return;
+    panel.classList.add("hidden");
   });
 
   /* ============ render: home / classifica ============ */
