@@ -102,20 +102,11 @@
     <p class="section-sub" style="text-align:center; margin-bottom:18px;">Stagione 2026/2027</p>
 
     <div id="login-form">
-      <div class="field"><label>Email</label><input type="email" id="login-email" autocomplete="username"></div>
+      <div class="field"><label>Username</label><input type="text" id="login-username" autocomplete="username" autocapitalize="none" autocorrect="off"></div>
       <div class="field"><label>Password</label><input type="password" id="login-password" autocomplete="current-password"></div>
       <button class="btn primary block" id="login-btn">Accedi</button>
       <p class="err hidden" id="login-error"></p>
-      <p class="tabs-link">Non hai un account? <span id="show-signup">Registrati</span></p>
-    </div>
-
-    <div id="signup-form" class="hidden">
-      <div class="field"><label>Nome da mostrare agli altri</label><input type="text" id="signup-name" placeholder="Es. Marco R."></div>
-      <div class="field"><label>Email</label><input type="email" id="signup-email" autocomplete="username"></div>
-      <div class="field"><label>Password (almeno 6 caratteri)</label><input type="password" id="signup-password" autocomplete="new-password"></div>
-      <button class="btn primary block" id="signup-btn">Crea account</button>
-      <p class="err hidden" id="signup-error"></p>
-      <p class="tabs-link">Hai già un account? <span id="show-login">Accedi</span></p>
+      <p class="tabs-link">Account smarrito o nuovo? Chiedi all'Admin della lega.</p>
     </div>
   </div>
 </div>
@@ -250,42 +241,43 @@
   }
 
   /* ============ auth ============ */
-  document.getElementById("show-signup").addEventListener("click", function(){
-    document.getElementById("login-form").classList.add("hidden");
-    document.getElementById("signup-form").classList.remove("hidden");
-  });
-  document.getElementById("show-login").addEventListener("click", function(){
-    document.getElementById("signup-form").classList.add("hidden");
-    document.getElementById("login-form").classList.remove("hidden");
-  });
-
+  // Login by USERNAME: the browser never sees or handles the internal auth
+  // email. It calls the login-username Edge Function, which resolves the
+  // username server-side and verifies the password through Supabase Auth,
+  // returning only a session token pair. Public self-registration has been
+  // removed: accounts are created only by the Admin.
   document.getElementById("login-btn").addEventListener("click", function(){
-    var email = document.getElementById("login-email").value.trim();
+    var username = document.getElementById("login-username").value.trim();
     var password = document.getElementById("login-password").value;
     var errEl = document.getElementById("login-error");
     errEl.classList.add("hidden");
-    sb.auth.signInWithPassword({email:email, password:password}).then(function(res){
-      if (res.error){ errEl.textContent = "Accesso non riuscito: " + res.error.message; errEl.classList.remove("hidden"); return; }
-      onAuthed();
-    });
-  });
-
-  document.getElementById("signup-btn").addEventListener("click", function(){
-    var name = document.getElementById("signup-name").value.trim();
-    var email = document.getElementById("signup-email").value.trim();
-    var password = document.getElementById("signup-password").value;
-    var errEl = document.getElementById("signup-error");
-    errEl.classList.add("hidden");
-    if (!name || !email || password.length<6){ errEl.textContent = "Compila nome, email e una password di almeno 6 caratteri."; errEl.classList.remove("hidden"); return; }
-    sb.auth.signUp({email:email, password:password, options:{data:{username:email.split("@")[0], display_name:name}}}).then(function(res){
-      if (res.error){ errEl.textContent = "Registrazione non riuscita: " + res.error.message; errEl.classList.remove("hidden"); return; }
-      // crea la squadra collegata, se non esiste già (idempotente)
-      var uid = res.data.user && res.data.user.id;
-      if (!uid){ errEl.textContent = "Registrazione avvenuta ma senza sessione attiva: prova ad accedere."; errEl.classList.remove("hidden"); return; }
-      sb.from("teams").select("id").eq("profile_id", uid).then(function(r){
-        if (r.data && r.data.length){ onAuthed(); return; }
-        sb.from("teams").insert({profile_id:uid, nome_squadra: name}).then(function(){ onAuthed(); });
+    if (!username || !password){
+      errEl.textContent = "Inserisci username e password.";
+      errEl.classList.remove("hidden");
+      return;
+    }
+    var btn = document.getElementById("login-btn");
+    btn.disabled = true;
+    fetch(SUPABASE_URL + "/functions/v1/login-username", {
+      method: "POST",
+      headers: {"Content-Type":"application/json", "apikey":SUPABASE_KEY, "Authorization":"Bearer "+SUPABASE_KEY},
+      body: JSON.stringify({username:username, password:password})
+    }).then(function(r){
+      return r.json().then(function(body){ return {status:r.status, body:body}; });
+    }).then(function(res){
+      btn.disabled = false;
+      if (!res.body || !res.body.session){
+        errEl.textContent = (res.body && res.body.error) || "Credenziali non valide.";
+        errEl.classList.remove("hidden");
+        return;
+      }
+      sb.auth.setSession({access_token: res.body.session.access_token, refresh_token: res.body.session.refresh_token}).then(function(){
+        onAuthed();
       });
+    }).catch(function(){
+      btn.disabled = false;
+      errEl.textContent = "Credenziali non valide.";
+      errEl.classList.remove("hidden");
     });
   });
 
