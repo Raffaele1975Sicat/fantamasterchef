@@ -86,9 +86,14 @@
   .install-banner-inner{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
   .install-banner-inner span{flex:1; min-width:180px; line-height:1.4;}
   .install-banner-inner .btn{flex-shrink:0;}
+  #card-lightbox{position:fixed; inset:0; background:rgba(0,0,0,.75); display:none; align-items:center; justify-content:center; z-index:999; padding:24px;}
+  #card-lightbox.open{display:flex;}
+  #card-lightbox img{max-width:min(90vw,420px); max-height:85vh; border-radius:14px; box-shadow:0 10px 40px rgba(0,0,0,.5);}
 </style>
 </head>
 <body>
+
+<div id="card-lightbox"><img id="card-lightbox-img" src="" alt=""></div>
 
 <div id="auth-screen">
   <div class="card auth-card">
@@ -213,6 +218,7 @@
   var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
   var CARD_ICON = {chef_ombra:"🥷", fornelli_spenti:"🔥", secondo_intuito:"🔮", salvataggio:"🛟", variazione_artusi:"🥸"};
+  var CARD_IMG = {chef_ombra:"card-chef-ombra.png", fornelli_spenti:"card-fornelli-spenti.png", secondo_intuito:"card-secondo-intuito.png", salvataggio:"card-salvataggio.png", variazione_artusi:"card-variazione-artusi.png"};
 
   /* ============ state ============ */
   var state = {
@@ -428,9 +434,10 @@
   function renderHome(){
     var standings = computeStandings();
     var started = state.episodes.some(function(e){ return e.confermata; });
-    var html = '<div class="section-head"><div><h2>Classifica</h2><p class="section-sub">Il Premio Artusi va a chi totalizza più punti a fine stagione.</p></div></div>';
+    var html = '<img src="illus-home.png" alt="" style="width:100%;max-width:260px;display:block;margin:0 auto 14px;border-radius:12px;">';
+    html += '<div class="section-head"><div><h2>Classifica</h2><p class="section-sub">Il Premio Artusi va a chi totalizza più punti a fine stagione.</p></div></div>';
     if (!started){
-      html += '<div class="card empty">La stagione non è ancora iniziata: la classifica apparirà dopo la prima puntata confermata.</div>';
+      html += '<div class="card empty" style="text-align:center;"><img src="state-nessun-risultato.png" alt="" style="width:120px;display:block;margin:0 auto 10px;">La stagione non è ancora iniziata: la classifica apparirà dopo la prima puntata confermata.</div>';
     } else {
       html += '<div class="card">';
       standings.forEach(function(r){
@@ -471,6 +478,7 @@
       + '<div><div class="section-sub">Stelle disponibili</div><div style="font-family:Fraunces,serif; font-size:26px;">'+remaining+' / '+(team.stelle_acquistate||1)+'</div></div>'
       + '</div>';
 
+    html += '<img src="illus-brigata.png" alt="" style="width:100%;max-width:220px;display:block;margin:0 auto 14px;border-radius:12px;">';
     html += '<div class="card" style="padding:16px; margin-bottom:16px;"><h3 style="font-size:15px;">Brigata</h3><div>';
     if (brigata.length){
       brigata.forEach(function(tc){ html += '<span class="chip">'+esc(concorrenteName(tc.concorrente_id))+' <span class="muted">'+fmtNum(concorrenteCumulativo(tc.concorrente_id))+'</span></span>'; });
@@ -523,16 +531,17 @@
 
   /* ============ render: carte ============ */
   function renderCarte(){
-    var html = '<div class="section-head"><div><h2>Carte</h2><p class="section-sub">Ogni carta si acquista una sola volta per squadra.</p></div></div>';
+    var html = '<img src="illus-carte.png" alt="" style="width:100%;max-width:260px;display:block;margin:0 auto 14px;border-radius:12px;">';
+    html += '<div class="section-head"><div><h2>Carte</h2><p class="section-sub">Ogni carta si acquista una sola volta per squadra. Tocca l\'immagine per vederla intera.</p></div></div>';
     html += '<div class="table-wrap" style="margin-bottom:20px;"><table><thead><tr><th>Carta</th><th class="num">Costo</th><th>Descrizione</th></tr></thead><tbody>';
     state.cardTypes.forEach(function(c){
-      html += '<tr><td>'+(CARD_ICON[c.key]||"")+' '+esc(c.label)+'</td><td class="num">'+c.costo_stelle+'★</td><td>'+esc(c.descrizione)+'</td></tr>';
+      html += '<tr><td><img src="'+(CARD_IMG[c.key]||"")+'" alt="" class="card-thumb" data-card-img="'+(CARD_IMG[c.key]||"")+'" data-card-label="'+esc(c.label)+'" style="width:34px;height:51px;object-fit:cover;border-radius:4px;vertical-align:middle;cursor:pointer;margin-right:8px;"> '+esc(c.label)+'</td><td class="num">'+c.costo_stelle+'★</td><td>'+esc(c.descrizione)+'</td></tr>';
     });
     html += '</tbody></table></div>';
 
     html += '<div class="section-head"><h3 style="font-size:15px;">Storico attivazioni</h3></div>';
     if (!state.activationsPublic.length){
-      html += '<div class="card empty">Nessuna carta attivata finora.</div>';
+      html += '<div class="card empty" style="text-align:center;"><img src="state-nessuna-carta.png" alt="" style="width:120px;display:block;margin:0 auto 10px;">Nessuna carta attivata finora.</div>';
     } else {
       html += '<div class="table-wrap"><table><thead><tr><th>Puntata</th><th>Squadra</th><th>Carta</th></tr></thead><tbody>';
       state.activationsPublic.slice().reverse().forEach(function(a){
@@ -549,7 +558,8 @@
   /* ============ render: regolamento ============ */
   function renderRegolamento(){
     var maxSpend = regola("costo_stella_eur",10) * regola("max_stelle",5);
-    var html = '<div class="section-head"><div><h2>Regolamento</h2></div></div>';
+    var html = '<img src="illus-regolamento.png" alt="" style="width:100%;max-width:260px;display:block;margin:0 auto 14px;border-radius:12px;">';
+    html += '<div class="section-head"><div><h2>Regolamento</h2></div></div>';
     html += '<div class="card" style="padding:16px; margin-bottom:14px;"><h3 style="font-size:14px;">Come si fanno i punti</h3>'
       + '<p class="section-sub">Bonus: Mystery Box +'+regola("bonus_mystery_box",3)+' · Esterna +'+regola("bonus_esterna",4)+' · Cucina +'+regola("bonus_cucina",4)+' · Miglior piatto +'+regola("bonus_miglior_piatto",2)+'</p>'
       + '<p class="section-sub">Penalità: Grembiule Nero '+regola("penalita_nero",-3)+' · Persa Esterna '+regola("penalita_esterna",-2)+' (non cumulabili tra loro)</p>'
@@ -776,6 +786,19 @@
       sb.from("team_chefs").insert({team_id:teamId, concorrente_id:concorrenteId, ruolo:ruolo}).then(afterWrite("Fatto."));
     });
   }
+
+  document.addEventListener("click", function(ev){
+    var t = ev.target.closest(".card-thumb");
+    if (t){
+      document.getElementById("card-lightbox-img").src = t.getAttribute("data-card-img");
+      document.getElementById("card-lightbox-img").alt = t.getAttribute("data-card-label")||"";
+      document.getElementById("card-lightbox").classList.add("open");
+      return;
+    }
+    if (ev.target.closest("#card-lightbox")){
+      document.getElementById("card-lightbox").classList.remove("open");
+    }
+  });
 
   function renderAll(){
     renderHome(); renderSquadra(); renderConcorrenti(); renderPuntate(); renderCarte(); renderRegolamento(); renderAdmin();
