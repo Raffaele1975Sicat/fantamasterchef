@@ -410,6 +410,17 @@
   }
   function concorrenteName(id){ var c = byId(state.concorrenti, id); return c?c.nome:"—"; }
 
+  /* ============ stelle / carte: acquisto ============ */
+  function starsSpent(teamId){
+    return state.purchases.filter(function(p){ return p.team_id===teamId; }).reduce(function(s,p){
+      var def = state.cardTypes.filter(function(c){ return c.key===p.card_key; })[0];
+      return s + (def?Number(def.costo_stelle):0);
+    }, 0);
+  }
+  function starsRemaining(team){
+    return Number(team.stelle_acquistate||1) - starsSpent(team.id);
+  }
+
   /* ============ tabs ============ */
   function selectTab(tab){
     state.activeTab = tab;
@@ -456,12 +467,7 @@
     var row = standings.filter(function(r){ return r.team.id===team.id; })[0];
     var brigata = teamChefsFor(team.id, true).filter(function(tc){ return tc.ruolo==="brigata"||tc.ruolo==="sostituto"; });
     var ombra = state.teamChefs.filter(function(tc){ return tc.team_id===team.id && tc.ruolo==="ombra" && tc.attivo; })[0];
-    var spentStars = state.purchases.filter(function(p){ return p.team_id===team.id; }).reduce(function(s,p){
-      var ct = byId(state.cardTypes, null); // placeholder
-      var def = state.cardTypes.filter(function(c){return c.key===p.card_key;})[0];
-      return s + (def?Number(def.costo_stelle):0);
-    }, 0);
-    var remaining = Number(team.stelle_acquistate||1) - spentStars;
+    var remaining = starsRemaining(team);
 
     var html = '<div class="section-head"><div><h2>'+esc(displayName(team))+'</h2><p class="section-sub">Il tuo cruscotto personale.</p></div></div>';
     html += '<div class="card" style="padding:16px; margin-bottom:16px; display:flex; gap:24px; flex-wrap:wrap;">'
@@ -523,13 +529,42 @@
 
   /* ============ render: carte ============ */
   function renderCarte(){
+    var team = state.myTeam;
+    var remaining = team ? starsRemaining(team) : 0;
+    var myPurchases = team ? state.purchases.filter(function(p){ return p.team_id===team.id; }) : [];
+
     var html = '<img src="illus-carte.png" alt="" style="width:100%;max-width:260px;display:block;margin:0 auto 14px;border-radius:12px;">';
     html += '<div class="section-head"><div><h2>Carte</h2><p class="section-sub">Ogni carta si acquista una sola volta per squadra. Tocca l\'immagine per vederla intera.</p></div></div>';
-    html += '<div class="table-wrap" style="margin-bottom:20px;"><table><thead><tr><th>Carta</th><th class="num">Costo</th><th>Descrizione</th></tr></thead><tbody>';
+    if (team){
+      html += '<div class="card" style="padding:12px 16px; margin-bottom:16px;"><span class="section-sub">Stelle disponibili: <b>'+remaining+' / '+(team.stelle_acquistate||1)+'</b></span></div>';
+    }
+    html += '<div class="table-wrap" style="margin-bottom:14px;"><table><thead><tr><th>Carta</th><th class="num">Costo</th><th>Descrizione</th><th></th></tr></thead><tbody>';
     state.cardTypes.forEach(function(c){
-      html += '<tr><td><img src="'+(CARD_IMG[c.key]||"")+'" alt="" class="card-thumb" data-card-img="'+(CARD_IMG[c.key]||"")+'" data-card-label="'+esc(c.label)+'" style="width:34px;height:51px;object-fit:cover;border-radius:4px;vertical-align:middle;cursor:pointer;margin-right:8px;"> '+esc(c.label)+'</td><td class="num">'+c.costo_stelle+'★</td><td>'+esc(c.descrizione)+'</td></tr>';
+      var actionHtml = "";
+      if (team){
+        var owned = myPurchases.some(function(p){ return p.card_key===c.key; });
+        if (owned){
+          var used = state.activations.some(function(a){ return a.team_id===team.id && a.card_key===c.key; });
+          actionHtml = used ? '<span class="badge ok">Utilizzata</span>' : '<span class="badge">Posseduta</span>';
+        } else if (c.key==="chef_ombra" && state._pickingOmbra){
+          var taken = teamChefsFor(team.id, true).map(function(tc){ return tc.concorrente_id; });
+          var eligibili = state.concorrenti.filter(function(x){ return !x.eliminato && taken.indexOf(x.id)===-1; });
+          actionHtml = eligibili.length
+            ? ('<select id="ombra-select" style="margin-right:6px;">' + eligibili.map(function(x){ return '<option value="'+x.id+'">'+esc(x.nome)+'</option>'; }).join("") + '</select>'
+              + '<button class="btn sm primary" id="ombra-confirm">Conferma</button> '
+              + '<button class="btn sm ghost" id="ombra-cancel">Annulla</button>')
+            : '<span class="muted">Nessuno Chef disponibile</span>';
+        } else {
+          var afford = remaining >= Number(c.costo_stelle);
+          actionHtml = '<button class="btn sm '+(afford?'primary':'ghost')+'" data-buy-card="'+esc(c.key)+'" '+(afford?'':'disabled title="Stelle insufficienti"')+'>Compra</button>';
+        }
+      }
+      html += '<tr><td><img src="'+(CARD_IMG[c.key]||"")+'" alt="" class="card-thumb" data-card-img="'+(CARD_IMG[c.key]||"")+'" data-card-label="'+esc(c.label)+'" style="width:34px;height:51px;object-fit:cover;border-radius:4px;vertical-align:middle;cursor:pointer;margin-right:8px;"> '+esc(c.label)+'</td><td class="num">'+c.costo_stelle+'★</td><td>'+esc(c.descrizione)+'</td><td style="white-space:nowrap;">'+actionHtml+'</td></tr>';
     });
     html += '</tbody></table></div>';
+    if (team){
+      html += '<p class="section-sub" style="margin-top:-6px;margin-bottom:20px;">L\'utilizzo delle carte durante le puntate arriverà a breve: per ora puoi acquistarle e, per lo Chef Ombra, scegliere subito il tuo Chef segreto.</p>';
+    }
 
     html += '<div class="section-head"><h3 style="font-size:15px;">Storico attivazioni</h3></div>';
     if (!state.activationsPublic.length){
@@ -545,6 +580,49 @@
       html += '</tbody></table></div>';
     }
     document.getElementById("panel-carte").innerHTML = html;
+    bindCarteEvents();
+  }
+
+  function bindCarteEvents(){
+    document.querySelectorAll("[data-buy-card]").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        var key = btn.getAttribute("data-buy-card");
+        if (key === "chef_ombra"){
+          state._pickingOmbra = true;
+          renderCarte();
+          return;
+        }
+        var def = state.cardTypes.filter(function(c){ return c.key===key; })[0];
+        if (!def || !state.myTeam) return;
+        if (!confirm('Confermi l\'acquisto di "'+def.label+'" per '+def.costo_stelle+'★? L\'acquisto è definitivo.')) return;
+        sb.from("card_purchases").insert({team_id: state.myTeam.id, card_key: key}).then(function(res){
+          if (res.error){ toast("Acquisto non riuscito: " + res.error.message); return; }
+          afterWrite("Carta acquistata.")(res);
+        });
+      });
+    });
+    var ombraConfirm = document.getElementById("ombra-confirm");
+    if (ombraConfirm){
+      ombraConfirm.addEventListener("click", function(){
+        var sel = document.getElementById("ombra-select");
+        var conc = sel && byId(state.concorrenti, sel.value);
+        if (!conc){ toast("Scelta non valida."); return; }
+        var def = state.cardTypes.filter(function(c){ return c.key==="chef_ombra"; })[0];
+        if (!confirm('Confermi "'+conc.nome+'" come tuo Chef Ombra segreto, per '+(def?def.costo_stelle:2)+'★? La scelta resta segreta fino al 31/01/2027 ed è definitiva.')) return;
+        sb.from("card_purchases").insert({team_id: state.myTeam.id, card_key:"chef_ombra"}).then(function(res){
+          if (res.error){ toast("Acquisto non riuscito: " + res.error.message); return; }
+          sb.from("team_chefs").insert({team_id: state.myTeam.id, concorrente_id: conc.id, ruolo:"ombra"}).then(function(res2){
+            if (res2.error){ toast("Errore: " + res2.error.message); return; }
+            state._pickingOmbra = false;
+            afterWrite("Chef Ombra scelto in segreto.")(res2);
+          });
+        });
+      });
+    }
+    var ombraCancel = document.getElementById("ombra-cancel");
+    if (ombraCancel){
+      ombraCancel.addEventListener("click", function(){ state._pickingOmbra = false; renderCarte(); });
+    }
   }
 
   /* ============ render: regolamento ============ */
