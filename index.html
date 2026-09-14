@@ -213,7 +213,7 @@
 
   /* ============ state ============ */
   var state = {
-    session: null, profile: null, myTeam: null,
+    session: null, profile: null, myTeam: null, profiles: [],
     meta: null, settings: {}, concorrenti: [], teams: [], teamChefs: [],
     episodes: [], events: [], cardTypes: [], purchases: [], activations: [], activationsPublic: [],
     activeTab: "home"
@@ -311,7 +311,8 @@
       sb.from("card_types").select("*"),
       sb.from("card_purchases").select("*"),
       sb.from("card_activations").select("*"),
-      sb.from("card_activations_public").select("*")
+      sb.from("card_activations_public").select("*"),
+      sb.from("profiles").select("*")
     ]).then(function(res){
       var errs = res.filter(function(r){ return r.error; });
       if (errs.length){ console.error(errs); toast("Errore nel caricamento dati: " + errs[0].error.message); }
@@ -327,6 +328,7 @@
       state.purchases = res[9].data||[];
       state.activations = res[10].data||[];
       state.activationsPublic = res[11].data||[];
+      state.profiles = res[12].data||[];
       state.myTeam = state.teams.filter(function(t){ return t.profile_id===uid; })[0] || null;
       document.getElementById("league-name-display").textContent = state.meta.nome_lega;
       document.getElementById("season-label-display").textContent = "Stagione " + state.meta.stagione_label;
@@ -876,6 +878,36 @@
       + '<button class="btn sm danger" id="a-toggle-ombra">'+(state.meta.ombra_svelato?"Nascondi di nuovo":"Svela tutti")+'</button></div>'
     );
 
+    var accountRows = state.profiles.slice().sort(function(a,b){ return (a.display_name||"").localeCompare(b.display_name||""); }).map(function(p){
+      var t = state.teams.filter(function(tt){ return tt.profile_id===p.id; })[0];
+      return '<div class="banner" style="flex-wrap:wrap;">'
+        + '<span>'+esc(p.display_name)+' <span class="muted">('+esc(p.username)+')</span>'
+          + (t ? ' — '+esc(t.nome_squadra) : ' <span class="badge warn">senza squadra</span>')
+          + (p.is_admin ? ' <span class="badge ok">Admin</span>' : '')
+          + (!p.attivo ? ' <span class="badge warn">Disattivato</span>' : '')
+        + '</span>'
+        + '<span style="white-space:nowrap;"><button class="btn sm ghost" data-reset-pw="'+p.id+'">Reset password</button> '
+        + (p.id===state.profile.id
+            ? '<span class="muted" title="Non puoi disattivare il tuo stesso account.">—</span>'
+            : '<button class="btn sm ghost" data-toggle-active="'+p.id+'">'+(p.attivo?"Disattiva":"Riattiva")+'</button>')
+        + '</span>'
+        + '</div>';
+    }).join("") || '<p class="section-sub">Nessun account ancora.</p>';
+    html += fieldset("Account giocatori", accountRows
+      + '<h4 style="margin:14px 0 6px;font-size:13.5px;color:var(--gold-strong);">Nuovo giocatore</h4>'
+      + '<div class="field-row">'
+      + '<label class="field"><span>Username</span><input id="a-new-username" autocapitalize="none" autocorrect="off"></label>'
+      + '<label class="field"><span>Nome visualizzato</span><input id="a-new-displayname"></label>'
+      + '<label class="field"><span>Nome squadra</span><input id="a-new-teamname"></label>'
+      + '</div>'
+      + '<div class="field-row" style="align-items:flex-end;">'
+      + '<label class="field"><span>Password iniziale</span><input id="a-new-password" value="'+esc(genPassword())+'"></label>'
+      + '<button class="btn sm ghost" id="a-new-pw-gen" type="button" style="margin-bottom:12px;">Genera nuova</button>'
+      + '</div>'
+      + '<button class="btn sm primary" id="a-create-player">Crea account e squadra</button>'
+      + '<p class="section-sub" style="margin-top:8px;">Username e password vanno comunicati tu stesso al giocatore, fuori dall\'app. Il giocatore non può ancora cambiare la password da solo: se serve, torna qui e usa "Reset password".</p>'
+    );
+
     var concList = state.concorrenti.map(function(c){
       return '<div class="banner"><span>'+esc(c.nome)+(c.eliminato?' <span class="badge warn">Eliminato</span>':'')+'</span>'
         + '<span><button class="btn sm ghost" data-toggle-elim="'+c.id+'">'+(c.eliminato?"Riammetti":"Elimina")+'</button></span></div>';
@@ -972,6 +1004,51 @@
       if (!confirm("Confermi la rivelazione/nascondimento degli Chef Ombra?")) return;
       sb.from("league_meta").update({ombra_svelato: !state.meta.ombra_svelato}).eq("id", true).then(afterWrite("Fatto."));
     });
+    g("a-new-pw-gen") && g("a-new-pw-gen").addEventListener("click", function(){ g("a-new-password").value = genPassword(); });
+    g("a-create-player") && g("a-create-player").addEventListener("click", function(){
+      var username = g("a-new-username").value.trim();
+      var displayName = g("a-new-displayname").value.trim();
+      var teamName = g("a-new-teamname").value.trim();
+      var password = g("a-new-password").value;
+      if (!username || !teamName || password.length<6){ toast("Username, nome squadra e password (almeno 6 caratteri) sono obbligatori."); return; }
+      if (!confirm('Confermi la creazione dell\'account "'+username+'" e della squadra "'+teamName+'"?')) return;
+      callAdminManage({action:"create", username:username, display_name:displayName, password:password}).then(function(res){
+        if (res.status!==200 || !res.body || !res.body.ok){
+          toast("Creazione non riuscita: " + ((res.body&&res.body.error)||"errore sconosciuto"));
+          return;
+        }
+        sb.from("teams").insert({profile_id: res.body.user_id, nome_squadra: teamName}).then(function(res2){
+          if (res2.error){ toast("Account creato ma la squadra non è stata creata: " + res2.error.message); loadEverything(); return; }
+          reload('Giocatore "'+username+'" creato.');
+        });
+      }).catch(function(){ toast("Creazione non riuscita: errore di rete."); });
+    });
+    document.querySelectorAll("[data-reset-pw]").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        var id = btn.getAttribute("data-reset-pw");
+        var pw = prompt("Nuova password per questo account (almeno 6 caratteri). Puoi lasciare quella proposta oppure sceglierne un'altra:", genPassword());
+        if (pw===null) return;
+        if (pw.length<6){ toast("La password deve avere almeno 6 caratteri."); return; }
+        if (!confirm("Confermi il reset della password? Comunicala tu stesso al giocatore.")) return;
+        callAdminManage({action:"reset_password", target_user_id:id, password:pw}).then(function(res){
+          if (res.status!==200 || !res.body || !res.body.ok){ toast("Reset non riuscito: " + ((res.body&&res.body.error)||"errore sconosciuto")); return; }
+          toast("Password aggiornata.");
+        });
+      });
+    });
+    document.querySelectorAll("[data-toggle-active]").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        var id = btn.getAttribute("data-toggle-active");
+        var p = state.profiles.filter(function(x){ return x.id===id; })[0];
+        if (!p) return;
+        var next = !p.attivo;
+        if (!confirm((next?"Riattivare":"Disattivare")+' l\'account di "'+p.display_name+'"?')) return;
+        callAdminManage({action:"set_active", target_user_id:id, attivo:next}).then(function(res){
+          if (res.status!==200 || !res.body || !res.body.ok){ toast("Operazione non riuscita: " + ((res.body&&res.body.error)||"errore sconosciuto")); return; }
+          reload("Fatto.");
+        });
+      });
+    });
     g("a-add-conc") && g("a-add-conc").addEventListener("click", function(){
       var name = g("a-new-conc").value.trim(); if (!name) return;
       sb.from("concorrenti").insert({nome:name}).then(afterWrite("Concorrente aggiunto."));
@@ -1064,6 +1141,28 @@
       toast(msg);
       loadEverything();
     };
+  }
+  function reload(msg){ toast(msg); loadEverything(); }
+
+  /* ============ admin: gestione account giocatori ============ */
+  // Nessuna registrazione pubblica: gli account (username + password) sono
+  // creati e resettati solo dall'Admin, tramite la funzione server-side
+  // "admin-manage-user" (l'email interna di Supabase Auth non è mai
+  // visibile qui: la gestisce solo la funzione, con la service-role key).
+  function genPassword(){
+    var alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789";
+    var out = "";
+    for (var i=0;i<10;i++){ out += alphabet.charAt(Math.floor(Math.random()*alphabet.length)); }
+    return out;
+  }
+  function callAdminManage(payload){
+    return fetch(SUPABASE_URL + "/functions/v1/admin-manage-user", {
+      method: "POST",
+      headers: {"Content-Type":"application/json", "apikey":SUPABASE_KEY, "Authorization":"Bearer "+state.session.access_token},
+      body: JSON.stringify(payload)
+    }).then(function(r){
+      return r.json().then(function(body){ return {status:r.status, body:body}; });
+    });
   }
   function upsertTeamChef(teamId, concorrenteId, ruolo){
     var existing = state.teamChefs.filter(function(tc){ return tc.team_id===teamId && tc.ruolo===ruolo; });
