@@ -10,7 +10,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="FantaMC">
-<link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAYAAAA9zQYyAAAEQ0lEQVR42u3dL4wUVxzA8fcemHMlDRZfgT/ZcFVFoFEUTCVJHVVVJMhLMKewTRNoKlAEUCUnS+qqGlxzIVfTnOKPIuG2uztvZufNnzefjyNcsne73/3xm9mbIYYJuHxp70Ng9k5Oz+LY30MUMDUFHkVMTXFHEVNT3HHskJ8eHniFK3L97vNRw45DxyxggZeMOg4RsohpiruvsGPJmIVMm7D7iDqOHXKbnYvp6+O13yXs2GfMOT+MgAWe00TXqONQMQtZ2ENEHUvGLGLaxN1H1HGXmLe968RM14m92k6bqGPfMQuZEtM6N+okZsa0qZnVxnI/fU5ipqaoU8lvCIZuKO06ncVMyajbTukkZmqKOmvlEDNTi7pV0E1jXcyMvVNvajR1WTVgDDmrR+r7nQNDTenGCd00ncXM2FE3TenkKaMmKXdfganu0muDdmaDue7Sn7dr5aD+lcPBIHM7ODwXtDscMXefGrZyUP/KAdUEbX9mznt0sj9T0x5t5cAODYIGQYOgETQIGgQNggZBI2gQNAgaBA2CRtAgaBA0CBo2urikH/ba/pVweG/Z9+x79urv8MODlyY0CBoEDYIGQVOfRZ3leHH8Jly98ajx617/+l1IKe78eG//PQtf3/p58J/zwoUU/nhyy4QGQYOgQdAgaAQNggZBg6BB0CzERU9Bfd69e5/1Eb8JDYIGQYOgwUHhTPz4/X64+e1Xa//umzu/hH/e/udJMqERNAgaBA2CRtAgaBA0FOaDlYK+/GIv/PnbbU+ECQ2CBkEjaBA0DMFZjoL6vJ3utl8fxYRG0CBoEDQIGgSNoEHQMAwfrMzE/aPjcP/o2BNhQiNoEDQIGgQNgkbQIGgQNAgaBI2gQdAgaBA0CBpBg6BB0CBoCAu7SPba/pVweO9gsMdr+3+s/PTw9/D42V+qNKFB0AgaBA2Chi4WdZbjxfGbcPXGI6+6CQ2CBkGDoEHQCBoEDYIGQYOgETQIGgQNgkbQIGgQNAgaBI2gYe5Bn5yeRU8DNTg5PYv/m9DX7z4/9+enhweeKSZhtcXVVq0c2KFh8kHbo6lhf944oe3RzHF/tnJQ7w7dtHaY0kxlOm9aN7ZO6E0jHca2rU0rB3WuHOvWDgeHTP1gcLXZtOsDwFi7c9bK0TSlYSq787oTGanpqNGUZorTeVOjqcs7Q9QMHXPuppBy3wGiZioxb9sgUpuxLmqmHHP2ylHiaBRKNNQYdO5ZD1HTd8xtp3P2hBY1c4g5hBBa/R705Ut7H3IDdv6aritG15hbB70u6jbvMmjbS9uLTzpdqdImanHTtY8uV1J1vvSqS9TCFnLJmHcKelPUbQ8OBb68gJte+12uce3l4tg+wmY5SoTca9DbohY2Of8a93Xngd5vX7AtbHGLuFTIxYLOiVrgyw24ZMzFgu4SNstR8sZGg90xSdwiHuJxRrkFmLhFXFXQAhdwKR8BlSbOXWb1s+gAAAAASUVORK5CYII=">
+<link rel="icon" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
@@ -91,6 +92,7 @@
 
 <div id="auth-screen">
   <div class="card auth-card">
+    <img src="logo-auth.png" alt="Fanta MasterChef" style="display:block;margin:0 auto 14px;max-width:220px;width:60%;height:auto;">
     <h1 style="text-align:center;">Fanta MasterChef</h1>
     <p class="section-sub" style="text-align:center; margin-bottom:18px;">Stagione 2026/2027</p>
 
@@ -115,7 +117,10 @@
 
 <div id="app" class="hidden">
   <header class="topbar">
-    <div><span class="eyebrow" id="season-label-display">Stagione 2026/2027</span><h1 id="league-name-display">Fanta MasterChef</h1></div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <img src="icon-96.png" alt="" style="height:32px;width:32px;border-radius:8px;flex:0 0 auto;">
+      <div><span class="eyebrow" id="season-label-display">Stagione 2026/2027</span><h1 id="league-name-display">Fanta MasterChef</h1></div>
+    </div>
     <button class="btn ghost sm" id="logout-btn">Esci</button>
   </header>
   <main>
