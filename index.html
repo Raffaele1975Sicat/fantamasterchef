@@ -239,6 +239,32 @@
     var s = (Math.round(n*2)/2).toString();
     return (n>0?"+":"") + s;
   }
+  // Grafico a linea disegnato a mano in SVG inline: nessuna libreria esterna,
+  // così funziona anche offline (coerente con l'impostazione PWA dell'app).
+  function svgLineChart(points, opts){
+    opts = opts || {};
+    var w = opts.width || 280, h = opts.height || 70, pad = 6;
+    if (!points || points.length < 2){
+      return '<div class="muted" style="font-size:11px;white-space:nowrap;">'+(opts.fallback||"Dati insufficienti.")+'</div>';
+    }
+    var ys = points.map(function(p){ return p.y; });
+    var minY = Math.min(0, Math.min.apply(null, ys));
+    var maxY = Math.max(0, Math.max.apply(null, ys));
+    if (maxY === minY){ maxY = minY + 1; }
+    var stepX = (w - 2*pad) / (points.length - 1);
+    function px(i){ return pad + i*stepX; }
+    function py(v){ return h - pad - ((v - minY) / (maxY - minY)) * (h - 2*pad); }
+    var path = points.map(function(p, i){ return (i===0 ? "M" : "L") + px(i).toFixed(1) + "," + py(p.y).toFixed(1); }).join(" ");
+    var dots = points.map(function(p, i){ return '<circle cx="'+px(i).toFixed(1)+'" cy="'+py(p.y).toFixed(1)+'" r="2.5" style="fill:'+(opts.color||"var(--gold-strong)")+';"></circle>'; }).join("");
+    var zeroLine = (minY < 0 && maxY > 0)
+      ? '<line x1="'+pad+'" y1="'+py(0).toFixed(1)+'" x2="'+(w-pad)+'" y2="'+py(0).toFixed(1)+'" style="stroke:var(--line);stroke-width:1;"></line>'
+      : "";
+    return '<svg viewBox="0 0 '+w+' '+h+'" width="100%" height="'+h+'" preserveAspectRatio="none" style="display:block;overflow:visible;">'
+      + zeroLine
+      + '<path d="'+path+'" fill="none" style="stroke:'+(opts.color||"var(--gold-strong)")+';stroke-width:2;"></path>'
+      + (opts.dots===false ? "" : dots)
+      + '</svg>';
+  }
 
   /* ============ auth ============ */
   // Login by USERNAME: the browser never sees or handles the internal auth
@@ -402,6 +428,22 @@
     var pos=0, last=null;
     rows.forEach(function(r,idx){ if (last===null || r.total!==last){ pos=idx+1; last=r.total; } r.pos=pos; });
     return rows;
+  }
+  // Posizioni come erano subito prima dell'ultima puntata confermata, per mostrare
+  // in classifica chi sale/scende. Vuoto se c'è meno di una puntata di storico.
+  function standingsDelta(){
+    var confirmed = state.episodes.filter(function(e){ return e.confermata; }).slice().sort(function(a,b){ return a.numero-b.numero; });
+    if (confirmed.length < 2) return {};
+    var prevEpisodes = confirmed.slice(0, -1);
+    var rows = state.teams.map(function(t){
+      var total = Number(t.punti_ingresso||0);
+      prevEpisodes.forEach(function(ep){ total += teamEpisodeScore(t, ep.id); });
+      return {team:t, total:total};
+    });
+    rows.sort(function(a,b){ return b.total-a.total; });
+    var pos=0, last=null, map={};
+    rows.forEach(function(r,idx){ if (last===null || r.total!==last){ pos=idx+1; last=r.total; } map[r.team.id]=pos; });
+    return map;
   }
   function concorrenteCumulativo(concorrenteId){
     var total = 0;
@@ -567,22 +609,77 @@
   function renderHome(){
     var standings = computeStandings();
     var started = state.episodes.some(function(e){ return e.confermata; });
+    var prevPos = started ? standingsDelta() : {};
     var html = '<img src="illus-home.png" alt="" style="width:100%;max-width:260px;display:block;margin:0 auto 14px;border-radius:12px;">';
-    html += '<div class="section-head"><div><h2>Classifica</h2><p class="section-sub">Il Premio Artusi va a chi totalizza più punti a fine stagione.</p></div></div>';
+    html += '<div class="section-head"><div><h2>Classifica</h2><p class="section-sub">Il Premio Artusi va a chi totalizza più punti a fine stagione. Tocca una squadra per i dettagli.</p></div></div>';
     if (!started){
       html += '<div class="card empty" style="text-align:center;"><img src="state-nessun-risultato.png" alt="" style="width:120px;display:block;margin:0 auto 10px;">La stagione non è ancora iniziata: la classifica apparirà dopo la prima puntata confermata.</div>';
     } else {
       html += '<div class="card">';
       standings.forEach(function(r){
         var mine = state.myTeam && r.team.id===state.myTeam.id;
-        html += '<div class="rank-row" style="'+(mine?'background:rgba(202,162,76,.08);':'')+'">'
-          + '<div class="rank-num">'+r.pos+'</div>'
-          + '<div class="rank-name">'+esc(displayName(r.team))+'</div>'
+        var medal = r.pos===1 ? "🥇" : (r.pos===2 ? "🥈" : (r.pos===3 ? "🥉" : r.pos));
+        var prev = prevPos[r.team.id];
+        var deltaHtml = '<span class="sub muted">—</span>';
+        if (prev!=null && prev!==r.pos){
+          deltaHtml = prev>r.pos
+            ? '<span class="sub" style="color:var(--teal);">▲ '+(prev-r.pos)+'</span>'
+            : '<span class="sub" style="color:var(--penalty);">▼ '+(r.pos-prev)+'</span>';
+        }
+        var running = Number(r.team.punti_ingresso||0);
+        var series = r.perEp.map(function(p){ running += p.punti; return {y:running}; });
+        html += '<div class="rank-row" data-team-row="'+r.team.id+'" style="cursor:pointer;'+(mine?'background:rgba(202,162,76,.08);':'')+'">'
+          + '<div class="rank-num">'+medal+'</div>'
+          + '<div class="rank-name">'+esc(displayName(r.team))+deltaHtml+'</div>'
+          + '<div style="width:64px;flex:0 0 auto;">'+svgLineChart(series, {width:64, height:24, dots:false, fallback:"—"})+'</div>'
           + '<div class="rank-points">'+fmtNum(r.total)+'</div></div>';
+        if (state._expandedTeamHome===r.team.id){
+          html += '<div style="padding:12px 14px 18px;border-bottom:1px solid var(--line);">'+teamDetailHtml(r)+'</div>';
+        }
       });
       html += '</div>';
     }
     document.getElementById("panel-home").innerHTML = html;
+    bindHomeEvents();
+  }
+  function teamDetailHtml(row){
+    var team = row.team;
+    var brigata = teamChefsFor(team.id, true).filter(function(tc){ return tc.ruolo==="brigata"||tc.ruolo==="sostituto"; });
+    var ombra = state.teamChefs.filter(function(tc){ return tc.team_id===team.id && tc.ruolo==="ombra" && tc.attivo; })[0];
+    var isMine = state.myTeam && state.myTeam.id===team.id;
+    var html = '<div style="margin-bottom:12px;"><span class="section-sub">Brigata</span><div style="margin-top:4px;">';
+    if (brigata.length){
+      brigata.forEach(function(tc){ html += '<span class="chip">'+esc(concorrenteName(tc.concorrente_id))+' <span class="muted">'+fmtNum(concorrenteCumulativo(tc.concorrente_id))+'</span></span>'; });
+    } else if (!isMine && !(state.meta && state.meta.brigate_visibili)){
+      html += '<span class="muted">Le Brigate non sono ancora state rese visibili dall\'Admin.</span>';
+    } else {
+      html += '<span class="muted">Non ancora impostata dall\'admin.</span>';
+    }
+    if (ombra){
+      html += '<span class="chip ombra">Chef Ombra: '+(state.meta.ombra_svelato?esc(concorrenteName(ombra.concorrente_id)):"segreto")+'</span>';
+    }
+    html += '</div></div>';
+    if (row.perEp.length){
+      var running = Number(team.punti_ingresso||0);
+      var series = row.perEp.map(function(p){ running += p.punti; return {y:running}; });
+      html += '<div class="section-sub" style="margin-bottom:4px;">Andamento punti totali</div>'
+        + '<div style="margin-bottom:12px;">'+svgLineChart(series, {width:520, height:90})+'</div>';
+      html += '<div class="table-wrap"><table><thead><tr><th>Puntata</th><th class="num">Punti</th></tr></thead><tbody>'
+        + row.perEp.slice().reverse().map(function(p){ return '<tr><td>Puntata '+p.numero+'</td><td class="num">'+fmtNum(p.punti)+'</td></tr>'; }).join("")
+        + '</tbody></table></div>';
+    } else {
+      html += '<span class="muted">Nessuna puntata confermata ancora.</span>';
+    }
+    return html;
+  }
+  function bindHomeEvents(){
+    document.querySelectorAll("[data-team-row]").forEach(function(el){
+      el.addEventListener("click", function(){
+        var id = el.getAttribute("data-team-row");
+        state._expandedTeamHome = (state._expandedTeamHome===id) ? null : id;
+        renderHome();
+      });
+    });
   }
 
   /* ============ render: la mia squadra ============ */
@@ -626,13 +723,48 @@
   }
   /* ============ render: concorrenti ============ */
   function renderConcorrenti(){
-    var html = '<div class="section-head"><div><h2>Concorrenti</h2><p class="section-sub">Il tabellone si aggiorna con le puntate confermate.</p></div></div>';
+    var html = '<div class="section-head"><div><h2>Concorrenti</h2><p class="section-sub">Il tabellone si aggiorna con le puntate confermate. Tocca un concorrente per la scheda.</p></div></div>';
     html += '<div class="table-wrap"><table><thead><tr><th>Nome</th><th>Stato</th><th class="num">Punti</th></tr></thead><tbody>';
-    state.concorrenti.forEach(function(c){
-      html += '<tr><td>'+esc(c.nome)+'</td><td>'+(c.eliminato?'<span class="badge warn">Eliminato</span>':'<span class="badge ok">In gara</span>')+'</td><td class="num">'+fmtNum(concorrenteCumulativo(c.id))+'</td></tr>';
+    var rows = state.concorrenti.slice().sort(function(a,b){
+      return concorrenteCumulativo(b.id)-concorrenteCumulativo(a.id) || String(a.nome).localeCompare(String(b.nome));
+    });
+    rows.forEach(function(c){
+      html += '<tr data-conc-row="'+c.id+'" style="cursor:pointer;"><td>'+esc(c.nome)+'</td><td>'+(c.eliminato?'<span class="badge warn">Eliminato</span>':'<span class="badge ok">In gara</span>')+'</td><td class="num">'+fmtNum(concorrenteCumulativo(c.id))+'</td></tr>';
+      if (state._expandedConc===c.id){
+        html += '<tr><td colspan="3" style="padding:12px 10px 18px;">'+concorrenteDetailHtml(c)+'</td></tr>';
+      }
     });
     html += '</tbody></table></div>';
     document.getElementById("panel-concorrenti").innerHTML = html;
+    bindConcorrentiEvents();
+  }
+  function concorrenteDetailHtml(c){
+    var confirmed = state.episodes.filter(function(e){ return e.confermata; }).slice().sort(function(a,b){ return a.numero-b.numero; });
+    if (!confirmed.length){ return '<span class="muted">Nessuna puntata confermata ancora.</span>'; }
+    var running = 0;
+    var series = [];
+    var rowsHtml = confirmed.map(function(ep){
+      var e = eventFor(ep.id, c.id);
+      var bp = basePoints(ep.id, c.id);
+      running += bp.bonus + bp.penalty;
+      series.push({y:running});
+      if (!e) return '<tr><td>Puntata '+ep.numero+'</td><td colspan="2" class="muted">Non in gara / nessun dato</td><td class="num">'+fmtNum(0)+'</td></tr>';
+      var bonusStr = [e.mystery_box&&"Mystery Box", e.vince_esterna&&"Esterna", e.vince_cucina&&"Cucina", e.miglior_piatto&&"Miglior piatto"].filter(Boolean).join(", ") || "—";
+      var penStr = e.penalita==="nero" ? "Grembiule Nero" : (e.penalita==="esterna" ? "Persa Esterna" : "—");
+      return '<tr><td>Puntata '+ep.numero+'</td><td>'+esc(bonusStr)+'</td><td>'+esc(penStr)+'</td><td class="num">'+fmtNum(bp.bonus+bp.penalty)+'</td></tr>';
+    }).join("");
+    return '<div class="section-sub" style="margin-bottom:4px;">Andamento punti</div>'
+      + '<div style="margin-bottom:10px;">'+svgLineChart(series, {width:500, height:80})+'</div>'
+      + '<div class="table-wrap"><table><thead><tr><th>Puntata</th><th>Bonus</th><th>Penalità</th><th class="num">Punti</th></tr></thead><tbody>'+rowsHtml+'</tbody></table></div>';
+  }
+  function bindConcorrentiEvents(){
+    document.querySelectorAll("[data-conc-row]").forEach(function(el){
+      el.addEventListener("click", function(){
+        var id = el.getAttribute("data-conc-row");
+        state._expandedConc = (state._expandedConc===id) ? null : id;
+        renderConcorrenti();
+      });
+    });
   }
 
   /* ============ render: puntate ============ */
