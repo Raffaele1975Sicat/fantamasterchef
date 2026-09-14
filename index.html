@@ -625,6 +625,63 @@
     return "";
   }
 
+  /* ============ calendario / scadenze ============ */
+  // Le scadenze non sono un dato salvato: si calcolano al volo da calendario
+  // puntate + regolamento + stato della propria squadra, così restano sempre
+  // coerenti con quello che l'utente può davvero ancora fare.
+  function fmtEpWhen(ep){
+    if (!ep || !ep.data) return "";
+    var base = fmtDate(ep.data);
+    if (ep.ora){ return base + " alle " + String(ep.ora).slice(0,5); }
+    return base;
+  }
+  function epSortKey(ep){
+    return new Date(ep.data + "T" + (ep.ora ? ep.ora : "00:00") + ":00");
+  }
+  function computeScadenze(){
+    var items = [];
+    var draft = draftEpisodes();
+    var nextEp = (draft.length && draft[0].data) ? draft[0] : null;
+    if (nextEp){
+      items.push({label: "Puntata " + nextEp.numero + " in onda", when: fmtEpWhen(nextEp), sortKey: epSortKey(nextEp)});
+    }
+    if (state.myTeam && nextEp){
+      var myPurchases = state.purchases.filter(function(p){ return p.team_id===state.myTeam.id; });
+      ["fornelli_spenti","secondo_intuito","salvataggio"].forEach(function(key){
+        var owned = myPurchases.some(function(p){ return p.card_key===key; });
+        if (!owned) return;
+        var used = state.activations.some(function(a){ return a.team_id===state.myTeam.id && a.card_key===key; });
+        if (used) return;
+        var win = cardWindowInfo(key);
+        if (!win.open) return;
+        var def = state.cardTypes.filter(function(c){ return c.key===key; })[0];
+        items.push({
+          label: 'Usa "' + (def?def.label:key) + '" entro Puntata ' + nextEp.numero,
+          when: fmtEpWhen(nextEp),
+          sortKey: epSortKey(nextEp)
+        });
+      });
+    }
+    if (state.meta && state.meta.ombra_svelato===false && state.meta.data_svelamento){
+      var reveal = new Date(state.meta.data_svelamento + "T00:00:00");
+      var daysLeft = Math.ceil((reveal - new Date()) / 86400000);
+      if (daysLeft>=0 && daysLeft<=30){
+        items.push({label: "Lo Chef Ombra viene svelato", when: fmtDate(state.meta.data_svelamento), sortKey: reveal});
+      }
+    }
+    items.sort(function(a,b){ return a.sortKey - b.sortKey; });
+    return items;
+  }
+  function scadenzeHtml(items){
+    if (!items.length) return "";
+    return '<div class="card" style="padding:16px;margin-bottom:16px;">'
+      + '<h3 style="font-size:15px;margin:0 0 10px;">Prossime scadenze</h3>'
+      + items.map(function(it){
+          return '<div class="banner"><span>'+esc(it.label)+'</span><span class="muted" style="font-size:12px;white-space:nowrap;">'+esc(it.when)+'</span></div>';
+        }).join("")
+      + '</div>';
+  }
+
   /* ============ tabs ============ */
   function selectTab(tab){
     var leavingChat = state.activeTab==="chat" && tab!=="chat";
@@ -655,6 +712,7 @@
     var started = state.episodes.some(function(e){ return e.confermata; });
     var prevPos = started ? standingsDelta() : {};
     var html = '<img src="illus-home.png" alt="" style="width:100%;max-width:260px;display:block;margin:0 auto 14px;border-radius:12px;">';
+    html += scadenzeHtml(computeScadenze());
     html += '<div class="section-head"><div><h2>Classifica</h2><p class="section-sub">Il Premio Artusi va a chi totalizza più punti a fine stagione. Tocca una squadra per i dettagli.</p></div></div>';
     if (!started){
       html += '<div class="card empty" style="text-align:center;"><img src="state-nessun-risultato.png" alt="" style="width:120px;display:block;margin:0 auto 10px;">La stagione non è ancora iniziata: la classifica apparirà dopo la prima puntata confermata.</div>';
@@ -818,7 +876,7 @@
     if (!episodes.length){ html += '<div class="card empty">Nessuna puntata ancora confermata.</div>'; }
     episodes.forEach(function(ep){
       html += '<div class="card" style="padding:16px; margin-bottom:14px;">'
-        + '<div class="section-head" style="margin-bottom:8px;"><h3 style="font-size:16px;">Puntata '+ep.numero+(ep.confermata?'':' <span class="badge warn">Bozza</span>')+'</h3><span class="section-sub">'+esc(fmtDate(ep.data))+'</span></div>'
+        + '<div class="section-head" style="margin-bottom:8px;"><h3 style="font-size:16px;">Puntata '+ep.numero+(ep.confermata?'':' <span class="badge warn">Bozza</span>')+'</h3><span class="section-sub">'+esc(fmtEpWhen(ep))+'</span></div>'
         + '<div class="table-wrap"><table><thead><tr><th>Concorrente</th><th>Bonus</th><th>Penalità</th><th class="num">Punti base</th></tr></thead><tbody>';
       state.concorrenti.forEach(function(c){
         var e = eventFor(ep.id, c.id);
@@ -1352,11 +1410,19 @@
     html += fieldset("Giocatori & Squadre", teamBlocks);
 
     var epRows = state.episodes.slice().sort(function(a,b){return b.numero-a.numero;}).map(function(e){
-      return '<div class="banner"><span>Puntata '+e.numero+' — '+(e.confermata?'<span class="badge ok">Confermata</span>':'<span class="badge warn">Bozza</span>')+'</span>'
+      return '<div class="banner"><span>Puntata '+e.numero+(e.data?' — '+esc(fmtEpWhen(e)):'')+' '+(e.confermata?'<span class="badge ok">Confermata</span>':'<span class="badge warn">Bozza</span>')+'</span>'
         + '<span><button class="btn sm ghost" data-edit-ep="'+e.id+'">Modifica</button> '
         + (e.confermata?'<button class="btn sm ghost" data-unconfirm-ep="'+e.id+'">Riporta in bozza</button>':'<button class="btn sm primary" data-confirm-ep="'+e.id+'">Conferma</button>')+'</span></div>';
     }).join("");
     html += fieldset("Puntate & Risultati", epRows || '<p class="section-sub">Nessuna puntata registrata.</p>');
+
+    var calRows = state.episodes.slice().sort(function(a,b){return a.numero-b.numero;}).map(function(e){
+      return '<div class="banner"><span>Puntata '+e.numero+'</span><span class="muted" style="font-size:12.5px;">'+(e.data?esc(fmtEpWhen(e)):'Data non ancora impostata')+'</span></div>';
+    }).join("");
+    calRows += '<div class="banner"><span>Svelamento Chef Ombra</span><span class="muted" style="font-size:12.5px;">'+(state.meta&&state.meta.ombra_svelato?'Già svelato':esc(fmtDate(state.meta&&state.meta.data_svelamento)))+'</span></div>';
+    html += fieldset("Calendario & Scadenze", ''
+      + '<p class="section-sub" style="margin-top:-4px;">Calendario delle puntate (correggibile qui sotto in "Nuova puntata"/"Modifica") e scadenze fisse della stagione. Le scadenze personali di ogni giocatore (es. carte da usare) si vedono automaticamente nella loro Home.</p>'
+      + calRows);
 
     var editingEp = state._editingEp ? byId(state.episodes, state._editingEp) : null;
     var concForEp = state.concorrenti.filter(function(c){ return !c.eliminato; });
@@ -1374,6 +1440,7 @@
       + '<div class="field-row">'
       + '<label class="field"><span>Numero</span><input type="number" id="a-ep-num" value="'+(editingEp?editingEp.numero:nextNum)+'" '+(editingEp?"readonly":"")+'></label>'
       + '<label class="field"><span>Data</span><input type="date" id="a-ep-data" value="'+(editingEp&&editingEp.data?editingEp.data:"")+'"></label>'
+      + '<label class="field"><span>Ora</span><input type="time" id="a-ep-ora" value="'+(editingEp&&editingEp.ora?String(editingEp.ora).slice(0,5):"")+'"></label>'
       + '</div>'
       + '<div class="table-wrap"><table><thead><tr><th>Concorrente</th><th>Mystery</th><th>Esterna</th><th>Cucina</th><th>Piatto</th><th>Penalità</th></tr></thead><tbody>'+evRows+'</tbody></table></div>'
       + '<div style="margin-top:10px;"><button class="btn sm" id="a-save-ep">'+(editingEp?"Salva modifiche":"Salva puntata (bozza)")+'</button> '
@@ -1511,6 +1578,7 @@
     g("a-save-ep") && g("a-save-ep").addEventListener("click", function(){
       var numero = parseInt(g("a-ep-num").value,10);
       var data = g("a-ep-data").value || null;
+      var ora = g("a-ep-ora").value || null;
       if (!numero){ toast("Numero puntata mancante."); return; }
       var editing = state._editingEp ? byId(state.episodes, state._editingEp) : null;
       var doAfter = function(episodeId){
@@ -1528,9 +1596,9 @@
         });
       };
       if (editing){
-        sb.from("episodes").update({data:data}).eq("id", editing.id).then(function(){ doAfter(editing.id); });
+        sb.from("episodes").update({data:data, ora:ora}).eq("id", editing.id).then(function(){ doAfter(editing.id); });
       } else {
-        sb.from("episodes").insert({numero:numero, data:data, confermata:false}).select().single().then(function(res){
+        sb.from("episodes").insert({numero:numero, data:data, ora:ora, confermata:false}).select().single().then(function(res){
           if (res.error){ toast(res.error.message); return; }
           doAfter(res.data.id);
         });
