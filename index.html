@@ -296,6 +296,28 @@
       + (opts.dots===false ? "" : dots)
       + '</svg>';
   }
+  // Grafico dell'andamento della POSIZIONE in classifica puntata dopo
+  // puntata (diverso dal grafico del punteggio cumulativo sopra). L'asse è
+  // invertito apposta: la posizione 1 (la migliore) va disegnata in alto.
+  function svgPositionChart(series, teamCount, opts){
+    opts = opts || {};
+    var w = opts.width || 280, h = opts.height || 70, pad = 10;
+    if (!series || series.length < 2){
+      return '<div class="muted" style="font-size:11px;white-space:nowrap;">Dati insufficienti.</div>';
+    }
+    var maxPos = Math.max(teamCount||1, Math.max.apply(null, series.map(function(s){ return s.pos; })));
+    var stepX = (w - 2*pad) / (series.length - 1);
+    function px(i){ return pad + i*stepX; }
+    function py(pos){ return pad + ((pos-1) / Math.max(1, maxPos-1)) * (h - 2*pad); }
+    var path = series.map(function(s, i){ return (i===0 ? "M" : "L") + px(i).toFixed(1) + "," + py(s.pos).toFixed(1); }).join(" ");
+    var dots = series.map(function(s, i){
+      return '<circle cx="'+px(i).toFixed(1)+'" cy="'+py(s.pos).toFixed(1)+'" r="2.5" style="fill:var(--teal);"><title>Puntata '+s.numero+': #'+s.pos+'</title></circle>';
+    }).join("");
+    return '<svg viewBox="0 0 '+w+' '+h+'" width="100%" height="'+h+'" preserveAspectRatio="none" style="display:block;overflow:visible;">'
+      + '<path d="'+path+'" fill="none" style="stroke:var(--teal);stroke-width:2;"></path>'
+      + dots
+      + '</svg>';
+  }
 
   /* ============ auth ============ */
   // Login by USERNAME: the browser never sees or handles the internal auth
@@ -451,8 +473,15 @@
   function teamEpisodeScore(team, episodeId){
     var includeOmbra = !!(state.meta && state.meta.ombra_svelato);
     var chefs = teamChefsFor(team.id, includeOmbra);
+    var ep = byId(state.episodes, episodeId);
     var total = 0;
-    chefs.forEach(function(tc){ total += chefContribution(team, tc.concorrente_id, episodeId); });
+    chefs.forEach(function(tc){
+      // Un Chef entrato con una sostituzione di gennaio non recupera punti
+      // dalle puntate precedenti al suo ingresso (parte da 0), anche se lui
+      // stesso, come concorrente reale, aveva già eventi in quelle puntate.
+      if (tc.da_episodio_numero && ep && ep.numero < tc.da_episodio_numero) return;
+      total += chefContribution(team, tc.concorrente_id, episodeId);
+    });
     return total;
   }
   function computeStandings(){
@@ -482,6 +511,25 @@
     var pos=0, last=null, map={};
     rows.forEach(function(r,idx){ if (last===null || r.total!==last){ pos=idx+1; last=r.total; } map[r.team.id]=pos; });
     return map;
+  }
+  // Posizione in classifica della squadra dopo OGNI puntata confermata, per
+  // il grafico "andamento posizione" (diverso dall'andamento del punteggio).
+  function positionSeriesFor(teamId){
+    var confirmed = state.episodes.filter(function(e){ return e.confermata; }).slice().sort(function(a,b){ return a.numero-b.numero; });
+    var series = [];
+    for (var i=0; i<confirmed.length; i++){
+      var upto = confirmed.slice(0, i+1);
+      var rows = state.teams.map(function(t){
+        var total = Number(t.punti_ingresso||0);
+        upto.forEach(function(ep){ total += teamEpisodeScore(t, ep.id); });
+        return {teamId:t.id, total:total};
+      });
+      rows.sort(function(a,b){ return b.total-a.total; });
+      var pos=0, last=null, map={};
+      rows.forEach(function(r,idx){ if (last===null || r.total!==last){ pos=idx+1; last=r.total; } map[r.teamId]=pos; });
+      series.push({numero: confirmed[i].numero, pos: map[teamId]});
+    }
+    return series;
   }
   function concorrenteCumulativo(concorrenteId){
     var total = 0;
@@ -714,6 +762,47 @@
     return new Date() >= dl;
   }
 
+  // Sostituzione di gennaio: possibile UNA sola volta a stagione, solo se la
+  // squadra ha in Brigata almeno un Chef eliminato, entro la stessa data
+  // fissa di svelamento dell'Ombra (31/01) — la stessa validazione è anche
+  // nel database (trigger), questa è solo per mostrare/nascondere la UI.
+  function sostituzioneDeadline(){
+    if (!state.meta || !state.meta.data_svelamento) return null;
+    return new Date(state.meta.data_svelamento + "T00:00:00");
+  }
+  function sostituzioneClosed(){
+    var dl = sostituzioneDeadline();
+    return dl ? (new Date() >= dl) : false;
+  }
+  function teamHasEliminatoInBrigata(team){
+    if (!team) return false;
+    return teamChefsFor(team.id, false).some(function(tc){
+      if (tc.ruolo!=="brigata") return false;
+      var c = byId(state.concorrenti, tc.concorrente_id);
+      return c && c.eliminato;
+    });
+  }
+  function sostituzioneEligible(team){
+    return !!team && !team.sostituzione_usata && !sostituzioneClosed() && teamHasEliminatoInBrigata(team);
+  }
+  function sostituzioneFormHtml(team){
+    var eliminatiInBrigata = teamChefsFor(team.id, false).filter(function(tc){
+      if (tc.ruolo!=="brigata") return false;
+      var c = byId(state.concorrenti, tc.concorrente_id);
+      return c && c.eliminato;
+    });
+    var oldOpts = eliminatiInBrigata.map(function(tc){ return '<option value="'+tc.concorrente_id+'">'+esc(concorrenteName(tc.concorrente_id))+'</option>'; }).join("");
+    var ownIds = teamChefsFor(team.id, true).map(function(tc){ return tc.concorrente_id; });
+    var eligibili = state.concorrenti.filter(function(c){ return !c.eliminato && ownIds.indexOf(c.id)===-1; });
+    var newOpts = eligibili.map(function(c){ return '<option value="'+c.id+'">'+esc(c.nome)+'</option>'; }).join("");
+    return '<div style="margin-top:10px;display:flex;flex-direction:column;gap:8px;max-width:320px;">'
+      + '<label class="field"><span>Chef eliminato che stai sostituendo</span><select id="sost-old">'+oldOpts+'</select></label>'
+      + '<label class="field"><span>Nuovo Chef</span><select id="sost-new">'+(newOpts||'<option value="">Nessuno disponibile</option>')+'</select></label>'
+      + '<p class="section-sub" style="color:var(--penalty);">Attenzione: è definitiva e irrevocabile, non esiste una seconda sostituzione. Il nuovo Chef parte da 0 punti; quelli già fatti dal vecchio Chef restano acquisiti.</p>'
+      + '<div><button class="btn sm primary" id="sq-confirm-sostituzione">Conferma sostituzione (10€)</button> <button class="btn sm ghost" id="sq-cancel-sostituzione">Annulla</button></div>'
+      + '</div>';
+  }
+
   /* ============ tabs ============ */
   // Voci "secondarie" raccolte nel menu a tendina "Altro" del bottombar, per
   // non affollare la barra su schermi stretti (richiesto dall'utente).
@@ -802,7 +891,11 @@
     var isMine = state.myTeam && state.myTeam.id===team.id;
     var html = '<div style="margin-bottom:12px;"><span class="section-sub">Brigata</span><div style="margin-top:4px;">';
     if (brigata.length){
-      brigata.forEach(function(tc){ html += '<span class="chip">'+esc(concorrenteName(tc.concorrente_id))+' <span class="muted">'+fmtNum(concorrenteCumulativo(tc.concorrente_id))+'</span></span>'; });
+      brigata.forEach(function(tc){
+        var cc = byId(state.concorrenti, tc.concorrente_id);
+        var elimTag = (cc && cc.eliminato) ? ' <span class="badge warn" style="font-size:9px;">Eliminato</span>' : '';
+        html += '<span class="chip">'+esc(concorrenteName(tc.concorrente_id))+' <span class="muted">'+fmtNum(concorrenteCumulativo(tc.concorrente_id))+'</span>'+elimTag+'</span>';
+      });
     } else if (!isMine && !(state.meta && state.meta.brigate_visibili)){
       html += '<span class="muted">Le Brigate non sono ancora state rese visibili dall\'Admin.</span>';
     } else {
@@ -817,6 +910,9 @@
       var series = row.perEp.map(function(p){ running += p.punti; return {y:running}; });
       html += '<div class="section-sub" style="margin-bottom:4px;">Andamento punti totali</div>'
         + '<div style="margin-bottom:12px;">'+svgLineChart(series, {width:520, height:90})+'</div>';
+      var posSeries = positionSeriesFor(team.id);
+      html += '<div class="section-sub" style="margin-bottom:4px;">Andamento posizione in classifica</div>'
+        + '<div style="margin-bottom:12px;">'+svgPositionChart(posSeries, state.teams.length, {width:520, height:90})+'</div>';
       html += '<div class="table-wrap"><table><thead><tr><th>Puntata</th><th class="num">Punti</th></tr></thead><tbody>'
         + row.perEp.slice().reverse().map(function(p){ return '<tr><td>Puntata '+p.numero+'</td><td class="num">'+fmtNum(p.punti)+'</td></tr>'; }).join("")
         + '</tbody></table></div>';
@@ -864,7 +960,11 @@
       + (locked ? '' : '<button class="btn sm ghost" id="sq-edit-brigata">'+(state._editingBrigata?"Annulla":"Modifica")+'</button>')
       + '</div><div>';
     if (brigata.length){
-      brigata.forEach(function(tc){ html += '<span class="chip">'+esc(concorrenteName(tc.concorrente_id))+' <span class="muted">'+fmtNum(concorrenteCumulativo(tc.concorrente_id))+'</span></span>'; });
+      brigata.forEach(function(tc){
+        var cc = byId(state.concorrenti, tc.concorrente_id);
+        var elimTag = (cc && cc.eliminato) ? ' <span class="badge warn" style="font-size:9px;">Eliminato</span>' : '';
+        html += '<span class="chip">'+esc(concorrenteName(tc.concorrente_id))+' <span class="muted">'+fmtNum(concorrenteCumulativo(tc.concorrente_id))+'</span>'+elimTag+'</span>';
+      });
     } else { html += '<span class="muted">Non hai ancora scelto la tua Brigata.</span>'; }
     if (ombra){
       html += '<span class="chip ombra">Chef Ombra: '+(state.meta.ombra_svelato?esc(concorrenteName(ombra.concorrente_id)):"segreto, lo sai solo tu")+'</span>';
@@ -888,7 +988,25 @@
     }
     html += '</div>';
 
+    if (sostituzioneEligible(team)){
+      html += '<div class="card" style="padding:16px; margin-bottom:16px;">'
+        + '<h3 style="font-size:15px;margin:0 0 8px;">Sostituzione di gennaio disponibile</h3>'
+        + '<p class="section-sub">Un tuo Chef in Brigata è stato eliminato: puoi sostituirlo con un altro Chef ancora in gara, una sola volta per tutta la stagione'+(sostituzioneDeadline()?(', entro il '+esc(fmtDeadline(sostituzioneDeadline()))):'')+'. Costa 10€, da versare all\'Admin fuori dall\'app, separati dal tuo budget Stelle/Carte.</p>'
+        + (state._showSostituzione ? sostituzioneFormHtml(team) : '<button class="btn sm primary" id="sq-open-sostituzione">Sostituisci un Chef</button>')
+        + '</div>';
+    }
+
+    html += '<div class="card" style="padding:16px; margin-bottom:16px;">'
+      + '<h3 style="font-size:15px;margin:0 0 8px;">Il tuo nome visualizzato</h3>'
+      + '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;">'
+      + '<label class="field" style="flex:1;min-width:160px;"><span>Nome</span><input id="sq-display-name" value="'+esc(state.profile.display_name||"")+'"></label>'
+      + '<button class="btn sm" id="sq-save-display-name">Salva</button>'
+      + '</div></div>';
+
     if (row && row.perEp.length){
+      var posSeriesMine = positionSeriesFor(team.id);
+      html += '<div class="card" style="padding:16px;margin-bottom:16px;"><h3 style="font-size:15px;margin:0 0 4px;">Andamento posizione in classifica</h3>'
+        + svgPositionChart(posSeriesMine, state.teams.length, {width:520, height:90}) + '</div>';
       html += '<div class="card" style="padding:16px;"><h3 style="font-size:15px;">Storico puntata per puntata</h3>'
         + '<div class="table-wrap"><table><thead><tr><th>Puntata</th><th class="num">Punti</th></tr></thead><tbody>'
         + row.perEp.slice().reverse().map(function(p){ return '<tr><td>Puntata '+p.numero+'</td><td class="num">'+fmtNum(p.punti)+'</td></tr>'; }).join("")
@@ -911,6 +1029,38 @@
         if (!state.myTeam) return;
         var ids = Array.prototype.map.call(document.querySelectorAll("[data-sq-brigata]"), function(sel){ return sel.value; });
         saveBrigata(state.myTeam.id, ids, "Brigata salvata.");
+      });
+    }
+    var openSost = document.getElementById("sq-open-sostituzione");
+    if (openSost){
+      openSost.addEventListener("click", function(){ state._showSostituzione = true; renderSquadra(); });
+    }
+    var cancelSost = document.getElementById("sq-cancel-sostituzione");
+    if (cancelSost){
+      cancelSost.addEventListener("click", function(){ state._showSostituzione = false; renderSquadra(); });
+    }
+    var confirmSost = document.getElementById("sq-confirm-sostituzione");
+    if (confirmSost){
+      confirmSost.addEventListener("click", function(){
+        if (!state.myTeam) return;
+        var newSel = document.getElementById("sost-new");
+        var newId = newSel ? newSel.value : "";
+        if (!newId){ toast("Scegli il nuovo Chef."); return; }
+        if (!confirm("Confermi la sostituzione? È definitiva e irrevocabile, non esiste una seconda sostituzione, e comporta un costo di 10€ da versare all'Admin fuori dall'app.")) return;
+        sb.from("team_chefs").insert({team_id: state.myTeam.id, concorrente_id: newId, ruolo: "sostituto"}).then(function(res){
+          if (res.error){ toast("Errore: " + res.error.message); return; }
+          state._showSostituzione = false;
+          reload("Sostituzione registrata.");
+        });
+      });
+    }
+    var saveNameBtn = document.getElementById("sq-save-display-name");
+    if (saveNameBtn){
+      saveNameBtn.addEventListener("click", function(){
+        var inp = document.getElementById("sq-display-name");
+        var val = inp ? inp.value.trim() : "";
+        if (!val){ toast("Il nome non può essere vuoto."); return; }
+        sb.from("profiles").update({display_name: val}).eq("id", state.profile.id).then(afterWrite("Nome aggiornato."));
       });
     }
   }
@@ -1497,7 +1647,9 @@
     var accountRows = state.profiles.slice().sort(function(a,b){ return (a.display_name||"").localeCompare(b.display_name||""); }).map(function(p){
       var t = state.teams.filter(function(tt){ return tt.profile_id===p.id; })[0];
       return '<div class="banner" style="flex-wrap:wrap;">'
-        + '<span>'+esc(p.display_name)+' <span class="muted">('+esc(p.username)+')</span>'
+        + '<span style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">'
+          + '<input data-player-name="'+p.id+'" value="'+esc(p.display_name||"")+'" style="width:140px;">'
+          + '<span class="muted">('+esc(p.username)+')</span>'
           + (t ? ' — '+esc(t.nome_squadra) : ' <span class="badge warn">senza squadra</span>')
           + (p.is_admin ? ' <span class="badge ok">Admin</span>' : '')
           + (!p.attivo ? ' <span class="badge warn">Disattivato</span>' : '')
@@ -1547,6 +1699,21 @@
           + '</select>';
       });
       var ombraSel = cur.filter(function(tc){return tc.ruolo==="ombra";})[0];
+      var sostRow = cur.filter(function(tc){ return tc.ruolo==="sostituto"; })[0];
+      var eligibiliSost = state.concorrenti.filter(function(c){ return !c.eliminato && cur.every(function(tc){ return tc.concorrente_id!==c.id; }); });
+      var sostBlock;
+      if (sostRow){
+        sostBlock = '<div class="field-row"><span class="section-sub" style="align-self:center;">Sostituzione gennaio:</span>'
+          + '<span class="badge ok">Usata — '+esc(concorrenteName(sostRow.concorrente_id))+'</span> '
+          + '<button class="btn sm ghost" data-undo-sostituzione="'+t.id+'" data-sost-row="'+sostRow.id+'">Annulla sostituzione</button></div>';
+      } else if (t.sostituzione_usata){
+        sostBlock = '<div class="field-row"><span class="section-sub" style="align-self:center;">Sostituzione gennaio:</span><span class="badge warn">Segnata come usata</span></div>';
+      } else {
+        var sostOpts = eligibiliSost.map(function(c){ return '<option value="'+c.id+'">'+esc(c.nome)+'</option>'; }).join("");
+        sostBlock = '<div class="field-row" style="align-items:flex-end;"><span class="section-sub" style="align-self:center;">Sostituzione gennaio:</span>'
+          + '<select data-team-sostituto="'+t.id+'"><option value="">— nessuna —</option>'+sostOpts+'</select>'
+          + '<button class="btn sm ghost" data-save-team-sostituto="'+t.id+'">Registra sostituzione</button></div>';
+      }
       return '<div class="card" style="padding:14px; margin-bottom:10px;" data-team-block="'+t.id+'">'
         + '<div class="field-row" style="align-items:flex-end;">'
         + '<label class="field"><span>Nome squadra</span><input data-team-name="'+t.id+'" value="'+esc(t.nome_squadra||"")+'"></label>'
@@ -1559,6 +1726,7 @@
         + '</div>'
         + '<div class="field-row"><span class="section-sub" style="align-self:center;">Chef Ombra:</span><select data-ombra="1" data-team="'+t.id+'"><option value="">Nessuno</option>'+optsFor(ombraSel?ombraSel.concorrente_id:null)+'</select></div>'
         + '<div class="field-row"><label class="field"><span>Scadenza Brigata personalizzata (facoltativa, per chi entra in ritardo)</span><input type="date" data-team-scadenza-brigata="'+t.id+'" value="'+(t.brigata_scadenza_personale||"")+'"></label></div>'
+        + sostBlock
         + '</div>';
     }).join("");
     html += fieldset("Giocatori & Squadre", teamBlocks, "admin-sec-squadre");
@@ -1750,6 +1918,13 @@
         sb.from("concorrenti").update({eliminato: !c.eliminato}).eq("id", c.id).then(afterWrite("Fatto."));
       });
     });
+    document.querySelectorAll("[data-player-name]").forEach(function(inp){
+      inp.addEventListener("change", function(){
+        var val = inp.value.trim();
+        if (!val){ toast("Il nome non può essere vuoto."); return; }
+        sb.from("profiles").update({display_name:val}).eq("id", inp.getAttribute("data-player-name")).then(afterWrite("Salvato."));
+      });
+    });
     document.querySelectorAll("[data-team-name]").forEach(function(inp){
       inp.addEventListener("change", function(){ sb.from("teams").update({nome_squadra:inp.value.trim()}).eq("id", inp.getAttribute("data-team-name")).then(afterWrite("Salvato.")); });
     });
@@ -1770,6 +1945,30 @@
     document.querySelectorAll("[data-team-scadenza-brigata]").forEach(function(inp){
       inp.addEventListener("change", function(){
         sb.from("teams").update({brigata_scadenza_personale: inp.value || null}).eq("id", inp.getAttribute("data-team-scadenza-brigata")).then(afterWrite("Salvato."));
+      });
+    });
+    document.querySelectorAll("[data-save-team-sostituto]").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        var teamId = btn.getAttribute("data-save-team-sostituto");
+        var sel = document.querySelector('[data-team-sostituto="'+teamId+'"]');
+        var newId = sel ? sel.value : "";
+        if (!newId){ toast("Scegli il nuovo Chef."); return; }
+        if (!confirm("Registrare questa sostituzione di gennaio per questa squadra? È un'operazione una tantum: dopo non se ne potranno registrare altre, salvo usare \"Annulla sostituzione\".")) return;
+        sb.from("team_chefs").insert({team_id:teamId, concorrente_id:newId, ruolo:"sostituto"}).then(function(res){
+          if (res.error){ toast("Errore: " + res.error.message); return; }
+          reload("Sostituzione registrata.");
+        });
+      });
+    });
+    document.querySelectorAll("[data-undo-sostituzione]").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        var teamId = btn.getAttribute("data-undo-sostituzione");
+        var rowId = btn.getAttribute("data-sost-row");
+        if (!confirm("Annullare la sostituzione di gennaio di questa squadra? Il giocatore potrà eventualmente rifarla da capo.")) return;
+        sb.from("team_chefs").delete().eq("id", rowId).then(function(res){
+          if (res.error){ toast("Errore: " + res.error.message); return; }
+          sb.from("teams").update({sostituzione_usata:false}).eq("id", teamId).then(afterWrite("Sostituzione annullata."));
+        });
       });
     });
     document.querySelectorAll("[data-ombra]").forEach(function(sel){
@@ -1921,6 +2120,15 @@
     if (res.data.session){ onAuthed(); }
   });
 })();
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('./service-worker.js').catch(function(err){
+      console.warn('Service worker non registrato:', err);
+    });
+  });
+}
 </script>
 </body>
 </html>
