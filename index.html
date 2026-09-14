@@ -1399,12 +1399,64 @@
   }
 
   /* ============ render: admin ============ */
-  function fieldset(legend, inner){ return '<fieldset><legend>'+esc(legend)+'</legend>'+inner+'</fieldset>'; }
+  function fieldset(legend, inner, id){ return '<fieldset'+(id?' id="'+esc(id)+'"':'')+'><legend>'+esc(legend)+'</legend>'+inner+'</fieldset>'; }
+
+  // Dashboard Admin: anomalie calcolate al volo (non salvate), con priorità
+  // urgente/importante/avviso come da regolamento. Nessuno storico: quando
+  // la condizione che le genera sparisce, l'anomalia sparisce con lei.
+  function computeAnomalie(){
+    var items = [];
+    var withoutTeam = state.profiles.filter(function(p){
+      if (!p.attivo || p.is_admin) return false;
+      return !state.teams.some(function(t){ return t.profile_id===p.id; });
+    });
+    if (withoutTeam.length){
+      items.push({priority:"urgente", text: withoutTeam.length+" account attivi senza squadra collegata: "+withoutTeam.map(function(p){return p.display_name;}).join(", ")+".", anchor:"admin-sec-account"});
+    }
+    state.teams.forEach(function(t){
+      var count = state.teamChefs.filter(function(tc){ return tc.team_id===t.id && tc.ruolo==="brigata" && tc.attivo; }).length;
+      if (count>=3) return;
+      var locked = brigataLocked(t);
+      var dl = brigataDeadlineFor(t);
+      if (locked){
+        items.push({priority:"urgente", text: '"'+(t.nome_squadra||"Squadra")+'" ha la Brigata incompleta ('+count+'/3) ed è già bloccata.', anchor:"admin-sec-squadre"});
+      } else if (dl){
+        var daysLeft = Math.ceil((dl - new Date()) / 86400000);
+        if (daysLeft<=3){
+          items.push({priority:"importante", text: '"'+(t.nome_squadra||"Squadra")+'" ha la Brigata incompleta ('+count+'/3), scadenza tra '+(daysLeft<=0?"meno di un giorno":daysLeft+" giorni")+".", anchor:"admin-sec-squadre"});
+        }
+      }
+    });
+    state.episodes.filter(function(e){ return !e.confermata && e.data; }).forEach(function(e){
+      var days = Math.floor((new Date() - new Date(e.data+"T00:00:00")) / 86400000);
+      if (days>=2){
+        items.push({priority:"importante", text: "Puntata "+e.numero+" è andata in onda ma non è ancora stata confermata.", anchor:"admin-sec-puntate"});
+      }
+    });
+    var hasAnyDraft = state.episodes.some(function(e){ return !e.confermata; });
+    var hasFutureDraft = state.episodes.some(function(e){ return !e.confermata && e.data; });
+    if (hasAnyDraft && !hasFutureDraft){
+      items.push({priority:"avviso", text: "C'è una puntata in bozza senza data: ricordati di impostarla.", anchor:"admin-sec-puntate"});
+    }
+    var order = {urgente:0, importante:1, avviso:2};
+    items.sort(function(a,b){ return order[a.priority]-order[b.priority]; });
+    return items;
+  }
+  function anomalieHtml(items){
+    if (!items.length) return '<p class="section-sub">Nessun problema da segnalare.</p>';
+    var labels = {urgente:"Urgente", importante:"Importante", avviso:"Avviso"};
+    return items.map(function(it){
+      return '<div class="banner '+(it.priority==="avviso"?"":"warn")+'"><span><span class="badge '+(it.priority==="avviso"?"ok":"warn")+'" style="margin-right:6px;">'+labels[it.priority]+'</span>'+esc(it.text)+'</span>'
+        + '<button class="btn sm ghost" data-goto="'+esc(it.anchor)+'">Vai</button></div>';
+    }).join("");
+  }
 
   function renderAdmin(){
     var el = document.getElementById("panel-admin");
     if (!state.profile.is_admin){ el.innerHTML = ""; return; }
     var html = '<div class="section-head"><div><h2>Pannello Admin</h2></div></div>';
+
+    html += fieldset("Dashboard", anomalieHtml(computeAnomalie()), "admin-sec-dashboard");
 
     html += fieldset("Impostazioni lega", ''
       + '<div class="field-row">'
@@ -1444,7 +1496,8 @@
       + '<button class="btn sm ghost" id="a-new-pw-gen" type="button" style="margin-bottom:12px;">Genera nuova</button>'
       + '</div>'
       + '<button class="btn sm primary" id="a-create-player">Crea account e squadra</button>'
-      + '<p class="section-sub" style="margin-top:8px;">Username e password vanno comunicati tu stesso al giocatore, fuori dall\'app. Il giocatore non può ancora cambiare la password da solo: se serve, torna qui e usa "Reset password".</p>'
+      + '<p class="section-sub" style="margin-top:8px;">Username e password vanno comunicati tu stesso al giocatore, fuori dall\'app. Il giocatore non può ancora cambiare la password da solo: se serve, torna qui e usa "Reset password".</p>',
+      "admin-sec-account"
     );
 
     var concList = state.concorrenti.map(function(c){
@@ -1483,14 +1536,14 @@
         + '<div class="field-row"><label class="field"><span>Scadenza Brigata personalizzata (facoltativa, per chi entra in ritardo)</span><input type="date" data-team-scadenza-brigata="'+t.id+'" value="'+(t.brigata_scadenza_personale||"")+'"></label></div>'
         + '</div>';
     }).join("");
-    html += fieldset("Giocatori & Squadre", teamBlocks);
+    html += fieldset("Giocatori & Squadre", teamBlocks, "admin-sec-squadre");
 
     var epRows = state.episodes.slice().sort(function(a,b){return b.numero-a.numero;}).map(function(e){
       return '<div class="banner"><span>Puntata '+e.numero+(e.data?' — '+esc(fmtEpWhen(e)):'')+' '+(e.confermata?'<span class="badge ok">Confermata</span>':'<span class="badge warn">Bozza</span>')+'</span>'
         + '<span><button class="btn sm ghost" data-edit-ep="'+e.id+'">Modifica</button> '
         + (e.confermata?'<button class="btn sm ghost" data-unconfirm-ep="'+e.id+'">Riporta in bozza</button>':'<button class="btn sm primary" data-confirm-ep="'+e.id+'">Conferma</button>')+'</span></div>';
     }).join("");
-    html += fieldset("Puntate & Risultati", epRows || '<p class="section-sub">Nessuna puntata registrata.</p>');
+    html += fieldset("Puntate & Risultati", epRows || '<p class="section-sub">Nessuna puntata registrata.</p>', "admin-sec-puntate");
 
     var calRows = state.episodes.slice().sort(function(a,b){return a.numero-b.numero;}).map(function(e){
       return '<div class="banner"><span>Puntata '+e.numero+'</span><span class="muted" style="font-size:12.5px;">'+(e.data?esc(fmtEpWhen(e)):'Data non ancora impostata')+'</span></div>';
@@ -1546,12 +1599,67 @@
       + '</div><button class="btn sm" id="a-save-settings">Salva parametri</button>'
     );
 
+    // Il regolamento non prevede notifiche manuali: questa sezione è solo di
+    // lettura, per rivedere gli ultimi avvisi automatici generati dal
+    // sistema e vedere quanti giocatori hanno le notifiche disattivate.
+    var avvisiRecenti = state.chatMessages.filter(function(m){ return m.is_avviso; })
+      .slice().sort(function(a,b){ return new Date(b.created_at)-new Date(a.created_at); }).slice(0,15);
+    var attivi = state.profiles.filter(function(p){ return p.attivo; });
+    var notifOff = attivi.filter(function(p){ return p.notifiche_attive===false; }).length;
+    html += fieldset("Notifiche & Avvisi", ''
+      + '<p class="section-sub" style="margin-top:-4px;">Gli avvisi sono automatici (nessun invio manuale, come da regolamento). '+notifOff+' giocatori su '+attivi.length+' hanno le notifiche disattivate.</p>'
+      + (avvisiRecenti.length ? avvisiRecenti.map(function(m){
+          return '<div class="banner"><span>'+esc(m.testo)+(m.target_profile_id?' <span class="badge ok">personale</span>':'')+'</span><span class="muted" style="font-size:12px;white-space:nowrap;">'+esc(fmtDateTime(m.created_at))+'</span></div>';
+        }).join("") : '<p class="section-sub">Nessun avviso ancora.</p>')
+    );
+
+    // Strumenti di correzione: la specifica non dettaglia il contenuto di
+    // questa sezione oltre al nome, quindi qui copro il caso più concreto
+    // già previsto dal regolamento ("l'Admin può correggere"): annullare
+    // un'attivazione o un acquisto carta sbagliati.
+    var actRows = state.activations.slice().sort(function(a,b){ return new Date(b.creato_il||0)-new Date(a.creato_il||0); }).map(function(a){
+      var ep = byId(state.episodes, a.episode_id);
+      var t = byId(state.teams, a.team_id);
+      var ct = state.cardTypes.filter(function(c){return c.key===a.card_key;})[0];
+      return '<div class="banner"><span>'+(ep?"Puntata "+ep.numero:"—")+' — '+esc(t?displayName(t):"?")+' — '+esc(ct?ct.label:a.card_key)+'</span><button class="btn sm ghost" data-remove-act="'+a.id+'">Annulla</button></div>';
+    }).join("") || '<p class="section-sub">Nessuna attivazione registrata.</p>';
+    var purRows = state.purchases.slice().map(function(p){
+      var t = byId(state.teams, p.team_id);
+      var ct = state.cardTypes.filter(function(c){return c.key===p.card_key;})[0];
+      var hasAct = state.activations.some(function(a){ return a.team_id===p.team_id && a.card_key===p.card_key; });
+      return '<div class="banner"><span>'+esc(t?displayName(t):"?")+' — '+esc(ct?ct.label:p.card_key)+'</span>'
+        + (hasAct ? '<span class="muted" style="font-size:12px;">Già attivata: annulla prima quella</span>' : '<button class="btn sm ghost" data-remove-purchase="'+p.id+'">Annulla acquisto</button>')
+        + '</div>';
+    }).join("") || '<p class="section-sub">Nessun acquisto registrato.</p>';
+    html += fieldset("Strumenti Admin", ''
+      + '<h4 style="margin:0 0 6px;font-size:13.5px;color:var(--gold-strong);">Correggi attivazioni carte</h4>' + actRows
+      + '<h4 style="margin:14px 0 6px;font-size:13.5px;color:var(--gold-strong);">Correggi acquisti carte</h4>' + purRows
+    );
+
     el.innerHTML = html;
     bindAdminEvents();
   }
 
   function bindAdminEvents(){
     var g = function(id){ return document.getElementById(id); };
+    document.querySelectorAll("[data-goto]").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        var target = g(btn.getAttribute("data-goto"));
+        if (target) target.scrollIntoView({behavior:"smooth", block:"start"});
+      });
+    });
+    document.querySelectorAll("[data-remove-act]").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        if (!confirm("Annullare questa attivazione? La carta tornerà disponibile per l'uso.")) return;
+        sb.from("card_activations").delete().eq("id", btn.getAttribute("data-remove-act")).then(afterWrite("Attivazione annullata."));
+      });
+    });
+    document.querySelectorAll("[data-remove-purchase]").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        if (!confirm("Annullare questo acquisto carta?")) return;
+        sb.from("card_purchases").delete().eq("id", btn.getAttribute("data-remove-purchase")).then(afterWrite("Acquisto annullato."));
+      });
+    });
     g("a-save-meta") && g("a-save-meta").addEventListener("click", function(){
       sb.from("league_meta").update({nome_lega:g("a-nome-lega").value.trim(), stagione_label:g("a-stagione").value.trim()}).eq("id", true).then(afterWrite("Impostazioni salvate."));
     });
