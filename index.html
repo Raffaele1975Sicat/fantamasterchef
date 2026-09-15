@@ -130,6 +130,13 @@
   .my-team-points b{font-family:'Fraunces',serif; font-size:19px; display:block;}
   .my-team-points-sub{font-size:11px; color:var(--ink-faint);}
   .my-team-chevron{font-size:20px; color:var(--ink-faint); flex:0 0 auto;}
+  .action-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:20px;}
+  .action-card{background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:14px; display:flex; flex-direction:column; align-items:flex-start; gap:8px; cursor:pointer; -webkit-tap-highlight-color:transparent;}
+  .action-card:active{background:var(--panel2); border-color:var(--gold-dim);}
+  .action-icon-wrap{width:42px; height:42px; border-radius:50%; background:var(--wood-dark); border:2px solid var(--gold); display:flex; align-items:center; justify-content:center; flex:0 0 auto;}
+  .action-icon-wrap img{width:21px; height:21px; object-fit:contain;}
+  .action-card h3{margin:0; font-size:14.5px;}
+  .action-card span{font-size:11.5px; color:var(--ink-faint); line-height:1.3;}
   .stat-row{display:flex; margin-bottom:18px; border:1px solid var(--line); border-radius:14px; overflow:hidden;}
   .stat-cell{flex:1; padding:12px 8px; text-align:center; border-right:1px solid var(--line);}
   .stat-cell:last-child{border-right:none;}
@@ -175,6 +182,10 @@
     .brigata-head h3{font-size:14px;}
     .brigata-chips .chip{padding:5px 10px; font-size:12px;}
     .rank-row{padding:12px 10px; gap:9px;}
+    .action-grid{gap:9px; margin-bottom:15px;}
+    .action-card{padding:11px;}
+    .action-icon-wrap{width:36px; height:36px;}
+    .action-icon-wrap img{width:18px; height:18px;}
   }
   /* --- breakpoint mobile: telefoni standard/larghi (≥390px) — più respiro --- */
   @media (min-width: 390px){
@@ -318,6 +329,7 @@
     <div id="notices-host"></div>
 
     <section class="tab-panel" data-panel="home" id="panel-home"></section>
+    <section class="tab-panel" data-panel="classifica" id="panel-classifica"></section>
     <section class="tab-panel" data-panel="squadra" id="panel-squadra"></section>
     <section class="tab-panel" data-panel="concorrenti" id="panel-concorrenti"></section>
     <section class="tab-panel" data-panel="puntate" id="panel-puntate"></section>
@@ -330,12 +342,13 @@
 
 <nav class="bottombar hidden" id="bottombar">
   <button data-tab="home"><img class="nav-ico" src="ico-home.png" alt="">Home</button>
-  <button data-tab="squadra"><img class="nav-ico" src="ico-brigata.png" alt="">Squadra</button>
   <button data-tab="carte"><img class="nav-ico" src="ico-carte.png" alt="">Carte</button>
+  <button data-tab="classifica"><img class="nav-ico" src="ico-trofeo.png" alt="">Classifica</button>
+  <button data-tab="squadra"><img class="nav-ico" src="ico-brigata.png" alt="">Squadra</button>
   <button data-tab="chat"><img class="nav-ico" src="ico-chat.png" alt="">Chat<span class="chat-badge hidden" id="chat-badge">0</span></button>
   <button type="button" id="more-nav-btn"><span class="nav-dots"><span></span><span></span><span></span></span>Altro</button>
   <div class="more-panel hidden" id="more-panel">
-    <button data-tab="concorrenti"><img class="nav-ico" src="ico-trofeo.png" alt="">Chef</button>
+    <button data-tab="concorrenti"><img class="nav-ico" src="ico-info.png" alt="">Chef</button>
     <button data-tab="puntate"><img class="nav-ico" src="ico-calendario.png" alt="">Puntate</button>
     <button data-tab="regolamento"><img class="nav-ico" src="ico-regolamento.png" alt="">Regole</button>
     <button data-tab="admin" id="admin-nav-btn" style="display:none;"><img class="nav-ico" src="ico-impostazioni.png" alt="">Pannello Admin</button>
@@ -1026,45 +1039,68 @@
   });
 
   /* ============ render: home / classifica ============ */
+  // La Home è il centro dell'app: 1) chi sono, 2) accesso alle funzioni
+  // principali, 3) la mia situazione, 4) informazioni dinamiche utili.
+  // Niente elenchi lunghi qui: quelli hanno una loro schermata dedicata.
   function renderHome(){
     var standings = computeStandings();
-    var started = state.episodes.some(function(e){ return e.confermata; });
-    var prevPos = started ? standingsDelta() : {};
     var myRow = state.myTeam ? standings.filter(function(r){ return r.team.id===state.myTeam.id; })[0] : null;
+    var team = state.myTeam;
+    var remaining = team ? starsRemaining(team) : 0;
 
-    // 1) chi sono / dove mi trovo: saluto breve
+    // 1) chi sono / dove mi trovo
     var html = '<div class="greet-row"><img class="greet-illus" src="hero-home.png" alt="">'
       + '<h1>Ciao'+(state.profile && state.profile.display_name ? ", " + esc(state.profile.display_name) : "")+'!</h1></div>';
 
-    // 2) la mia situazione attuale: posizione e punti, in un solo colpo d'occhio
+    // 2) accesso evidente alle funzioni principali
+    html += '<div class="action-grid">'
+      + '<div class="action-card" data-goto="carte"><div class="action-icon-wrap"><img src="ico-carte.png" alt=""></div><h3>Carte</h3><span>'+(team?remaining+'★ disponibili':'Scopri le carte')+'</span></div>'
+      + '<div class="action-card" data-goto="classifica"><div class="action-icon-wrap"><img src="ico-trofeo.png" alt=""></div><h3>Classifica</h3><span>'+(myRow?('Sei '+(myRow.pos===1?'primo':myRow.pos===2?'secondo':myRow.pos===3?'terzo':'#'+myRow.pos)):'Chi comanda la lega')+'</span></div>'
+      + '<div class="action-card" data-goto="squadra"><div class="action-icon-wrap"><img src="ico-brigata.png" alt=""></div><h3>Squadra</h3><span>La tua Brigata</span></div>'
+      + '<div class="action-card" data-goto="chat"><div class="action-icon-wrap"><img src="ico-chat.png" alt=""></div><h3>Chat</h3><span>Parla con la lega</span></div>'
+      + '</div>';
+
+    // 3) la mia situazione essenziale
     if (myRow){
+      var standingsDeltaMap = state.episodes.some(function(e){ return e.confermata; }) ? standingsDelta() : {};
       var myMedal = myRow.pos===1 ? "🥇" : (myRow.pos===2 ? "🥈" : (myRow.pos===3 ? "🥉" : null));
-      var prevMy = prevPos[myRow.team.id];
+      var prevMy = standingsDeltaMap[myRow.team.id];
       var myDelta = "";
       if (prevMy!=null && prevMy!==myRow.pos){
         myDelta = prevMy>myRow.pos
           ? ' <span style="color:var(--teal);">▲'+(prevMy-myRow.pos)+'</span>'
           : ' <span style="color:var(--penalty);">▼'+(myRow.pos-prevMy)+'</span>';
       }
-      html += '<div class="card my-team-card" data-goto-squadra="1">'
+      html += '<div class="card my-team-card" data-goto="squadra">'
         + '<div class="my-team-pos">'+(myMedal || ("#"+myRow.pos))+'</div>'
         + '<div class="my-team-info"><div class="my-team-label">La tua squadra</div><div class="my-team-name">'+esc(displayName(myRow.team))+'</div></div>'
         + '<div class="my-team-points"><b>'+fmtNum(myRow.total)+'</b><span class="my-team-points-sub">punti'+myDelta+'</span></div>'
         + '<div class="my-team-chevron">›</div></div>';
     }
 
-    // 3) eventuale azione importante da fare: scadenze/promemoria urgenti
+    // 4) informazioni dinamiche realmente utili: scadenze/promemoria
     html += scadenzeHtml(computeScadenze());
 
-    // 4) informazioni secondarie: classifica generale — solo il podio, il resto è dietro un tocco
-    html += '<div class="section-head" style="margin-bottom:8px;"><div><h2>Classifica</h2><p class="section-sub">Tocca una squadra per i dettagli.</p></div></div>';
+    document.getElementById("panel-home").innerHTML = html;
+    bindHomeEvents();
+  }
+  function bindHomeEvents(){
+    document.querySelectorAll("[data-goto]").forEach(function(el){
+      el.addEventListener("click", function(){ selectTab(el.getAttribute("data-goto")); });
+    });
+  }
+
+  /* ============ render: classifica ============ */
+  function renderClassifica(){
+    var standings = computeStandings();
+    var started = state.episodes.some(function(e){ return e.confermata; });
+    var prevPos = started ? standingsDelta() : {};
+    var html = '<div class="screen-head"><img src="ico-trofeo-badge.png" alt="" class="screen-head-icon"><div><h2>Classifica</h2><p class="section-sub">Tocca una squadra per i dettagli.</p></div></div>';
     if (!started){
       html += '<div class="card empty" style="text-align:center;"><img src="char-vuoto.png" alt="" class="hero-illus sm">La stagione non è ancora iniziata: la classifica apparirà dopo la prima puntata confermata.</div>';
     } else {
-      var expanded = !!state._classificaExpanded;
-      var visibleStandings = expanded ? standings : standings.slice(0,3);
       html += '<div class="card" style="padding:4px 0;">';
-      visibleStandings.forEach(function(r){
+      standings.forEach(function(r){
         var mine = state.myTeam && r.team.id===state.myTeam.id;
         var medal = r.pos===1 ? "🥇" : (r.pos===2 ? "🥈" : (r.pos===3 ? "🥉" : r.pos));
         var prev = prevPos[r.team.id];
@@ -1079,18 +1115,23 @@
           + '<div class="rank-name">'+esc(displayName(r.team))+deltaHtml+'</div>'
           + '<div class="rank-points">'+fmtNum(r.total)+'</div></div>';
         // dettagli squadra: solo se l'utente tocca una riga
-        if (state._expandedTeamHome===r.team.id){
+        if (state._expandedTeamClassifica===r.team.id){
           html += '<div style="padding:12px 14px 18px;border-bottom:1px solid var(--line);">'+teamDetailHtml(r)+'</div>';
         }
       });
-      if (standings.length>3){
-        html += '<div class="rank-row" id="classifica-toggle" style="justify-content:center;cursor:pointer;color:var(--gold-strong);font-weight:600;">'
-          + (expanded ? 'Comprimi classifica ‹' : 'Vedi classifica completa ('+standings.length+') ›') + '</div>';
-      }
       html += '</div>';
     }
-    document.getElementById("panel-home").innerHTML = html;
-    bindHomeEvents();
+    document.getElementById("panel-classifica").innerHTML = html;
+    bindClassificaEvents();
+  }
+  function bindClassificaEvents(){
+    document.querySelectorAll("[data-team-row]").forEach(function(el){
+      el.addEventListener("click", function(){
+        var id = el.getAttribute("data-team-row");
+        state._expandedTeamClassifica = (state._expandedTeamClassifica===id) ? null : id;
+        renderClassifica();
+      });
+    });
   }
   function teamDetailHtml(row){
     var team = row.team;
@@ -1128,26 +1169,6 @@
       html += '<span class="muted">Nessuna puntata confermata ancora.</span>';
     }
     return html;
-  }
-  function bindHomeEvents(){
-    document.querySelectorAll("[data-team-row]").forEach(function(el){
-      el.addEventListener("click", function(){
-        var id = el.getAttribute("data-team-row");
-        state._expandedTeamHome = (state._expandedTeamHome===id) ? null : id;
-        renderHome();
-      });
-    });
-    var goSquadra = document.querySelector("[data-goto-squadra]");
-    if (goSquadra){
-      goSquadra.addEventListener("click", function(){ selectTab("squadra"); });
-    }
-    var toggleClassifica = document.getElementById("classifica-toggle");
-    if (toggleClassifica){
-      toggleClassifica.addEventListener("click", function(){
-        state._classificaExpanded = !state._classificaExpanded;
-        renderHome();
-      });
-    }
   }
 
   /* ============ render: la mia squadra ============ */
@@ -2441,7 +2462,7 @@
   });
 
   function renderAll(){
-    renderHome(); renderSquadra(); renderConcorrenti(); renderPuntate(); renderCarte(); renderChat(); renderRegolamento(); renderAdmin();
+    renderHome(); renderClassifica(); renderSquadra(); renderConcorrenti(); renderPuntate(); renderCarte(); renderChat(); renderRegolamento(); renderAdmin();
     selectTab(state.activeTab);
   }
 
