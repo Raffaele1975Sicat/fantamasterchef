@@ -34,9 +34,10 @@
   .field{margin-bottom:12px; display:flex; flex-direction:column; gap:4px;}
   .field label{font-size:12.5px; color:var(--ink-faint);}
   .field input, .field select, .field textarea{background:var(--panel2); border:1px solid var(--line); color:var(--ink); border-radius:8px; padding:10px 12px; font-size:15px; font-family:inherit;}
-  select{background:var(--panel2); border:1px solid var(--line); color:var(--ink); border-radius:8px; padding:10px 12px; font-size:15px; font-family:inherit;}
+  select{background:var(--panel2); border:1px solid var(--line); color:var(--ink); border-radius:8px; padding:10px 12px; font-size:15px; font-family:inherit; max-width:100%;}
   .field-row{display:flex; gap:10px; flex-wrap:wrap;}
   .field-row .field{flex:1; min-width:140px;}
+  .field-row select, .field-row input{flex:1 1 120px; min-width:0; max-width:100%;}
   /* --- pulsanti: sistema unico, coerente con le carte (oro/legno), niente immagini --- */
   .btn{background:var(--panel2); color:var(--ink); border:1px solid var(--line); border-radius:10px; padding:10px 16px; font-size:14px; font-weight:700;
     box-shadow:0 2px 0 rgba(0,0,0,.3); transition:transform .05s ease, box-shadow .05s ease; letter-spacing:.01em;}
@@ -184,6 +185,70 @@
     .disclosure{margin-bottom:18px;}
   }
   details summary{cursor:pointer; font-size:13px; color:var(--ink-dim); margin-top:6px;}
+
+  /* --- carte / chef / puntate / regolamento / chat: stessa filosofia essenziale→azione→dettagli --- */
+  .screen-head{display:flex; align-items:center; gap:12px; margin-bottom:16px;}
+  .screen-head-icon{width:44px; height:44px; object-fit:cover; border-radius:50%; border:2px solid var(--gold); flex:0 0 auto; background:var(--wood-dark);}
+  .screen-head h2{margin:0;}
+  .screen-head .section-sub{margin-top:2px;}
+
+  .stars-card{display:flex; align-items:center; gap:12px; padding:14px 16px; margin-bottom:18px;}
+  .stars-card img{width:28px; height:28px; object-fit:contain; flex:0 0 auto;}
+  .stars-card .stars-label{font-size:11.5px; color:var(--ink-faint); text-transform:uppercase; letter-spacing:.05em;}
+  .stars-card .stars-val{font-family:'Fraunces',serif; font-size:22px; color:var(--gold-strong); font-weight:700;}
+
+  .card-item{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:14px 16px; margin-bottom:12px;}
+  .card-item-head{display:flex; align-items:center; gap:12px; margin-bottom:10px;}
+  .card-item-thumb{width:42px; height:63px; object-fit:cover; border-radius:5px; flex:0 0 auto; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,.35);}
+  .card-item-title{flex:1; min-width:0;}
+  .card-item-title h3{margin:0 0 2px; font-size:15px;}
+  .card-item-cost{font-family:'Fraunces',serif; color:var(--gold-strong); font-size:13.5px; white-space:nowrap;}
+  .card-item-info{font-size:12.5px; color:var(--gold-strong); cursor:pointer; -webkit-tap-highlight-color:transparent; display:inline-block; margin-bottom:2px;}
+  .card-item-desc{font-size:13px; color:var(--ink-dim); line-height:1.45; margin:8px 0 0; padding-top:10px; border-top:1px solid var(--line);}
+
+  .chip-row{display:flex; align-items:center; gap:12px; padding:12px 14px; border-bottom:1px solid var(--line); cursor:pointer; -webkit-tap-highlight-color:transparent;}
+  .chip-row:last-child{border-bottom:none;}
+  .chip-row-name{flex:1; min-width:0;}
+  .chip-row-points{font-weight:700; font-variant-numeric:tabular-nums; flex:0 0 auto;}
+  .chip-row-chevron{color:var(--ink-faint); flex:0 0 auto;}
+
+  .ep-card{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:14px 16px; margin-bottom:12px;}
+  .ep-card-head{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:6px;}
+  .ep-card-head h3{margin:0; font-size:15.5px;}
+  .ep-highlights{display:flex; flex-wrap:wrap; gap:6px 8px; margin:8px 0 2px;}
+  .ep-highlights .chip{margin:0;}
+  .ep-toggle{margin-top:10px; font-size:12.5px; color:var(--gold-strong); cursor:pointer; -webkit-tap-highlight-color:transparent; display:inline-block;}
+
+  .chat-top{display:flex; align-items:center; gap:10px; margin-bottom:10px; padding-bottom:10px; border-bottom:1px solid var(--line);}
+  .chat-top img{width:38px; height:38px; object-fit:cover; border-radius:50%; flex:0 0 auto;}
+  .chat-top-title{flex:1; min-width:0;}
+  .chat-top-title h2{margin:0; font-size:17px;}
+  .chat-top-title span{font-size:11px; color:var(--ink-faint);}
+  .chat-notif-toggle{display:flex; align-items:center; gap:5px; font-size:18px; flex:0 0 auto; cursor:pointer; -webkit-tap-highlight-color:transparent; padding:6px; -webkit-tap-highlight-color:transparent;}
+  .chat-notif-toggle input{margin:0;}
+  .chat-notif-toggle input:not(:checked) ~ .bell{opacity:.35;}
+
+  details.admin-disclosure{background:var(--panel); border:1px solid var(--line); border-radius:14px; margin-bottom:12px; overflow:hidden;}
+  details.admin-disclosure summary{list-style:none; cursor:pointer; display:flex; align-items:center; justify-content:space-between; gap:10px; padding:14px 16px; -webkit-tap-highlight-color:transparent;}
+  details.admin-disclosure summary::-webkit-details-marker{display:none;}
+  details.admin-disclosure summary h3{margin:0; font-size:14.5px;}
+  details.admin-disclosure summary .chev{color:var(--gold-strong); font-size:15px; transition:transform .2s ease; flex:0 0 auto;}
+  details.admin-disclosure[open] summary .chev{transform:rotate(90deg);}
+  details.admin-disclosure summary{border-bottom:1px solid transparent;}
+  details.admin-disclosure[open] summary{border-bottom-color:var(--line);}
+  details.admin-disclosure .disclosure-body{padding:14px 16px 16px;}
+  details.admin-disclosure fieldset{border:none; margin:0; padding:0;}
+  details.admin-disclosure legend{display:none;}
+
+  @media (max-width: 389px){
+    .card-item{padding:12px 13px;}
+    .card-item-thumb{width:38px; height:57px;}
+    .stars-card{padding:12px 14px;}
+    .screen-head-icon{width:38px; height:38px;}
+    .ep-card{padding:12px 13px;}
+    details.admin-disclosure summary{padding:12px 13px;}
+    details.admin-disclosure .disclosure-body{padding:12px 13px 14px;}
+  }
   #install-banner{position:fixed; left:12px; right:12px; bottom:12px; background:var(--panel); border:1px solid var(--gold); border-radius:12px; padding:12px 14px; box-shadow:0 8px 24px rgba(0,0,0,.5); z-index:50; font-size:13.5px; max-width:460px; margin:0 auto;}
   .install-banner-inner{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
   .install-banner-inner span{flex:1; min-width:180px; line-height:1.4;}
@@ -193,7 +258,7 @@
   #card-lightbox img{max-width:min(90vw,420px); max-height:85vh; border-radius:14px; box-shadow:0 10px 40px rgba(0,0,0,.5);}
   .bottombar button{position:relative;}
   .chat-badge{position:absolute; top:3px; right:12px; background:var(--penalty); color:#fff; font-size:9.5px; min-width:15px; height:15px; line-height:15px; text-align:center; border-radius:999px; padding:0 3px;}
-  #chat-wrap{display:flex; flex-direction:column; height:calc(100vh - 250px); min-height:320px;}
+  #chat-wrap{display:flex; flex-direction:column; height:calc(100vh - 210px); min-height:320px;}
   #chat-list{flex:1; overflow-y:auto; padding:4px 2px 10px; display:flex; flex-direction:column; gap:10px;}
   .chat-msg{max-width:84%; align-self:flex-start; display:flex; flex-direction:column;}
   .chat-msg.mine{align-self:flex-end; align-items:flex-end;}
@@ -967,10 +1032,11 @@
     var prevPos = started ? standingsDelta() : {};
     var myRow = state.myTeam ? standings.filter(function(r){ return r.team.id===state.myTeam.id; })[0] : null;
 
-    // 1) essenziale: saluto breve + eventuali scadenze urgenti + colpo d'occhio sulla propria squadra
+    // 1) chi sono / dove mi trovo: saluto breve
     var html = '<div class="greet-row"><img class="greet-illus" src="hero-home.png" alt="">'
       + '<h1>Ciao'+(state.profile && state.profile.display_name ? ", " + esc(state.profile.display_name) : "")+'!</h1></div>';
-    html += scadenzeHtml(computeScadenze());
+
+    // 2) la mia situazione attuale: posizione e punti, in un solo colpo d'occhio
     if (myRow){
       var myMedal = myRow.pos===1 ? "🥇" : (myRow.pos===2 ? "🥈" : (myRow.pos===3 ? "🥉" : null));
       var prevMy = prevPos[myRow.team.id];
@@ -987,13 +1053,18 @@
         + '<div class="my-team-chevron">›</div></div>';
     }
 
-    // 2) azione principale di questa schermata: guardare la classifica
+    // 3) eventuale azione importante da fare: scadenze/promemoria urgenti
+    html += scadenzeHtml(computeScadenze());
+
+    // 4) informazioni secondarie: classifica generale — solo il podio, il resto è dietro un tocco
     html += '<div class="section-head" style="margin-bottom:8px;"><div><h2>Classifica</h2><p class="section-sub">Tocca una squadra per i dettagli.</p></div></div>';
     if (!started){
       html += '<div class="card empty" style="text-align:center;"><img src="char-vuoto.png" alt="" class="hero-illus sm">La stagione non è ancora iniziata: la classifica apparirà dopo la prima puntata confermata.</div>';
     } else {
+      var expanded = !!state._classificaExpanded;
+      var visibleStandings = expanded ? standings : standings.slice(0,3);
       html += '<div class="card" style="padding:4px 0;">';
-      standings.forEach(function(r){
+      visibleStandings.forEach(function(r){
         var mine = state.myTeam && r.team.id===state.myTeam.id;
         var medal = r.pos===1 ? "🥇" : (r.pos===2 ? "🥈" : (r.pos===3 ? "🥉" : r.pos));
         var prev = prevPos[r.team.id];
@@ -1007,11 +1078,15 @@
           + '<div class="rank-num">'+medal+'</div>'
           + '<div class="rank-name">'+esc(displayName(r.team))+deltaHtml+'</div>'
           + '<div class="rank-points">'+fmtNum(r.total)+'</div></div>';
-        // 3) dettagli: solo se l'utente tocca una squadra
+        // dettagli squadra: solo se l'utente tocca una riga
         if (state._expandedTeamHome===r.team.id){
           html += '<div style="padding:12px 14px 18px;border-bottom:1px solid var(--line);">'+teamDetailHtml(r)+'</div>';
         }
       });
+      if (standings.length>3){
+        html += '<div class="rank-row" id="classifica-toggle" style="justify-content:center;cursor:pointer;color:var(--gold-strong);font-weight:600;">'
+          + (expanded ? 'Comprimi classifica ‹' : 'Vedi classifica completa ('+standings.length+') ›') + '</div>';
+      }
       html += '</div>';
     }
     document.getElementById("panel-home").innerHTML = html;
@@ -1065,6 +1140,13 @@
     var goSquadra = document.querySelector("[data-goto-squadra]");
     if (goSquadra){
       goSquadra.addEventListener("click", function(){ selectTab("squadra"); });
+    }
+    var toggleClassifica = document.getElementById("classifica-toggle");
+    if (toggleClassifica){
+      toggleClassifica.addEventListener("click", function(){
+        state._classificaExpanded = !state._classificaExpanded;
+        renderHome();
+      });
     }
   }
 
@@ -1224,18 +1306,23 @@
   }
   /* ============ render: concorrenti ============ */
   function renderConcorrenti(){
-    var html = '<div class="section-head"><div><h2>Concorrenti</h2><p class="section-sub">Il tabellone si aggiorna con le puntate confermate. Tocca un concorrente per la scheda.</p></div></div>';
-    html += '<div class="table-wrap"><table><thead><tr><th>Nome</th><th>Stato</th><th class="num">Punti</th></tr></thead><tbody>';
+    var html = '<div class="section-head"><div><h2>Chef</h2><p class="section-sub">Tocca uno Chef per la scheda.</p></div></div>';
     var rows = state.concorrenti.slice().sort(function(a,b){
       return concorrenteCumulativo(b.id)-concorrenteCumulativo(a.id) || String(a.nome).localeCompare(String(b.nome));
     });
+    html += '<div class="card" style="padding:4px 0;">';
     rows.forEach(function(c){
-      html += '<tr data-conc-row="'+c.id+'" style="cursor:pointer;"><td>'+esc(c.nome)+'</td><td>'+(c.eliminato?'<span class="badge warn">Eliminato</span>':'<span class="badge ok">In gara</span>')+'</td><td class="num">'+fmtNum(concorrenteCumulativo(c.id))+'</td></tr>';
-      if (state._expandedConc===c.id){
-        html += '<tr><td colspan="3" style="padding:12px 10px 18px;">'+concorrenteDetailHtml(c)+'</td></tr>';
+      var open = state._expandedConc===c.id;
+      html += '<div class="chip-row" data-conc-row="'+c.id+'">'
+        + '<div class="chip-row-name">'+esc(c.nome)+(c.eliminato?' <span class="badge warn">Eliminato</span>':' <span class="badge ok">In gara</span>')+'</div>'
+        + '<div class="chip-row-points">'+fmtNum(concorrenteCumulativo(c.id))+'</div>'
+        + '<div class="chip-row-chevron">'+(open?'⌃':'›')+'</div>'
+        + '</div>';
+      if (open){
+        html += '<div style="padding:2px 14px 18px;border-bottom:1px solid var(--line);">'+concorrenteDetailHtml(c)+'</div>';
       }
     });
-    html += '</tbody></table></div>';
+    html += '</div>';
     document.getElementById("panel-concorrenti").innerHTML = html;
     bindConcorrentiEvents();
   }
@@ -1270,24 +1357,66 @@
 
   /* ============ render: puntate ============ */
   function renderPuntate(){
-    var html = '<div class="section-head"><div><h2>Puntate</h2><p class="section-sub">Risultati puntata per puntata.</p></div><img src="char-dettaglio.png" alt="" class="hero-illus sm" style="max-width:56px;margin:0;border-radius:10px;flex:0 0 auto;"></div>';
+    if (!state._puntateExpanded) state._puntateExpanded = {};
+    var html = '<div class="screen-head"><img src="char-dettaglio.png" alt="" class="screen-head-icon"><div><h2>Puntate</h2><p class="section-sub">Risultati puntata per puntata.</p></div></div>';
     var episodes = state.episodes.filter(function(e){ return state.profile.is_admin || e.confermata; }).slice().sort(function(a,b){return b.numero-a.numero;});
     if (!episodes.length){ html += '<div class="card empty" style="text-align:center;"><img src="char-vuoto.png" alt="" class="hero-illus sm">Nessuna puntata ancora confermata.</div>'; }
-    episodes.forEach(function(ep){
-      html += '<div class="card" style="padding:16px; margin-bottom:14px;">'
-        + '<div class="section-head" style="margin-bottom:8px;"><h3 style="font-size:16px;">Puntata '+ep.numero+(ep.confermata?'':' <span class="badge warn">Bozza</span>')+'</h3><span class="section-sub">'+esc(fmtEpWhen(ep))+'</span></div>'
-        + '<div class="table-wrap"><table><thead><tr><th>Concorrente</th><th>Bonus</th><th>Penalità</th><th class="num">Punti base</th></tr></thead><tbody>';
+    episodes.forEach(function(ep, idx){
+      var stored = state._puntateExpanded[ep.id];
+      var open = (stored===undefined) ? (idx===0) : stored;
+
+      // 1) essenziale: cosa è successo in questa puntata, a colpo d'occhio
+      var mysteryBox=[], esterna=[], cucina=[], miglior=[], nero=[], persaEsterna=[];
+      var rowsHtml = "";
       state.concorrenti.forEach(function(c){
         var e = eventFor(ep.id, c.id);
         if (!e) return;
+        if (e.mystery_box) mysteryBox.push(c.nome);
+        if (e.vince_esterna) esterna.push(c.nome);
+        if (e.vince_cucina) cucina.push(c.nome);
+        if (e.miglior_piatto) miglior.push(c.nome);
+        if (e.penalita==="nero") nero.push(c.nome);
+        if (e.penalita==="esterna") persaEsterna.push(c.nome);
         var bp = basePoints(ep.id, c.id);
         var bonusStr = [e.mystery_box&&"Mystery Box", e.vince_esterna&&"Esterna", e.vince_cucina&&"Cucina", e.miglior_piatto&&"Miglior piatto"].filter(Boolean).join(", ") || "—";
         var penStr = e.penalita==="nero"?"Grembiule Nero":(e.penalita==="esterna"?"Persa Esterna":"—");
-        html += '<tr><td>'+esc(c.nome)+'</td><td>'+esc(bonusStr)+'</td><td>'+esc(penStr)+'</td><td class="num">'+fmtNum(bp.bonus+bp.penalty)+'</td></tr>';
+        rowsHtml += '<tr><td>'+esc(c.nome)+'</td><td>'+esc(bonusStr)+'</td><td>'+esc(penStr)+'</td><td class="num">'+fmtNum(bp.bonus+bp.penalty)+'</td></tr>';
       });
-      html += '</tbody></table></div></div>';
+      html += '<div class="ep-card">'
+        + '<div class="ep-card-head"><h3>Puntata '+ep.numero+(ep.confermata?'':' <span class="badge warn">Bozza</span>')+'</h3><span class="section-sub">'+esc(fmtEpWhen(ep))+'</span></div>';
+      html += '<div class="ep-highlights">';
+      if (cucina.length) html += '<span class="chip">🏆 Cucina: '+esc(cucina.join(", "))+'</span>';
+      if (esterna.length) html += '<span class="chip">🌍 Esterna: '+esc(esterna.join(", "))+'</span>';
+      if (mysteryBox.length) html += '<span class="chip">📦 Mystery Box: '+esc(mysteryBox.join(", "))+'</span>';
+      if (miglior.length) html += '<span class="chip">🍽️ Miglior piatto: '+esc(miglior.join(", "))+'</span>';
+      if (nero.length) html += '<span class="chip">⚫ Grembiule Nero: '+esc(nero.join(", "))+'</span>';
+      if (persaEsterna.length) html += '<span class="chip">❌ Persa Esterna: '+esc(persaEsterna.join(", "))+'</span>';
+      if (!rowsHtml) html += '<span class="muted">Nessun punteggio inserito ancora.</span>';
+      html += '</div>';
+
+      // 2) dettagli: punteggio completo, solo se richiesto
+      if (rowsHtml){
+        if (open){
+          html += '<div class="table-wrap" style="margin-top:10px;"><table><thead><tr><th>Concorrente</th><th>Bonus</th><th>Penalità</th><th class="num">Punti base</th></tr></thead><tbody>'+rowsHtml+'</tbody></table></div>';
+          html += '<span class="ep-toggle" data-ep-toggle="'+ep.id+'">Nascondi punteggi completi ‹</span>';
+        } else {
+          html += '<span class="ep-toggle" data-ep-toggle="'+ep.id+'">Vedi punteggi completi ›</span>';
+        }
+      }
+      html += '</div>';
     });
     document.getElementById("panel-puntate").innerHTML = html;
+    bindPuntateEvents();
+  }
+  function bindPuntateEvents(){
+    document.querySelectorAll("[data-ep-toggle]").forEach(function(el){
+      el.addEventListener("click", function(){
+        var id = el.getAttribute("data-ep-toggle");
+        var currentlyOpen = el.textContent.indexOf("Nascondi")===0;
+        state._puntateExpanded[id] = !currentlyOpen;
+        renderPuntate();
+      });
+    });
   }
 
   /* ============ render: carte ============ */
@@ -1296,12 +1425,15 @@
     var remaining = team ? starsRemaining(team) : 0;
     var myPurchases = team ? state.purchases.filter(function(p){ return p.team_id===team.id; }) : [];
 
-    var html = '<img src="char-carte.png" alt="" class="hero-illus">';
-    html += '<div class="section-head"><div><h2>Carte</h2><p class="section-sub">Ogni carta si acquista una sola volta per squadra. Tocca l\'immagine per vederla intera.</p></div></div>';
+    if (!state._cardInfoOpen) state._cardInfoOpen = {};
+
+    // 1) essenziale: quante Stelle ho
+    var html = '<div class="screen-head"><img src="char-carte.png" alt="" class="screen-head-icon"><div><h2>Carte</h2><p class="section-sub">Tocca l\'immagine per vederla intera.</p></div></div>';
     if (team){
-      html += '<div class="card" style="padding:12px 16px; margin-bottom:16px;display:flex;align-items:center;gap:8px;"><img src="ico-stelle.png" alt="" style="width:18px;height:18px;object-fit:contain;"><span class="section-sub">Stelle disponibili: <b>'+remaining+' / '+(team.stelle_acquistate||1)+'</b></span></div>';
+      html += '<div class="card stars-card"><img src="ico-stelle.png" alt=""><div><div class="stars-label">Stelle disponibili</div><div class="stars-val">'+remaining+' / '+(team.stelle_acquistate||1)+'</div></div></div>';
     }
-    html += '<div class="table-wrap" style="margin-bottom:14px;"><table><thead><tr><th>Carta</th><th class="num">Costo</th><th>Descrizione</th><th></th></tr></thead><tbody>';
+
+    // 2) azione: una card per ogni tipo di carta, con l'unica azione possibile in evidenza
     state.cardTypes.forEach(function(c){
       var actionHtml = "";
       if (team){
@@ -1317,47 +1449,73 @@
           } else {
             var win = cardWindowInfo(c.key);
             actionHtml = win.open
-              ? ('<button class="btn sm primary" data-activate-card="'+esc(c.key)+'">Usa</button>')
-              : ('<button class="btn sm ghost" disabled title="'+esc(win.reasons.join(" · "))+'">Non disponibile</button>');
+              ? ('<button class="btn primary block" data-activate-card="'+esc(c.key)+'">Usa</button>')
+              : ('<button class="btn ghost block" disabled title="'+esc(win.reasons.join(" · "))+'">Non disponibile</button>');
           }
         } else if (c.key==="chef_ombra" && state._pickingOmbra){
           var taken = teamChefsFor(team.id, true).map(function(tc){ return tc.concorrente_id; });
           var eligibili = state.concorrenti.filter(function(x){ return !x.eliminato && taken.indexOf(x.id)===-1; });
           actionHtml = eligibili.length
-            ? ('<select id="ombra-select" style="margin-right:6px;">' + eligibili.map(function(x){ return '<option value="'+x.id+'">'+esc(x.nome)+'</option>'; }).join("") + '</select>'
-              + '<button class="btn sm primary" id="ombra-confirm">Conferma</button> '
-              + '<button class="btn sm ghost" id="ombra-cancel">Annulla</button>')
+            ? ('<div style="display:flex;flex-direction:column;gap:8px;"><select id="ombra-select">' + eligibili.map(function(x){ return '<option value="'+x.id+'">'+esc(x.nome)+'</option>'; }).join("") + '</select>'
+              + '<div><button class="btn sm primary" id="ombra-confirm">Conferma</button> '
+              + '<button class="btn sm ghost" id="ombra-cancel">Annulla</button></div></div>')
             : '<span class="muted">Nessuno Chef disponibile</span>';
         } else {
           var afford = remaining >= Number(c.costo_stelle);
-          actionHtml = '<button class="btn sm '+(afford?'primary':'ghost')+'" data-buy-card="'+esc(c.key)+'" '+(afford?'':'disabled title="Stelle insufficienti"')+'>Compra</button>';
+          actionHtml = '<button class="btn '+(afford?'primary':'ghost')+' block" data-buy-card="'+esc(c.key)+'" '+(afford?'':'disabled title="Stelle insufficienti"')+'>Compra</button>';
         }
       }
-      html += '<tr><td><img src="'+(CARD_IMG[c.key]||"")+'" alt="" class="card-thumb" data-card-img="'+(CARD_IMG[c.key]||"")+'" data-card-label="'+esc(c.label)+'" style="width:34px;height:51px;object-fit:cover;border-radius:4px;vertical-align:middle;cursor:pointer;margin-right:8px;"> '+esc(c.label)+'</td><td class="num">'+c.costo_stelle+'★</td><td>'+esc(c.descrizione)+'</td><td style="white-space:nowrap;">'+actionHtml+'</td></tr>';
+      var infoOpen = !!state._cardInfoOpen[c.key];
+      html += '<div class="card-item">'
+        + '<div class="card-item-head">'
+        + '<img src="'+(CARD_IMG[c.key]||"")+'" alt="" class="card-item-thumb card-thumb" data-card-img="'+(CARD_IMG[c.key]||"")+'" data-card-label="'+esc(c.label)+'">'
+        + '<div class="card-item-title"><h3>'+esc(c.label)+'</h3><span class="card-item-cost">'+c.costo_stelle+'★</span></div>'
+        + '</div>'
+        + '<span class="card-item-info" data-card-info-toggle="'+esc(c.key)+'">'+(infoOpen?'Nascondi spiegazione ‹':'Come funziona ›')+'</span>'
+        + (infoOpen ? '<p class="card-item-desc">'+esc(c.descrizione)+(team?' Ogni carta si utilizza una sola volta; se non è disponibile, il motivo è indicato al posto del pulsante. La conferma è definitiva.':'')+'</p>' : '')
+        + '<div class="card-item-status" style="margin-top:10px;">'+actionHtml+'</div>'
+        + '</div>';
     });
-    html += '</tbody></table></div>';
-    if (team){
-      html += '<p class="section-sub" style="margin-top:-6px;margin-bottom:20px;">Ogni carta si utilizza una sola volta. La finestra di utilizzo dipende dalla carta: se non è disponibile, il motivo è indicato al posto del pulsante. La conferma è definitiva.</p>';
-    }
 
-    html += '<div class="section-head"><h3 style="font-size:15px;">Storico attivazioni</h3></div>';
-    if (!state.activationsPublic.length){
-      html += '<div class="card empty" style="text-align:center;"><img src="char-vuoto.png" alt="" class="hero-illus sm">Nessuna carta attivata finora.</div>';
-    } else {
-      html += '<div class="table-wrap"><table><thead><tr><th>Puntata</th><th>Squadra</th><th>Carta</th></tr></thead><tbody>';
-      state.activationsPublic.slice().reverse().forEach(function(a){
-        var ep = byId(state.episodes, a.episode_id);
-        var t = byId(state.teams, a.team_id);
-        var ct = state.cardTypes.filter(function(c){return c.key===a.card_key;})[0];
-        html += '<tr><td>'+(ep?ep.numero:"?")+'</td><td>'+esc(t?displayName(t):"?")+'</td><td>'+esc(ct?ct.label:a.card_key)+'</td></tr>';
-      });
-      html += '</tbody></table></div>';
+    // 3) dettagli secondari: storico, chiuso di default
+    var storicoOpen = !!state._carteStoricoOpen;
+    html += '<div class="disclosure'+(storicoOpen?' open':'')+'"><div class="disclosure-head" id="carte-toggle-storico"><h3>Storico attivazioni</h3><span class="disclosure-chevron">›</span></div>';
+    if (storicoOpen){
+      html += '<div class="disclosure-body">';
+      if (!state.activationsPublic.length){
+        html += '<p class="muted">Nessuna carta attivata finora.</p>';
+      } else {
+        state.activationsPublic.slice().reverse().forEach(function(a){
+          var ep = byId(state.episodes, a.episode_id);
+          var t = byId(state.teams, a.team_id);
+          var ct = state.cardTypes.filter(function(c){return c.key===a.card_key;})[0];
+          html += '<div class="disclosure-sub" style="display:flex;justify-content:space-between;gap:10px;font-size:13.5px;"><span>'+esc(ct?ct.label:a.card_key)+' — '+esc(t?displayName(t):"?")+'</span><span class="muted">Puntata '+(ep?ep.numero:"?")+'</span></div>';
+        });
+      }
+      html += '</div>';
     }
+    html += '</div>';
+
     document.getElementById("panel-carte").innerHTML = html;
     bindCarteEvents();
   }
 
   function bindCarteEvents(){
+    document.querySelectorAll("[data-card-info-toggle]").forEach(function(el){
+      el.addEventListener("click", function(){
+        var key = el.getAttribute("data-card-info-toggle");
+        if (!state._cardInfoOpen) state._cardInfoOpen = {};
+        state._cardInfoOpen[key] = !state._cardInfoOpen[key];
+        renderCarte();
+      });
+    });
+    var storicoToggle = document.getElementById("carte-toggle-storico");
+    if (storicoToggle){
+      storicoToggle.addEventListener("click", function(){
+        state._carteStoricoOpen = !state._carteStoricoOpen;
+        renderCarte();
+      });
+    }
     document.querySelectorAll("[data-buy-card]").forEach(function(btn){
       btn.addEventListener("click", function(){
         var key = btn.getAttribute("data-buy-card");
@@ -1506,10 +1664,8 @@
       reactionsByMsg[r.message_id][r.emoji].push(r.profile_id);
     });
 
-    var html = '<div class="section-head"><div><h2>Chat</h2><p class="section-sub">Un\'unica chat della lega. I messaggi restano visibili per 20 giorni.</p></div><img src="char-chat.png" alt="" class="hero-illus sm" style="max-width:56px;margin:0;border-radius:50%;flex:0 0 auto;object-fit:cover;height:56px;"></div>';
-    html += '<div class="card" style="padding:10px 14px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center; gap:10px;">'
-      + '<span class="section-sub" style="margin:0;">Notifiche per gli avvisi importanti</span>'
-      + '<label style="display:flex;align-items:center;gap:6px;font-size:13px;white-space:nowrap;"><input type="checkbox" id="chat-notif-toggle" '+(state.profile.notifiche_attive?"checked":"")+'> Attive</label>'
+    var html = '<div class="chat-top"><img src="char-chat.png" alt=""><div class="chat-top-title"><h2>Chat</h2><span>Messaggi visibili 20 giorni</span></div>'
+      + '<label class="chat-notif-toggle" title="Notifiche per gli avvisi importanti"><input type="checkbox" id="chat-notif-toggle" '+(state.profile.notifiche_attive?"checked":"")+'><span class="bell">🔔</span></label>'
       + '</div>';
 
     html += '<div id="chat-wrap"><div id="chat-list">';
@@ -1718,21 +1874,25 @@
   /* ============ render: regolamento ============ */
   function renderRegolamento(){
     var maxSpend = regola("costo_stella_eur",10) * regola("max_stelle",5);
-    var html = '<img src="hero-regolamento.png" alt="" class="hero-illus">';
-    html += '<div class="section-head"><div><h2>Regolamento</h2></div></div>';
-    html += '<div class="card" style="padding:16px; margin-bottom:14px;"><h3 style="font-size:14px;">Come si fanno i punti</h3>'
+    var html = '<div class="screen-head"><img src="hero-regolamento.png" alt="" class="screen-head-icon"><div><h2>Regolamento</h2><p class="section-sub">Tocca un argomento per aprirlo.</p></div></div>';
+    html += '<details class="admin-disclosure" open><summary><h3>Come si fanno i punti</h3><span class="chev">›</span></summary><div class="disclosure-body">'
       + '<p class="section-sub">Bonus: Mystery Box +'+regola("bonus_mystery_box",3)+' · Esterna +'+regola("bonus_esterna",4)+' · Cucina +'+regola("bonus_cucina",4)+' · Miglior piatto +'+regola("bonus_miglior_piatto",2)+'</p>'
       + '<p class="section-sub">Penalità: Grembiule Nero '+regola("penalita_nero",-3)+' · Persa Esterna '+regola("penalita_esterna",-2)+' (non cumulabili tra loro)</p>'
-      + '<p class="section-sub">Sono ammessi mezzi punti dove previsto dalle carte.</p></div>';
-    html += '<div class="card" style="padding:16px; margin-bottom:14px;"><h3 style="font-size:14px;">Stelle</h3>'
-      + '<p class="section-sub">€'+regola("costo_stella_eur",10)+' = 1★. Massimo '+regola("max_stelle",5)+'★ (tetto €'+maxSpend+') per Stelle e Carte.</p></div>';
-    html += '<div class="card" style="padding:16px;"><h3 style="font-size:14px;">Chef Ombra</h3>'
-      + '<p class="section-sub">Quarto Chef segreto, costa 2★. Punti calcolati da subito ma mostrati e conteggiati in classifica solo al 31/01/2027.</p></div>';
+      + '<p class="section-sub" style="margin-bottom:0;">Sono ammessi mezzi punti dove previsto dalle carte.</p></div></details>';
+    html += '<details class="admin-disclosure"><summary><h3>Stelle</h3><span class="chev">›</span></summary><div class="disclosure-body">'
+      + '<p class="section-sub" style="margin-bottom:0;">€'+regola("costo_stella_eur",10)+' = 1★. Massimo '+regola("max_stelle",5)+'★ (tetto €'+maxSpend+') per Stelle e Carte.</p></div></details>';
+    html += '<details class="admin-disclosure"><summary><h3>Chef Ombra</h3><span class="chev">›</span></summary><div class="disclosure-body">'
+      + '<p class="section-sub" style="margin-bottom:0;">Quarto Chef segreto, costa 2★. Punti calcolati da subito ma mostrati e conteggiati in classifica solo al 31/01/2027.</p></div></details>';
     document.getElementById("panel-regolamento").innerHTML = html;
   }
 
   /* ============ render: admin ============ */
-  function fieldset(legend, inner, id){ return '<fieldset'+(id?' id="'+esc(id)+'"':'')+'><legend>'+esc(legend)+'</legend>'+inner+'</fieldset>'; }
+  function fieldset(legend, inner, id, openDefault){
+    return '<details class="admin-disclosure"'+(id?' id="'+esc(id)+'"':'')+(openDefault?' open':'')+'>'
+      + '<summary><h3>'+esc(legend)+'</h3><span class="chev">›</span></summary>'
+      + '<div class="disclosure-body">'+inner+'</div>'
+      + '</details>';
+  }
 
   // Dashboard Admin: anomalie calcolate al volo (non salvate), con priorità
   // urgente/importante/avviso come da regolamento. Nessuno storico: quando
@@ -1789,7 +1949,7 @@
     if (!state.profile.is_admin){ el.innerHTML = ""; return; }
     var html = '<div class="section-head"><div><h2>Pannello Admin</h2><p class="section-sub">Solo tu vedi questa sezione.</p></div><img src="ico-impostazioni.png" alt="" style="width:34px;height:34px;object-fit:contain;opacity:.85;flex:0 0 auto;"></div>';
 
-    html += fieldset("Dashboard", anomalieHtml(computeAnomalie()), "admin-sec-dashboard");
+    html += fieldset("Dashboard", anomalieHtml(computeAnomalie()), "admin-sec-dashboard", true);
 
     html += fieldset("Impostazioni lega", ''
       + '<div class="field-row">'
@@ -1799,7 +1959,8 @@
       + '<div class="banner '+(state.meta.brigate_visibili?"ok":"warn")+'"><span>Brigate: '+(state.meta.brigate_visibili?"visibili a tutti":"private")+'</span>'
       + '<button class="btn sm" id="a-toggle-brigate">'+(state.meta.brigate_visibili?"Nascondi":"Rendi visibili")+'</button></div>'
       + '<div class="banner '+(state.meta.ombra_svelato?"ok":"warn")+'"><span>Chef Ombra: '+(state.meta.ombra_svelato?"svelati":"segreti")+'</span>'
-      + '<button class="btn sm danger" id="a-toggle-ombra">'+(state.meta.ombra_svelato?"Nascondi di nuovo":"Svela tutti")+'</button></div>'
+      + '<button class="btn sm danger" id="a-toggle-ombra">'+(state.meta.ombra_svelato?"Nascondi di nuovo":"Svela tutti")+'</button></div>',
+      "admin-sec-impostazioni"
     );
 
     var accountRows = state.profiles.slice().sort(function(a,b){ return (a.display_name||"").localeCompare(b.display_name||""); }).map(function(p){
@@ -1840,7 +2001,8 @@
         + '<span><button class="btn sm ghost" data-toggle-elim="'+c.id+'">'+(c.eliminato?"Riammetti":"Elimina")+'</button></span></div>';
     }).join("");
     html += fieldset("Concorrenti", concList
-      + '<div class="field-row"><input id="a-new-conc" placeholder="Nome concorrente" style="flex:1;"><button class="btn sm" id="a-add-conc">Aggiungi</button></div>'
+      + '<div class="field-row"><input id="a-new-conc" placeholder="Nome concorrente" style="flex:1;"><button class="btn sm" id="a-add-conc">Aggiungi</button></div>',
+      "admin-sec-concorrenti"
     );
 
     var teamBlocks = state.teams.map(function(t){
@@ -1902,7 +2064,7 @@
     calRows += '<div class="banner"><span>Svelamento Chef Ombra</span><span class="muted" style="font-size:12.5px;">'+(state.meta&&state.meta.ombra_svelato?'Già svelato':esc(fmtDate(state.meta&&state.meta.data_svelamento)))+'</span></div>';
     html += fieldset("Calendario & Scadenze", ''
       + '<p class="section-sub" style="margin-top:-4px;">Calendario delle puntate (correggibile qui sotto in "Nuova puntata"/"Modifica") e scadenze fisse della stagione. Le scadenze personali di ogni giocatore (es. carte da usare) si vedono automaticamente nella loro Home.</p>'
-      + calRows);
+      + calRows, "admin-sec-calendario");
 
     var editingEp = state._editingEp ? byId(state.episodes, state._editingEp) : null;
     var concForEp = state.concorrenti.filter(function(c){ return !c.eliminato; });
@@ -1924,7 +2086,8 @@
       + '</div>'
       + '<div class="table-wrap"><table><thead><tr><th>Concorrente</th><th>Mystery</th><th>Esterna</th><th>Cucina</th><th>Piatto</th><th>Penalità</th></tr></thead><tbody>'+evRows+'</tbody></table></div>'
       + '<div style="margin-top:10px;"><button class="btn sm" id="a-save-ep">'+(editingEp?"Salva modifiche":"Salva puntata (bozza)")+'</button> '
-      + (editingEp?'<button class="btn sm ghost" id="a-cancel-ep">Annulla</button>':'')+'</div>'
+      + (editingEp?'<button class="btn sm ghost" id="a-cancel-ep">Annulla</button>':'')+'</div>',
+      "admin-sec-nuova-puntata", !!editingEp
     );
 
     var teamOpts = state.teams.map(function(t){return '<option value="'+t.id+'">'+esc(displayName(t))+'</option>';}).join("");
@@ -1941,13 +2104,15 @@
       + '<label class="field"><span>Squadra bersaglio</span><select id="a-act-target-team"><option value="">—</option>'+teamOpts+'</select></label>'
       + '<label class="field"><span>Concorrente bersaglio</span><select id="a-act-target-conc">'+concOpts+'</select></label>'
       + '<label class="field"><span>Scelta (Secondo Intuito)</span><select id="a-act-choice"><option value="x2">Raddoppia</option><option value="dimezza">Dimezza</option></select></label>'
-      + '</div><button class="btn sm" id="a-save-act">Registra attivazione</button>'
+      + '</div><button class="btn sm" id="a-save-act">Registra attivazione</button>',
+      "admin-sec-carte-attivazione"
     );
 
     var settingsKeys = [["bonus_mystery_box","Bonus Mystery Box"],["bonus_esterna","Bonus Esterna"],["bonus_cucina","Bonus Cucina"],["bonus_miglior_piatto","Bonus Miglior Piatto"],["penalita_nero","Penalità Nero"],["penalita_esterna","Penalità Esterna"],["costo_stella_eur","Costo Stella (€)"],["max_stelle","Stelle massime"]];
     html += fieldset("Regolamento & Parametri", '<div class="field-row">'
       + settingsKeys.map(function(k){ return '<label class="field"><span>'+esc(k[1])+'</span><input type="number" data-setting="'+k[0]+'" value="'+regola(k[0])+'"></label>'; }).join("")
-      + '</div><button class="btn sm" id="a-save-settings">Salva parametri</button>'
+      + '</div><button class="btn sm" id="a-save-settings">Salva parametri</button>',
+      "admin-sec-parametri"
     );
 
     // Il regolamento non prevede notifiche manuali: questa sezione è solo di
@@ -1961,7 +2126,8 @@
       + '<p class="section-sub" style="margin-top:-4px;">Gli avvisi sono automatici (nessun invio manuale, come da regolamento). '+notifOff+' giocatori su '+attivi.length+' hanno le notifiche disattivate.</p>'
       + (avvisiRecenti.length ? avvisiRecenti.map(function(m){
           return '<div class="banner"><span>'+esc(m.testo)+(m.target_profile_id?' <span class="badge ok">personale</span>':'')+'</span><span class="muted" style="font-size:12px;white-space:nowrap;">'+esc(fmtDateTime(m.created_at))+'</span></div>';
-        }).join("") : '<p class="section-sub">Nessun avviso ancora.</p>')
+        }).join("") : '<p class="section-sub">Nessun avviso ancora.</p>'),
+      "admin-sec-notifiche"
     );
 
     // Strumenti di correzione: la specifica non dettaglia il contenuto di
@@ -1984,7 +2150,8 @@
     }).join("") || '<p class="section-sub">Nessun acquisto registrato.</p>';
     html += fieldset("Strumenti Admin", ''
       + '<h4 style="margin:0 0 6px;font-size:13.5px;color:var(--gold-strong);">Correggi attivazioni carte</h4>' + actRows
-      + '<h4 style="margin:14px 0 6px;font-size:13.5px;color:var(--gold-strong);">Correggi acquisti carte</h4>' + purRows
+      + '<h4 style="margin:14px 0 6px;font-size:13.5px;color:var(--gold-strong);">Correggi acquisti carte</h4>' + purRows,
+      "admin-sec-strumenti"
     );
 
     el.innerHTML = html;
@@ -1996,7 +2163,7 @@
     document.querySelectorAll("[data-goto]").forEach(function(btn){
       btn.addEventListener("click", function(){
         var target = g(btn.getAttribute("data-goto"));
-        if (target) target.scrollIntoView({behavior:"smooth", block:"start"});
+        if (target){ target.open = true; target.scrollIntoView({behavior:"smooth", block:"start"}); }
       });
     });
     document.querySelectorAll("[data-remove-act]").forEach(function(btn){
@@ -2140,7 +2307,12 @@
         });
       });
     });
-    document.querySelectorAll("[data-edit-ep]").forEach(function(b){ b.addEventListener("click", function(){ state._editingEp = b.getAttribute("data-edit-ep"); renderAdmin(); }); });
+    document.querySelectorAll("[data-edit-ep]").forEach(function(b){ b.addEventListener("click", function(){
+      state._editingEp = b.getAttribute("data-edit-ep");
+      renderAdmin();
+      var target = g("admin-sec-nuova-puntata");
+      if (target) target.scrollIntoView({behavior:"smooth", block:"start"});
+    }); });
     g("a-cancel-ep") && g("a-cancel-ep").addEventListener("click", function(){ state._editingEp = null; renderAdmin(); });
     document.querySelectorAll("[data-confirm-ep]").forEach(function(b){
       b.addEventListener("click", function(){ sb.from("episodes").update({confermata:true}).eq("id", b.getAttribute("data-confirm-ep")).then(afterWrite("Puntata confermata.")); });
