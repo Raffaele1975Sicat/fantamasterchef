@@ -149,6 +149,40 @@
   .brigata-chips .chip{margin:0; padding:6px 12px; font-size:13px;}
   .status-line{display:flex; align-items:flex-start; gap:7px; font-size:12.5px; color:var(--ink-faint); margin:10px 0 0;}
   .status-line img{width:14px; height:14px; object-fit:contain; flex:0 0 auto; margin-top:2px;}
+  header.topbar .btn.sm{padding:11px 14px; min-height:44px;}
+
+  /* --- breakpoint mobile: telefoni molto stretti (≤389px, es. iPhone SE/mini) --- */
+  @media (max-width: 389px){
+    main{padding:14px;}
+    .greet-row{gap:9px; margin-bottom:13px;}
+    .greet-illus{width:42px; height:42px;}
+    .greet-row h1{font-size:16.5px;}
+    .notice{padding:9px 11px; margin-bottom:13px;}
+    .notice-head{font-size:13px;}
+    .notice-item{font-size:12.5px; padding:5px 0 5px 26px;}
+    .my-team-card{padding:11px 13px; gap:10px; margin-bottom:15px;}
+    .my-team-pos{font-size:19px; width:32px;}
+    .my-team-name{font-size:15px;}
+    .my-team-points b{font-size:17px;}
+    .stat-row{margin-bottom:13px;}
+    .stat-cell{padding:9px 5px;}
+    .stat-cell .stat-val{font-size:18px;}
+    .disclosure{margin-bottom:13px;}
+    .disclosure-head{padding:13px 14px;}
+    .disclosure-body{padding:2px 14px 14px;}
+    .brigata-head img{width:38px; height:38px;}
+    .brigata-head h3{font-size:14px;}
+    .brigata-chips .chip{padding:5px 10px; font-size:12px;}
+    .rank-row{padding:12px 10px; gap:9px;}
+  }
+  /* --- breakpoint mobile: telefoni standard/larghi (≥390px) — più respiro --- */
+  @media (min-width: 390px){
+    .greet-row{margin-bottom:20px;}
+    .notice{margin-bottom:18px;}
+    .my-team-card{margin-bottom:22px;}
+    .stat-row{margin-bottom:20px;}
+    .disclosure{margin-bottom:18px;}
+  }
   details summary{cursor:pointer; font-size:13px; color:var(--ink-dim); margin-top:6px;}
   #install-banner{position:fixed; left:12px; right:12px; bottom:12px; background:var(--panel); border:1px solid var(--gold); border-radius:12px; padding:12px 14px; box-shadow:0 8px 24px rgba(0,0,0,.5); z-index:50; font-size:13.5px; max-width:460px; margin:0 auto;}
   .install-banner-inner{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
