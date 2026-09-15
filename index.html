@@ -75,12 +75,34 @@
   .section-sub{color:var(--ink-faint); font-size:13px; margin:0;}
   .tab-panel{display:none;}
   .tab-panel.active{display:block;}
-  .rank-row{display:flex; align-items:center; gap:12px; padding:12px 14px; border-bottom:1px solid var(--line);}
-  .rank-row:last-child{border-bottom:none;}
-  .rank-num{width:26px; text-align:center; font-family:'Fraunces',serif; font-weight:700; color:var(--gold-strong);}
-  .rank-name{flex:1;}
-  .rank-name .sub{display:block; font-size:11.5px; color:var(--ink-faint);}
-  .rank-points{font-weight:700; font-variant-numeric:tabular-nums;}
+  /* Classifica: ogni squadra è una "targhetta" a sé, come le carte in Carte —
+     non una tabella gestionale. Il primo posto e la propria squadra si
+     riconoscono a colpo d'occhio; dal 4° posto in poi lo stile resta sobrio
+     per restare leggibile anche con molti giocatori in lega. */
+  .classifica-row-card{background:var(--panel); border:1px solid var(--line); border-radius:13px; margin-bottom:9px; overflow:hidden;}
+  .classifica-row-card.mine{border-color:var(--gold);}
+  .classifica-row-card.pos-1{border-color:var(--gold); background:linear-gradient(160deg, rgba(232,194,106,.14) 0%, var(--panel) 68%); box-shadow:0 4px 16px rgba(202,162,76,.18);}
+  .classifica-row-card.pos-2, .classifica-row-card.pos-3{border-top:2px solid var(--gold-dim);}
+  .classifica-row-head{display:flex; align-items:center; gap:12px; padding:13px 14px; cursor:pointer; -webkit-tap-highlight-color:transparent;}
+  .classifica-num{width:32px; text-align:center; flex:0 0 auto;}
+  .classifica-num .medal{font-size:21px; line-height:1;}
+  .classifica-row-card.pos-1 .classifica-num .medal{font-size:26px;}
+  .classifica-num .plain{font-family:'Fraunces',serif; font-weight:700; color:var(--gold-strong); font-size:16px;}
+  .classifica-name{flex:1; min-width:0;}
+  .classifica-name .team-name{font-weight:600; font-size:14.5px;}
+  .classifica-mine-tag{display:inline-block; margin-left:6px; font-size:10px; font-weight:700; color:var(--gold-strong); background:rgba(202,162,76,.16); border:1px solid var(--gold-dim); border-radius:999px; padding:1px 7px; vertical-align:middle;}
+  .classifica-sub-row{margin-top:3px; display:flex; align-items:center; gap:6px; flex-wrap:wrap;}
+  .classifica-lead-tag{font-size:11px; font-weight:700; color:var(--gold-strong); letter-spacing:.01em;}
+  .classifica-delta-pill{display:inline-flex; align-items:center; gap:2px; font-size:11px; font-weight:700; border-radius:999px; padding:1px 7px;}
+  .classifica-delta-pill.up{color:var(--teal); background:rgba(63,143,130,.16);}
+  .classifica-delta-pill.down{color:var(--penalty); background:rgba(193,84,63,.16);}
+  .classifica-points{text-align:right; flex:0 0 auto;}
+  .classifica-points b{font-family:'Fraunces',serif; font-size:17px; font-weight:700; font-variant-numeric:tabular-nums; color:var(--ink);}
+  .classifica-row-card.pos-1 .classifica-points b{color:var(--gold-strong);}
+  .classifica-points-sub{display:block; font-size:10px; color:var(--ink-faint);}
+  .classifica-chevron{color:var(--gold-strong); font-size:15px; flex:0 0 auto; transition:transform .2s ease;}
+  .classifica-row-card.open .classifica-chevron{transform:rotate(90deg);}
+  .classifica-row-body{padding:0 14px 16px; border-top:1px solid var(--line); padding-top:14px;}
   table{width:100%; border-collapse:collapse; font-size:13.5px;}
   th,td{text-align:left; padding:8px 10px; border-bottom:1px solid var(--line);}
   th{color:var(--ink-faint); font-weight:600; font-size:12px; text-transform:uppercase; letter-spacing:.04em;}
@@ -210,7 +232,8 @@
     .brigata-head img{width:38px; height:38px;}
     .brigata-head h3{font-size:14px;}
     .brigata-chips .chip{padding:5px 10px; font-size:12px;}
-    .rank-row{padding:12px 10px; gap:9px;}
+    .classifica-row-head{padding:11px 10px; gap:9px;}
+    .classifica-row-body{padding-left:10px; padding-right:10px;}
     .action-grid{gap:9px; margin-bottom:15px;}
     .action-card{padding:11px;}
     .action-icon-wrap{width:36px; height:36px;}
@@ -1180,6 +1203,12 @@
   }
 
   /* ============ render: classifica ============ */
+  // Ogni squadra è una "targhetta" a sé stante (come le carte in Carte), non
+  // una riga di tabella: il primo posto e la propria squadra si riconoscono
+  // subito, dal 4° posto in poi lo stile resta sobrio per restare leggibile
+  // anche con tante squadre in lega. Dati e calcolo (computeStandings,
+  // standingsDelta, teamDetailHtml) sono ESATTAMENTE gli stessi di prima:
+  // qui cambia solo la presentazione.
   function renderClassifica(){
     var standings = computeStandings();
     var started = state.episodes.some(function(e){ return e.confermata; });
@@ -1188,27 +1217,33 @@
     if (!started){
       html += '<div class="card empty" style="text-align:center;"><img src="char-vuoto.png" alt="" class="hero-illus sm">La stagione non è ancora iniziata: la classifica apparirà dopo la prima puntata confermata.</div>';
     } else {
-      html += '<div class="card" style="padding:4px 0;">';
       standings.forEach(function(r){
         var mine = state.myTeam && r.team.id===state.myTeam.id;
-        var medal = r.pos===1 ? "🥇" : (r.pos===2 ? "🥈" : (r.pos===3 ? "🥉" : r.pos));
+        var open = state._expandedTeamClassifica===r.team.id;
+        var medalEmoji = r.pos===1 ? "🥇" : (r.pos===2 ? "🥈" : (r.pos===3 ? "🥉" : null));
+        var numHtml = medalEmoji ? '<span class="medal">'+medalEmoji+'</span>' : '<span class="plain">'+r.pos+'</span>';
         var prev = prevPos[r.team.id];
-        var deltaHtml = "";
+        var subBits = [];
+        if (r.pos===1) subBits.push('<span class="classifica-lead-tag">🏆 In testa alla lega</span>');
         if (prev!=null && prev!==r.pos){
-          deltaHtml = prev>r.pos
-            ? ' <span class="sub" style="color:var(--teal);">▲'+(prev-r.pos)+'</span>'
-            : ' <span class="sub" style="color:var(--penalty);">▼'+(r.pos-prev)+'</span>';
+          subBits.push(prev>r.pos
+            ? '<span class="classifica-delta-pill up">▲ '+(prev-r.pos)+'</span>'
+            : '<span class="classifica-delta-pill down">▼ '+(r.pos-prev)+'</span>');
         }
-        html += '<div class="rank-row" data-team-row="'+r.team.id+'" style="cursor:pointer;'+(mine?'background:rgba(202,162,76,.08);':'')+'">'
-          + '<div class="rank-num">'+medal+'</div>'
-          + '<div class="rank-name">'+esc(displayName(r.team))+deltaHtml+'</div>'
-          + '<div class="rank-points">'+fmtNum(r.total)+'</div></div>';
+        var subHtml = subBits.length ? '<div class="classifica-sub-row">'+subBits.join("")+'</div>' : "";
+        html += '<div class="classifica-row-card pos-'+r.pos+(mine?' mine':'')+(open?' open':'')+'">'
+          + '<div class="classifica-row-head" data-team-row="'+r.team.id+'">'
+          + '<div class="classifica-num">'+numHtml+'</div>'
+          + '<div class="classifica-name"><span class="team-name">'+esc(displayName(r.team))+'</span>'+(mine?'<span class="classifica-mine-tag">Tu</span>':'')+subHtml+'</div>'
+          + '<div class="classifica-points"><b>'+fmtNum(r.total)+'</b><span class="classifica-points-sub">punti</span></div>'
+          + '<div class="classifica-chevron">›</div>'
+          + '</div>';
         // dettagli squadra: solo se l'utente tocca una riga
-        if (state._expandedTeamClassifica===r.team.id){
-          html += '<div style="padding:12px 14px 18px;border-bottom:1px solid var(--line);">'+teamDetailHtml(r)+'</div>';
+        if (open){
+          html += '<div class="classifica-row-body">'+teamDetailHtml(r)+'</div>';
         }
+        html += '</div>';
       });
-      html += '</div>';
     }
     document.getElementById("panel-classifica").innerHTML = html;
     bindClassificaEvents();
