@@ -419,6 +419,109 @@
   @media (max-width:389px){.home-v2 .home-welcome{min-height:210px}.home-v2 .home-sign{width:57%;padding:8px}.home-v2 .home-sign h1{font-size:16px}.home-v2 .home-sign p{font-size:9.5px}.home-v2 .home-bubble{font-size:11px;width:39%;bottom:9px}.home-v2 .home-action{min-height:103px}.home-v2 .home-action h3{font-size:11.5px}.home-v2 .home-action span{font-size:9.2px}}
 
 
+
+
+/* =========================================================
+   HOME V4 — MOBILE FIRST
+   La Home è progettata prima per smartphone; desktop mantiene
+   la composizione larga già approvata.
+   ========================================================= */
+.home-v2{width:100%;margin:0;padding:0 0 4px;}
+.home-v2 .home-welcome{min-height:300px;margin-bottom:14px;}
+.home-v2 .home-welcome-img{object-position:center center;}
+.home-v2 .home-actions{grid-template-columns:repeat(4,1fr);gap:10px;}
+.home-v2 .home-action{min-height:138px;}
+
+@media (max-width:700px){
+  #app{width:100%;max-width:none;padding-bottom:82px;}
+  header.topbar{padding:10px 12px;min-height:58px;}
+  header.topbar h1{font-size:18px;}
+  header.topbar .eyebrow{font-size:9.5px;}
+  header.topbar > div:first-child{gap:8px !important;}
+  header.topbar > div:first-child img{width:30px !important;height:30px !important;}
+  header.topbar .btn.sm{min-height:40px;padding:8px 11px;}
+  main{padding:10px 10px 16px;}
+
+  .home-v2 .home-welcome{
+    min-height:226px;
+    height:226px;
+    margin:0 0 10px;
+    border-radius:16px;
+  }
+  .home-v2 .home-welcome-img{
+    object-fit:cover;
+    object-position:center center;
+  }
+  .home-v2 .home-welcome-shade{
+    background:linear-gradient(90deg,rgba(15,8,3,.46),rgba(15,8,3,.08) 52%,rgba(15,8,3,.18));
+  }
+  .home-v2 .home-sign{
+    left:9px;top:9px;width:min(245px,61%);
+    padding:9px 10px 8px;border-radius:11px;
+  }
+  .home-v2 .home-sign .mini-chef{font-size:20px;}
+  .home-v2 .home-sign h1{font-size:19px;line-height:1.04;margin-bottom:4px;}
+  .home-v2 .home-sign p{font-size:10.5px;line-height:1.2;}
+  .home-v2 .home-sign .tricolor{height:3px;margin-top:6px;max-width:120px;}
+  .home-v2 .home-bubble{
+    right:8px;bottom:9px;width:min(205px,43%);
+    padding:8px 7px;border-radius:15px;font-size:12.5px;line-height:1.15;
+  }
+
+  /* Quattro azioni: 2x2, vere dimensioni da touch */
+  .home-v2 .home-actions{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:8px;margin-bottom:10px;
+  }
+  .home-v2 .home-action{
+    min-height:102px;height:102px;
+    padding:9px 7px 8px;border-radius:12px;
+  }
+  .home-v2 .home-action-icon{width:38px;height:38px;margin-bottom:5px;}
+  .home-v2 .home-action-icon img{width:21px;height:21px;}
+  .home-v2 .home-action h3{font-size:13.5px;line-height:1.08;margin-bottom:3px;}
+  .home-v2 .home-action span{font-size:10px;line-height:1.18;}
+
+  /* Le informazioni operative arrivano subito dopo le azioni */
+  .home-v2 .home-lower{
+    grid-template-columns:1fr;gap:8px;margin-bottom:8px;
+  }
+  .home-v2 .home-paper,.home-v2 .home-wood{border-radius:12px;}
+  .home-v2 .home-paper-head,.home-v2 .home-wood-head{
+    padding:8px 11px;font-size:16px;
+  }
+  .home-v2 .home-paper-body{padding:10px 11px;}
+  .home-v2 .home-next-row{gap:9px;}
+  .home-v2 .home-calendar{width:62px;flex-basis:62px;padding:6px 4px;}
+  .home-v2 .home-calendar b{font-size:24px;}
+  .home-v2 .home-calendar small,.home-v2 .home-calendar span{font-size:9px;}
+  .home-v2 .home-next-copy h3{font-size:15px;}
+  .home-v2 .home-next-copy p{font-size:11.5px;}
+  .home-v2 .home-wood > div[style]{padding:9px 10px !important;}
+  .home-v2 .home-team-strip{gap:5px;margin-bottom:6px;}
+  .home-v2 .home-chef-pill{padding:4px 7px;font-size:10.5px;}
+  .home-v2 .home-stat-grid{gap:5px;}
+  .home-v2 .home-stat{gap:6px;padding:7px 7px;}
+  .home-v2 .home-stat-ico{font-size:17px;width:21px;}
+  .home-v2 .home-stat b{font-size:15px;}
+  .home-v2 .home-stat span{font-size:9.5px;}
+  .home-v2 .home-quote{margin:0 4px 5px;padding:8px 10px;font-size:12px;}
+}
+
+@media (max-width:389px){
+  main{padding-left:8px;padding-right:8px;}
+  .home-v2 .home-welcome{height:210px;min-height:210px;}
+  .home-v2 .home-sign{width:62%;padding:8px 8px 7px;}
+  .home-v2 .home-sign h1{font-size:17px;}
+  .home-v2 .home-sign p{font-size:9.5px;}
+  .home-v2 .home-bubble{width:42%;font-size:11px;padding:7px 6px;}
+  .home-v2 .home-actions{gap:7px;}
+  .home-v2 .home-action{height:98px;min-height:98px;padding:8px 5px;}
+  .home-v2 .home-action-icon{width:35px;height:35px;}
+  .home-v2 .home-action h3{font-size:12.5px;}
+  .home-v2 .home-action span{font-size:9.5px;}
+}
+
 </style>
 </head>
 <body>
