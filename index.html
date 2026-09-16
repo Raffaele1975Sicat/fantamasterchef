@@ -2520,21 +2520,19 @@
         var teamId = btn.getAttribute("data-undo-sostituzione");
         var rowId = btn.getAttribute("data-sost-row");
         if (!confirm("Annullare la sostituzione di gennaio di questa squadra? Il giocatore potrà eventualmente rifarla da capo.")) return;
-        sb.from("team_chefs").delete().eq("id", rowId).then(function(res){
-          if (res.error){ toast("Errore: " + res.error.message); return; }
-          sb.from("teams").update({sostituzione_usata:false}).eq("id", teamId).then(afterWrite("Sostituzione annullata."));
-        });
+        // Operazione atomica lato database (RPC admin_undo_sostituzione): rimuove il
+        // sostituto e resetta il flag "usata" in un'unica transazione, così un errore
+        // a metà non lascia mai la squadra senza sostituto e bloccata per sempre.
+        sb.rpc("admin_undo_sostituzione", {p_team_id: teamId, p_team_chefs_id: rowId}).then(afterWrite("Sostituzione annullata."));
       });
     });
     document.querySelectorAll("[data-ombra]").forEach(function(sel){
       sel.addEventListener("change", function(){
         var teamId = sel.getAttribute("data-team");
-        // rimuove il precedente ombra e ne imposta uno nuovo
-        var prev = state.teamChefs.filter(function(tc){return tc.team_id===teamId && tc.ruolo==="ombra";});
-        Promise.all(prev.map(function(tc){ return sb.from("team_chefs").delete().eq("id", tc.id); })).then(function(){
-          if (!sel.value){ afterWrite("Fatto.")(); return; }
-          sb.from("team_chefs").insert({team_id:teamId, concorrente_id:sel.value, ruolo:"ombra"}).then(afterWrite("Fatto."));
-        });
+        // Sostituzione atomica lato database (RPC admin_set_ombra): rimuove il vecchio
+        // Chef Ombra e imposta il nuovo (o nessuno) in un'unica transazione, così un
+        // errore a metà non lascia mai la squadra senza alcun Chef Ombra assegnato.
+        sb.rpc("admin_set_ombra", {p_team_id: teamId, p_concorrente_id: sel.value || null}).then(afterWrite("Fatto."));
       });
     });
     document.querySelectorAll("[data-edit-ep]").forEach(function(b){ b.addEventListener("click", function(){
@@ -2556,28 +2554,27 @@
       var ora = g("a-ep-ora").value || null;
       if (!numero){ toast("Numero puntata mancante."); return; }
       var editing = state._editingEp ? byId(state.episodes, state._editingEp) : null;
-      var doAfter = function(episodeId){
-        var rows = state.concorrenti.filter(function(c){return !c.eliminato;}).map(function(c){
-          var mb = document.querySelector('[data-ev-mb="'+c.id+'"]').checked;
-          var est = document.querySelector('[data-ev-est="'+c.id+'"]').checked;
-          var cuc = document.querySelector('[data-ev-cuc="'+c.id+'"]').checked;
-          var mp = document.querySelector('[data-ev-mp="'+c.id+'"]').checked;
-          var pen = document.querySelector('[data-ev-pen="'+c.id+'"]').value || null;
-          return {episode_id:episodeId, concorrente_id:c.id, mystery_box:mb, vince_esterna:est, vince_cucina:cuc, miglior_piatto:mp, penalita:pen};
-        });
-        sb.from("episode_events").upsert(rows, {onConflict:"episode_id,concorrente_id"}).then(function(){
-          state._editingEp = null;
-          afterWrite("Puntata salvata.")();
-        });
-      };
-      if (editing){
-        sb.from("episodes").update({data:data, ora:ora}).eq("id", editing.id).then(function(){ doAfter(editing.id); });
-      } else {
-        sb.from("episodes").insert({numero:numero, data:data, ora:ora, confermata:false}).select().single().then(function(res){
-          if (res.error){ toast(res.error.message); return; }
-          doAfter(res.data.id);
-        });
-      }
+      var events = state.concorrenti.filter(function(c){return !c.eliminato;}).map(function(c){
+        return {
+          concorrente_id: c.id,
+          mystery_box: document.querySelector('[data-ev-mb="'+c.id+'"]').checked,
+          vince_esterna: document.querySelector('[data-ev-est="'+c.id+'"]').checked,
+          vince_cucina: document.querySelector('[data-ev-cuc="'+c.id+'"]').checked,
+          miglior_piatto: document.querySelector('[data-ev-mp="'+c.id+'"]').checked,
+          penalita: document.querySelector('[data-ev-pen="'+c.id+'"]').value || null
+        };
+      });
+      // Salvataggio atomico lato database (RPC admin_save_episode): la puntata e
+      // TUTTI gli eventi vengono scritti in un'unica transazione, così un errore a
+      // metà non lascia mai data/ora aggiornate con eventi non salvati (o viceversa).
+      sb.rpc("admin_save_episode", {
+        p_episode_id: editing ? editing.id : null,
+        p_numero: numero, p_data: data, p_ora: ora, p_events: events
+      }).then(function(res){
+        if (res.error){ toast("Errore: " + res.error.message); return; }
+        state._editingEp = null;
+        afterWrite("Puntata salvata.")(res);
+      });
     });
     g("a-save-act") && g("a-save-act").addEventListener("click", function(){
       var payload = {
