@@ -373,6 +373,52 @@
   #chat-input-bar{display:flex; gap:8px; align-items:flex-end; padding:8px 2px 2px; border-top:1px solid var(--line);}
   #chat-input-bar textarea{flex:1; resize:none; min-height:38px; max-height:100px; background:var(--panel2); border:1px solid var(--line); color:var(--ink); border-radius:9px; padding:9px 12px; font-size:14px; font-family:inherit;}
   #chat-reply-bar{display:flex; justify-content:space-between; align-items:center; font-size:12px; color:var(--ink-faint); background:var(--panel2); border-radius:8px; padding:6px 10px; margin-bottom:6px;}
+  /* ============ HOME — stile cucina illustrata / legno / pergamena ============ */
+  .home-v2{position:relative;margin:0 -2px;padding-bottom:6px;}
+  .home-v2 .home-welcome{position:relative;overflow:hidden;min-height:285px;margin-bottom:14px;border:2px solid var(--gold-dim);border-radius:18px;background:linear-gradient(180deg,#6a4527,#3b2111);box-shadow:0 9px 24px rgba(0,0,0,.48),inset 0 1px 0 rgba(255,255,255,.08);}
+  .home-v2 .home-welcome::before{content:"";position:absolute;inset:7px;border:1px solid rgba(232,194,106,.32);border-radius:12px;pointer-events:none;z-index:3;}
+  .home-v2 .home-welcome-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 22%;opacity:.96;filter:saturate(1.08) contrast(1.02);}
+  .home-v2 .home-welcome-shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(15,8,3,.58),rgba(15,8,3,.12) 46%,rgba(15,8,3,.22));z-index:1;}
+  .home-v2 .home-sign{position:absolute;left:15px;top:15px;z-index:2;width:min(300px,54%);padding:14px 16px 13px;text-align:center;background:linear-gradient(160deg,#f3e7c7,#e4d19c);color:#2b2013;border:2px solid #9b7838;border-radius:12px;box-shadow:0 7px 16px rgba(0,0,0,.42);transform:rotate(-1deg);}
+  .home-v2 .home-sign .mini-chef{font-size:25px;line-height:1;margin-bottom:2px;}
+  .home-v2 .home-sign h1{font-size:27px;line-height:1.02;margin:0 0 5px;color:#1f160d;}
+  .home-v2 .home-sign p{font-family:'Fraunces',serif;font-size:13px;line-height:1.25;margin:0;color:#5a3b20;}
+  .home-v2 .home-sign .tricolor{height:4px;margin:7px auto 0;max-width:160px;background:linear-gradient(90deg,#4f7a3d 0 33%,#f2e6c4 33% 66%,#b33c2e 66%);border-radius:4px;}
+  .home-v2 .home-bubble{position:absolute;right:14px;bottom:18px;z-index:2;width:min(245px,42%);padding:13px 15px;background:#f7edcf;color:#21170e;border:2px solid #8e713e;border-radius:18px;text-align:center;font-family:'Fraunces',serif;font-weight:700;font-size:17px;line-height:1.18;box-shadow:0 6px 15px rgba(0,0,0,.35);}
+  .home-v2 .home-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:15px;}
+  .home-v2 .home-action{min-height:142px;padding:12px 9px 10px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;cursor:pointer;-webkit-tap-highlight-color:transparent;background:linear-gradient(160deg,#f5e9c8,#e5d2a0);color:#2b2013;border:2px solid #9b7838;border-radius:12px;box-shadow:0 5px 12px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,255,255,.45);transition:transform .08s ease,filter .08s ease;}
+  .home-v2 .home-action:active{transform:translateY(1px);filter:brightness(.96);}
+  .home-v2 .home-action-icon{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:7px;background:radial-gradient(circle at 35% 28%,#7b542e,#3a2413 72%);border:2px solid #b99245;box-shadow:0 3px 7px rgba(0,0,0,.35);}
+  .home-v2 .home-action-icon img{width:27px;height:27px;object-fit:contain;}
+  .home-v2 .home-action h3{font-size:15px;margin:0 0 3px;color:#1f160d;}
+  .home-v2 .home-action span{font-size:11.5px;line-height:1.25;color:#60482c;}
+  .home-v2 .home-lower{display:grid;grid-template-columns:1.12fr .88fr;gap:11px;margin-bottom:12px;}
+  .home-v2 .home-paper,.home-v2 .home-wood{border-radius:14px;overflow:hidden;box-shadow:0 6px 15px rgba(0,0,0,.34);}
+  .home-v2 .home-paper{background:linear-gradient(160deg,#f4e8c8,#e5d1a0);color:#2b2013;border:2px solid #9b7838;}
+  .home-v2 .home-paper-head{background:#a72f25;color:#fff8eb;padding:9px 13px;font-family:'Fraunces',serif;font-size:18px;border-bottom:2px solid #6e211a;}
+  .home-v2 .home-paper-body{padding:12px 14px;}
+  .home-v2 .home-wood{background:repeating-linear-gradient(90deg,rgba(0,0,0,.10) 0,rgba(0,0,0,0) 2px,rgba(0,0,0,0) 19px,rgba(0,0,0,.05) 21px),linear-gradient(180deg,#5c3a21,#33200f);border:2px solid var(--gold-dim);color:var(--ink);}
+  .home-v2 .home-wood-head{padding:9px 13px;font-family:'Fraunces',serif;font-size:18px;color:var(--gold-strong);border-bottom:1px solid rgba(232,194,106,.24);text-align:center;}
+  .home-v2 .home-next-row{display:flex;gap:12px;align-items:center;}
+  .home-v2 .home-calendar{width:82px;flex:0 0 82px;padding:8px 5px;text-align:center;background:#f7edcf;color:#2b2013;border:1px solid #a98a4a;border-radius:8px;box-shadow:0 3px 7px rgba(0,0,0,.25);}
+  .home-v2 .home-calendar small{display:block;font-size:10px;text-transform:uppercase;color:#8b3027;font-weight:700;}
+  .home-v2 .home-calendar b{display:block;font-family:'Fraunces',serif;font-size:29px;line-height:1.05;}
+  .home-v2 .home-calendar span{display:block;font-size:10.5px;}
+  .home-v2 .home-next-copy h3{margin:0 0 3px;font-size:16px;color:#2b2013;}
+  .home-v2 .home-next-copy p{margin:2px 0;font-size:12.5px;color:#5b4427;}
+  .home-v2 .home-team-strip{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:8px;}
+  .home-v2 .home-chef-pill{display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:999px;background:rgba(0,0,0,.20);border:1px solid rgba(232,194,106,.34);font-size:11.5px;}
+  .home-v2 .home-stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+  .home-v2 .home-stat{display:flex;align-items:center;gap:8px;padding:8px 9px;border-radius:9px;background:rgba(0,0,0,.18);border:1px solid rgba(232,194,106,.18);}
+  .home-v2 .home-stat-ico{font-size:20px;width:25px;text-align:center;}
+  .home-v2 .home-stat b{display:block;font-family:'Fraunces',serif;font-size:17px;color:var(--gold-strong);line-height:1;}
+  .home-v2 .home-stat span{display:block;font-size:10.5px;color:var(--ink-dim);margin-top:2px;}
+  .home-v2 .home-quote{margin:0 10px 10px;padding:10px 16px;text-align:center;background:linear-gradient(160deg,#f4e8c8,#e5d1a0);color:#3c2a18;border:1px solid #a98a4a;border-radius:10px;font-family:'Fraunces',serif;font-size:14px;box-shadow:0 4px 10px rgba(0,0,0,.25);}
+  @media (max-width:700px){.home-v2 .home-welcome{min-height:260px}.home-v2 .home-sign{width:54%;padding:11px}.home-v2 .home-sign h1{font-size:22px}.home-v2 .home-bubble{font-size:14px;width:42%;padding:10px 9px}.home-v2 .home-action{min-height:126px}.home-v2 .home-action-icon{width:42px;height:42px}.home-v2 .home-action-icon img{width:23px;height:23px}}
+  @media (max-width:520px){.home-v2 .home-welcome{min-height:232px}.home-v2 .home-sign{left:10px;top:10px;width:56%}.home-v2 .home-sign h1{font-size:18px}.home-v2 .home-sign p{font-size:10.5px}.home-v2 .home-sign .mini-chef{font-size:20px}.home-v2 .home-bubble{right:8px;bottom:12px;width:40%;font-size:12.5px;padding:8px 7px}.home-v2 .home-actions{gap:7px}.home-v2 .home-action{min-height:111px;padding:8px 5px}.home-v2 .home-action-icon{width:36px;height:36px;margin-bottom:5px}.home-v2 .home-action-icon img{width:20px;height:20px}.home-v2 .home-action h3{font-size:12.5px}.home-v2 .home-action span{font-size:10px}.home-v2 .home-lower{grid-template-columns:1fr;gap:9px}}
+  @media (max-width:389px){.home-v2 .home-welcome{min-height:210px}.home-v2 .home-sign{width:57%;padding:8px}.home-v2 .home-sign h1{font-size:16px}.home-v2 .home-sign p{font-size:9.5px}.home-v2 .home-bubble{font-size:11px;width:39%;bottom:9px}.home-v2 .home-action{min-height:103px}.home-v2 .home-action h3{font-size:11.5px}.home-v2 .home-action span{font-size:9.2px}}
+
+
 </style>
 </head>
 <body>
@@ -585,6 +631,7 @@
       + dots
       + '</svg>';
   }
+
 
   /* ============ auth ============ */
   // Login by USERNAME: the browser never sees or handles the internal auth
@@ -1158,43 +1205,28 @@
     var myRow = state.myTeam ? standings.filter(function(r){ return r.team.id===state.myTeam.id; })[0] : null;
     var team = state.myTeam;
     var remaining = team ? starsRemaining(team) : 0;
-
-    // 1) chi sono / dove mi trovo
-    var html = '<div class="home-hero signboard"><img class="home-hero-img" src="hero-home.png" alt="">'
-      + '<div class="home-hero-text"><h1>Ciao'+(state.profile && state.profile.display_name ? ", " + esc(state.profile.display_name) : "")+'!</h1>'
-      + '<p class="home-hero-tag">Oggi cosa si cucina in classifica?</p></div></div>';
-
-    // 2) accesso evidente alle funzioni principali
-    html += '<div class="action-grid">'
-      + '<div class="action-card" data-goto="carte"><div class="action-icon-wrap"><img src="ico-carte.png" alt=""></div><h3>Carte</h3><span>'+(team?remaining+'★ disponibili':'Scopri le carte')+'</span></div>'
-      + '<div class="action-card" data-goto="classifica"><div class="action-icon-wrap"><img src="ico-trofeo.png" alt=""></div><h3>Classifica</h3><span>'+(myRow?('Sei '+(myRow.pos===1?'primo':myRow.pos===2?'secondo':myRow.pos===3?'terzo':'#'+myRow.pos)):'Chi comanda la lega')+'</span></div>'
-      + '<div class="action-card" data-goto="squadra"><div class="action-icon-wrap"><img src="ico-brigata.png" alt=""></div><h3>Squadra</h3><span>La tua Brigata</span></div>'
-      + '<div class="action-card" data-goto="chat"><div class="action-icon-wrap"><img src="ico-chat.png" alt=""></div><h3>Chat</h3><span>Parla con la lega</span></div>'
-      + '</div>';
-
-    // 3) la mia situazione essenziale
-    if (myRow){
-      var standingsDeltaMap = state.episodes.some(function(e){ return e.confermata; }) ? standingsDelta() : {};
-      var myMedal = myRow.pos===1 ? "🥇" : (myRow.pos===2 ? "🥈" : (myRow.pos===3 ? "🥉" : null));
-      var prevMy = standingsDeltaMap[myRow.team.id];
-      var myDelta = "";
-      if (prevMy!=null && prevMy!==myRow.pos){
-        myDelta = prevMy>myRow.pos
-          ? ' <span style="color:var(--teal);">▲'+(prevMy-myRow.pos)+'</span>'
-          : ' <span style="color:var(--penalty);">▼'+(myRow.pos-prevMy)+'</span>';
-      }
-      html += '<div class="card my-team-card" data-goto="squadra">'
-        + '<div class="my-team-pos">'+(myMedal || ("#"+myRow.pos))+'</div>'
-        + '<div class="my-team-info"><div class="my-team-label">La tua squadra</div><div class="my-team-name">'+esc(displayName(myRow.team))+'</div></div>'
-        + '<div class="my-team-points"><b>'+fmtNum(myRow.total)+'</b><span class="my-team-points-sub">punti'+myDelta+'</span></div>'
-        + '<div class="my-team-chevron">›</div></div>';
-    }
-
-    // 4) informazioni dinamiche realmente utili: scadenze/promemoria
-    html += scadenzeHtml(computeScadenze());
-
-    document.getElementById("panel-home").innerHTML = html;
-    bindHomeEvents();
+    var confirmed = state.episodes.filter(function(e){ return e.confermata; }).sort(function(a,b){ return a.numero-b.numero; });
+    var nextDraft = draftEpisodes().filter(function(e){ return e.data; })[0] || null;
+    var brigata = team ? teamChefsFor(team.id, false).filter(function(tc){ return tc.ruolo==='brigata'||tc.ruolo==='sostituto'; }) : [];
+    var myCards = team ? state.purchases.filter(function(p){ return p.team_id===team.id; }).length : 0;
+    var html = '<div class="home-v2">';
+    html += '<div class="home-welcome"><img class="home-welcome-img" src="hero-home.png" alt=""><div class="home-welcome-shade"></div><div class="home-sign"><div class="mini-chef">👨‍🍳</div><h1>Fanta MasterChef</h1><p>Il fantasy che trasforma la passione per la cucina in una sfida!</p><div class="tricolor"></div></div><div class="home-bubble">Benvenuto a tavola'+(state.profile&&state.profile.display_name?', '+esc(state.profile.display_name):'')+'!<br>🍴 Si cucina insieme.</div></div>';
+    html += '<div class="home-actions">'
+      +'<div class="home-action" data-goto="carte"><div class="home-action-icon"><img src="ico-carte.png" alt=""></div><h3>Le tue Carte</h3><span>'+(team?remaining+'★ disponibili':'Scopri e colleziona')+'</span></div>'
+      +'<div class="home-action" data-goto="classifica"><div class="home-action-icon"><img src="ico-trofeo.png" alt=""></div><h3>Classifica</h3><span>'+(myRow?('Sei #'+myRow.pos+' · '+fmtNum(myRow.total)+' punti'):'Vedi come va la lega')+'</span></div>'
+      +'<div class="home-action" data-goto="squadra"><div class="home-action-icon"><img src="ico-brigata.png" alt=""></div><h3>La Brigata</h3><span>'+(brigata.length?brigata.length+'/3 Chef scelti':'Costruisci la squadra')+'</span></div>'
+      +'<div class="home-action" data-goto="chat"><div class="home-action-icon"><img src="ico-chat.png" alt=""></div><h3>Chat</h3><span>Parla con la Brigata</span></div>'
+      +'</div>';
+    html += '<div class="home-lower"><div class="home-paper"><div class="home-paper-head">Prossima puntata</div><div class="home-paper-body">';
+    if(nextDraft){ var d=new Date(nextDraft.data+'T00:00:00'); var day=!isNaN(d)?d.getDate():''; var month=!isNaN(d)?d.toLocaleDateString('it-IT',{month:'long'}):''; html+='<div class="home-next-row"><div class="home-calendar"><small>Puntata '+esc(nextDraft.numero)+'</small><b>'+esc(day)+'</b><span>'+esc(month)+'</span></div><div class="home-next-copy"><h3>MasterChef Italia</h3><p>📺 '+esc(nextDraft.ora?String(nextDraft.ora).slice(0,5):'Orario da definire')+'</p><p>Preparati alla prossima sfida!</p></div></div>'; }
+    else if(confirmed.length){ html+='<div style="font-family:Fraunces,serif;font-size:16px;margin-bottom:5px;">Ultima puntata: '+esc(confirmed[confirmed.length-1].numero)+'</div><div style="font-size:12.5px;color:#5b4427;">La prossima puntata non è ancora stata programmata.</div>'; }
+    else { html+='<div style="font-family:Fraunces,serif;font-size:16px;margin-bottom:5px;">La stagione sta per iniziare!</div><div style="font-size:12.5px;color:#5b4427;">La prima puntata comparirà qui appena sarà inserita dall’Admin.</div>'; }
+    html += '</div></div><div class="home-wood"><div class="home-wood-head">'+(team?'La tua squadra':'La tua Brigata')+'</div><div style="padding:11px 12px;">';
+    if(brigata.length){ html+='<div class="home-team-strip">'; brigata.slice(0,3).forEach(function(tc){ html+='<div class="home-chef-pill"><span>👨‍🍳</span><b>'+esc(concorrenteName(tc.concorrente_id))+'</b></div>'; }); html+='</div>'; }
+    else html+='<div style="font-size:12px;color:var(--ink-dim);margin-bottom:9px;">Non hai ancora impostato la tua Brigata.</div>';
+    html+='<div class="home-stat-grid"><div class="home-stat"><div class="home-stat-ico">🏆</div><div><b>'+(myRow?'#'+myRow.pos:'—')+'</b><span>posizione</span></div></div><div class="home-stat"><div class="home-stat-ico">⭐</div><div><b>'+remaining+'</b><span>stelle disponibili</span></div></div><div class="home-stat"><div class="home-stat-ico">🍴</div><div><b>'+confirmed.length+'</b><span>puntate giocate</span></div></div><div class="home-stat"><div class="home-stat-ico">🃏</div><div><b>'+myCards+'</b><span>carte acquistate</span></div></div></div></div></div></div>';
+    html+='<div class="home-quote">“La cucina è più bella quando la si condivide.” ♥</div></div>';
+    document.getElementById('panel-home').innerHTML=html; bindHomeEvents();
   }
   function bindHomeEvents(){
     document.querySelectorAll("[data-goto]").forEach(function(el){
