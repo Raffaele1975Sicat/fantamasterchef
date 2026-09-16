@@ -2425,15 +2425,16 @@
       var password = g("a-new-password").value;
       if (!username || !teamName || password.length<6){ toast("Username, nome squadra e password (almeno 6 caratteri) sono obbligatori."); return; }
       if (!confirm('Confermi la creazione dell\'account "'+username+'" e della squadra "'+teamName+'"?')) return;
-      callAdminManage({action:"create", username:username, display_name:displayName, password:password}).then(function(res){
+      // Account e squadra vengono creati insieme in un'unica operazione atomica
+      // lato server (Edge Function admin-manage-user): se la squadra non può
+      // essere creata, l'account appena creato viene eliminato automaticamente,
+      // cosi' non resta mai un profilo "orfano" senza squadra.
+      callAdminManage({action:"create", username:username, display_name:displayName, password:password, team_name:teamName}).then(function(res){
         if (res.status!==200 || !res.body || !res.body.ok){
           toast("Creazione non riuscita: " + ((res.body&&res.body.error)||"errore sconosciuto"));
           return;
         }
-        sb.from("teams").insert({profile_id: res.body.user_id, nome_squadra: teamName}).then(function(res2){
-          if (res2.error){ toast("Account creato ma la squadra non è stata creata: " + res2.error.message); loadEverything(); return; }
-          reload('Giocatore "'+username+'" creato.');
-        });
+        reload('Giocatore "'+username+'" creato.');
       }).catch(function(){ toast("Creazione non riuscita: errore di rete."); });
     });
     document.querySelectorAll("[data-reset-pw]").forEach(function(btn){
@@ -2625,6 +2626,11 @@
   // differenziale rispetto a quella attuale e rimuove prima, aggiunge dopo,
   // così il conteggio "massimo 3" lato database non scatta mai per errore
   // durante il salvataggio. Usata sia dal giocatore (Squadra) sia dall'Admin.
+  // Il salvataggio della Brigata (rimuovi i vecchi Chef, aggiungi i nuovi) avviene
+  // in un'UNICA chiamata atomica lato database (RPC replace_brigata): se una
+  // qualunque regola non è rispettata (scadenza, max 3, Chef eliminato...) NON
+  // viene tolto nessuno dei Chef attuali — niente più stati intermedi con la
+  // Brigata a metà in caso di doppio click, rete lenta o errore a metà salvataggio.
   function saveBrigata(teamId, rawIds, doneMsg){
     var seen = {};
     var wanted = [];
@@ -2633,19 +2639,16 @@
       seen[id] = true;
       wanted.push(id);
     });
-    var current = state.teamChefs.filter(function(tc){ return tc.team_id===teamId && tc.ruolo==="brigata" && tc.attivo; });
-    var toRemove = current.filter(function(tc){ return wanted.indexOf(tc.concorrente_id)===-1; });
-    var toAdd = wanted.filter(function(cid){ return !current.some(function(tc){ return tc.concorrente_id===cid; }); });
-    Promise.all(toRemove.map(function(tc){ return sb.from("team_chefs").delete().eq("id", tc.id); })).then(function(delResults){
-      var delErr = (delResults||[]).filter(function(r){ return r && r.error; })[0];
-      if (delErr){ toast("Errore: " + delErr.error.message); return; }
-      if (!toAdd.length){ state._editingBrigata = false; afterWrite(doneMsg||"Fatto.")(); return; }
-      var rows = toAdd.map(function(cid){ return {team_id:teamId, concorrente_id:cid, ruolo:"brigata"}; });
-      sb.from("team_chefs").insert(rows).then(function(res){
-        if (res.error){ toast("Errore: " + res.error.message); return; }
-        state._editingBrigata = false;
-        afterWrite(doneMsg||"Fatto.")(res);
-      });
+    var saveBtn = document.getElementById("sq-save-brigata");
+    if (saveBtn){ if (saveBtn.disabled) return; saveBtn.disabled = true; }
+    sb.rpc("replace_brigata", {p_team_id: teamId, p_concorrente_ids: wanted}).then(function(res){
+      if (res.error){
+        toast("Errore: " + res.error.message);
+        if (saveBtn) saveBtn.disabled = false;
+        return;
+      }
+      state._editingBrigata = false;
+      afterWrite(doneMsg||"Fatto.")(res);
     });
   }
 
