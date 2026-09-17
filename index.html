@@ -98,15 +98,22 @@
      non una tabella gestionale. Il primo posto e la propria squadra si
      riconoscono a colpo d'occhio; dal 4° posto in poi lo stile resta sobrio
      per restare leggibile anche con molti giocatori in lega. */
-  .classifica-row-card{background:var(--panel); border:1px solid var(--line); border-radius:13px; margin-bottom:9px; overflow:hidden;}
+  .classifica-row-card{background:var(--panel); border:1px solid var(--line); border-radius:13px; margin-bottom:9px; overflow:hidden; position:relative;}
   .classifica-row-card.mine{border-color:var(--gold);}
-  .classifica-row-card.pos-1{border-color:var(--gold); background:linear-gradient(160deg, rgba(232,194,106,.14) 0%, var(--panel) 68%); box-shadow:0 4px 16px rgba(202,162,76,.18);}
+  .classifica-row-card.pos-1{border:2px solid #9c7734; background-image:url(bg-legno-texture.png); background-size:200px; background-repeat:repeat; box-shadow:0 6px 18px rgba(0,0,0,.35);}
+  .classifica-row-card.pos-1:before{content:""; position:absolute; inset:0; background:rgba(20,10,4,.4); pointer-events:none;}
+  .classifica-row-card.pos-1 .classifica-row-head, .classifica-row-card.pos-1 .classifica-row-body{position:relative;}
   .classifica-row-card.pos-2, .classifica-row-card.pos-3{border-top:2px solid var(--gold-dim);}
   .classifica-row-head{display:flex; align-items:center; gap:12px; padding:13px 14px; cursor:pointer; -webkit-tap-highlight-color:transparent;}
   .classifica-num{width:32px; text-align:center; flex:0 0 auto;}
   .classifica-num .medal{font-size:21px; line-height:1;}
-  .classifica-row-card.pos-1 .classifica-num .medal{font-size:26px;}
+  .classifica-num .medal-img{width:30px; height:30px; object-fit:contain; filter:drop-shadow(0 2px 4px rgba(0,0,0,.4));}
+  .classifica-row-card.pos-1 .classifica-num .medal-img{width:36px; height:36px;}
   .classifica-num .plain{font-family:'Fraunces',serif; font-weight:700; color:var(--gold-strong); font-size:16px;}
+  .classifica-avatar{width:34px; height:34px; border-radius:50%; flex:0 0 auto; display:flex; align-items:center; justify-content:center; font-family:'Fraunces',serif; font-weight:700; font-size:14px; color:#fff3de; border:2px solid rgba(232,194,106,.55); box-shadow:0 2px 5px rgba(0,0,0,.35);}
+  .classifica-row-card.pos-1 .classifica-avatar{border-color:#f3d98c;}
+  /* --- frase calda in fondo a una schermata: stesso stile della Home, riutilizzabile ovunque --- */
+  .section-quote{margin:10px 2px 4px; padding:11px 14px; background-image:url(bg-pergamena-texture.png); background-size:220px; background-repeat:repeat; border:2px solid #a27d3e; border-radius:12px; color:#3c2a18; font-family:'Fraunces',serif; font-size:13px; text-align:center; box-shadow:0 5px 10px rgba(0,0,0,.25);}
   .classifica-name{flex:1; min-width:0;}
   .classifica-name .team-name{font-weight:600; font-size:14.5px;}
   .classifica-mine-tag{display:inline-block; margin-left:6px; font-size:10px; font-weight:700; color:var(--gold-strong); background:rgba(202,162,76,.16); border:1px solid var(--gold-dim); border-radius:999px; padding:1px 7px; vertical-align:middle;}
@@ -954,6 +961,14 @@
     if (team.nome_squadra) return team.nome_squadra;
     return (team.profiles && team.profiles.display_name) || "Squadra";
   }
+  // Colore stabile per squadra (sempre lo stesso per la stessa squadra), usato
+  // per il pallino-iniziale nella Classifica: niente immagini da caricare.
+  function teamAvatarColor(id){
+    var hash = 0, s = String(id||"");
+    for (var i=0; i<s.length; i++){ hash = s.charCodeAt(i) + ((hash<<5)-hash); }
+    var hue = Math.abs(hash) % 360;
+    return 'hsl('+hue+',44%,36%)';
+  }
   function concorrenteName(id){ var c = byId(state.concorrenti, id); return c?c.nome:"—"; }
 
   /* ============ stelle / carte: acquisto ============ */
@@ -1329,8 +1344,8 @@
       standings.forEach(function(r){
         var mine = state.myTeam && r.team.id===state.myTeam.id;
         var open = state._expandedTeamClassifica===r.team.id;
-        var medalEmoji = r.pos===1 ? "🥇" : (r.pos===2 ? "🥈" : (r.pos===3 ? "🥉" : null));
-        var numHtml = medalEmoji ? '<span class="medal">'+medalEmoji+'</span>' : '<span class="plain">'+r.pos+'</span>';
+        var medalEmoji = r.pos===2 ? "🥈" : (r.pos===3 ? "🥉" : null);
+        var numHtml = r.pos===1 ? '<img class="medal-img" src="ico-trofeo-glossy.png" alt="">' : (medalEmoji ? '<span class="medal">'+medalEmoji+'</span>' : '<span class="plain">'+r.pos+'</span>');
         var prev = prevPos[r.team.id];
         var subBits = [];
         if (r.pos===1) subBits.push('<span class="classifica-lead-tag">🏆 In testa alla lega</span>');
@@ -1343,6 +1358,7 @@
         html += '<div class="classifica-row-card pos-'+r.pos+(mine?' mine':'')+(open?' open':'')+'">'
           + '<div class="classifica-row-head" data-team-row="'+r.team.id+'">'
           + '<div class="classifica-num">'+numHtml+'</div>'
+          + '<div class="classifica-avatar" style="background:'+teamAvatarColor(r.team.id)+';">'+esc(displayName(r.team).charAt(0).toUpperCase())+'</div>'
           + '<div class="classifica-name"><span class="team-name">'+esc(displayName(r.team))+'</span>'+(mine?'<span class="classifica-mine-tag">Tu</span>':'')+subHtml+'</div>'
           + '<div class="classifica-points"><b>'+fmtNum(r.total)+'</b><span class="classifica-points-sub">punti</span></div>'
           + '<div class="classifica-chevron">›</div>'
@@ -1353,6 +1369,7 @@
         }
         html += '</div>';
       });
+      html += '<div class="section-quote">"Stesse ricette, storie diverse. Un’unica grande Brigata." ♥</div>';
     }
     document.getElementById("panel-classifica").innerHTML = html;
     bindClassificaEvents();
