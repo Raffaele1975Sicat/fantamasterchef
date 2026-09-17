@@ -18,28 +18,52 @@
 <style>
   :root{
     --bg:#151109; --panel:#1d1811; --panel2:#241d13; --ink:#f3ead9; --ink-dim:#c9bda3; --ink-faint:#8d806a;
-    --gold:#caa24c; --gold-strong:#e8c26a; --olive:#5c6b3e; --teal:#3f8f82; --penalty:#c1543f; --line:#392f1f;
+    --gold:#caa24c; --gold-strong:#e8c26a; --gold-dim:#8a6a2f; --olive:#5c6b3e; --teal:#3f8f82; --penalty:#c1543f; --line:#392f1f;
+    --parchment:#f2e6c4; --parchment2:#e7d6a6; --ink-dark:#2b2013; --wood:#3a2413; --wood2:#5b3a22; --wood-dark:#241609;
+    --green-accent:#4f7a3d; --green-accent-dark:#33511f;
   }
   *{box-sizing:border-box;}
-  body{margin:0; background:var(--bg); color:var(--ink); font-family:'Work Sans',sans-serif; -webkit-font-smoothing:antialiased;}
+  body{margin:0; color:var(--ink); font-family:'Work Sans',sans-serif; -webkit-font-smoothing:antialiased;
+    background:
+      radial-gradient(1000px 520px at 12% -10%, rgba(122,80,30,.28) 0%, transparent 58%),
+      radial-gradient(900px 520px at 105% 0%, rgba(90,55,18,.26) 0%, transparent 55%),
+      var(--bg);
+    background-attachment:fixed;}
   h1,h2,h3{font-family:'Fraunces',serif; margin:0 0 8px;}
   a{color:var(--gold-strong);}
   button{font-family:inherit; cursor:pointer;}
   .hidden{display:none !important;}
-  #auth-screen{min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px;}
+  #auth-screen{min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px;
+    background:radial-gradient(900px 600px at 20% -10%, #241708 0%, transparent 60%), radial-gradient(800px 600px at 100% 0%, #1e1409 0%, transparent 55%), var(--bg);}
   .card{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:20px;}
-  .auth-card{max-width:380px; width:100%;}
+  .auth-card{max-width:380px; width:100%; position:relative; border-top:2px solid var(--gold-dim);}
   .field{margin-bottom:12px; display:flex; flex-direction:column; gap:4px;}
   .field label{font-size:12.5px; color:var(--ink-faint);}
   .field input, .field select, .field textarea{background:var(--panel2); border:1px solid var(--line); color:var(--ink); border-radius:8px; padding:10px 12px; font-size:15px; font-family:inherit;}
+  select{background:var(--panel2); border:1px solid var(--line); color:var(--ink); border-radius:8px; padding:10px 12px; font-size:15px; font-family:inherit; max-width:100%;}
   .field-row{display:flex; gap:10px; flex-wrap:wrap;}
   .field-row .field{flex:1; min-width:140px;}
-  .btn{background:var(--panel2); color:var(--ink); border:1px solid var(--line); border-radius:9px; padding:10px 16px; font-size:14px; font-weight:600;}
-  .btn.primary{background:var(--gold); color:#1a1408; border:none;}
+  .field-row select, .field-row input{flex:1 1 120px; min-width:0; max-width:100%;}
+  /* --- pulsanti: sistema unico, coerente con le carte (oro/legno), niente immagini --- */
+  .btn{background:var(--panel2); color:var(--ink); border:1px solid var(--line); border-radius:10px; padding:10px 16px; font-size:14px; font-weight:700;
+    box-shadow:0 2px 0 rgba(0,0,0,.3); transition:transform .05s ease, box-shadow .05s ease; letter-spacing:.01em;}
+  .btn:active{transform:translateY(1px); box-shadow:0 0 0 rgba(0,0,0,0);}
+  .btn.primary{background:linear-gradient(180deg,#f7e3a8 0%,#e8c26a 42%,#c99a3e 60%,#b9822a 100%); color:#3a2408; border:1px solid #7a5a1e;
+    box-shadow:0 2px 0 #6b4d18, inset 0 1px 0 rgba(255,255,255,.55), inset 0 -6px 8px rgba(122,90,30,.3);}
+  .btn.primary:active{box-shadow:inset 0 1px 0 rgba(255,255,255,.4);}
   .btn.block{width:100%; text-align:center;}
   .btn.sm{padding:6px 12px; font-size:13px;}
-  .btn.danger{background:transparent; border-color:var(--penalty); color:var(--penalty);}
-  .btn.ghost{background:transparent;}
+  .btn.danger{background:linear-gradient(180deg,#d97a63 0%,#b8503a 55%,#8a3222 100%); color:#fff3ec; border:1px solid #5e1f13;
+    box-shadow:0 2px 0 #4a180e, inset 0 1px 0 rgba(255,255,255,.25);}
+  .btn.danger:active{box-shadow:inset 0 1px 0 rgba(0,0,0,.15);}
+  .btn.ghost{background:transparent; box-shadow:none; border-color:var(--line);}
+  .btn:disabled{opacity:.42; cursor:not-allowed; box-shadow:none; transform:none;}
+  /* --- illustrazioni e cornici "carta da gioco" --- */
+  .hero-illus{width:100%; max-width:280px; display:block; margin:0 auto 14px; border-radius:12px; border:2px solid var(--gold); box-shadow:0 6px 18px rgba(0,0,0,.4); background:var(--wood-dark);}
+  .hero-illus.sm{max-width:170px;}
+  .empty img.hero-illus, .card.empty img.hero-illus{margin-bottom:10px;}
+  .section-head h2{position:relative; display:inline-block;}
+  .section-head h2::after{content:""; display:block; width:38px; height:3px; background:var(--gold); border-radius:3px; margin-top:5px;}
   .tabs-link{text-align:center; margin-top:12px; font-size:13.5px; color:var(--ink-faint);}
   .tabs-link span{color:var(--gold-strong); cursor:pointer; text-decoration:underline;}
   #app{max-width:900px; margin:0 auto; padding-bottom:90px;}
@@ -51,12 +75,34 @@
   .section-sub{color:var(--ink-faint); font-size:13px; margin:0;}
   .tab-panel{display:none;}
   .tab-panel.active{display:block;}
-  .rank-row{display:flex; align-items:center; gap:12px; padding:12px 14px; border-bottom:1px solid var(--line);}
-  .rank-row:last-child{border-bottom:none;}
-  .rank-num{width:26px; text-align:center; font-family:'Fraunces',serif; font-weight:700; color:var(--gold-strong);}
-  .rank-name{flex:1;}
-  .rank-name .sub{display:block; font-size:11.5px; color:var(--ink-faint);}
-  .rank-points{font-weight:700; font-variant-numeric:tabular-nums;}
+  /* Classifica: ogni squadra è una "targhetta" a sé, come le carte in Carte —
+     non una tabella gestionale. Il primo posto e la propria squadra si
+     riconoscono a colpo d'occhio; dal 4° posto in poi lo stile resta sobrio
+     per restare leggibile anche con molti giocatori in lega. */
+  .classifica-row-card{background:var(--panel); border:1px solid var(--line); border-radius:13px; margin-bottom:9px; overflow:hidden;}
+  .classifica-row-card.mine{border-color:var(--gold);}
+  .classifica-row-card.pos-1{border-color:var(--gold); background:linear-gradient(160deg, rgba(232,194,106,.14) 0%, var(--panel) 68%); box-shadow:0 4px 16px rgba(202,162,76,.18);}
+  .classifica-row-card.pos-2, .classifica-row-card.pos-3{border-top:2px solid var(--gold-dim);}
+  .classifica-row-head{display:flex; align-items:center; gap:12px; padding:13px 14px; cursor:pointer; -webkit-tap-highlight-color:transparent;}
+  .classifica-num{width:32px; text-align:center; flex:0 0 auto;}
+  .classifica-num .medal{font-size:21px; line-height:1;}
+  .classifica-row-card.pos-1 .classifica-num .medal{font-size:26px;}
+  .classifica-num .plain{font-family:'Fraunces',serif; font-weight:700; color:var(--gold-strong); font-size:16px;}
+  .classifica-name{flex:1; min-width:0;}
+  .classifica-name .team-name{font-weight:600; font-size:14.5px;}
+  .classifica-mine-tag{display:inline-block; margin-left:6px; font-size:10px; font-weight:700; color:var(--gold-strong); background:rgba(202,162,76,.16); border:1px solid var(--gold-dim); border-radius:999px; padding:1px 7px; vertical-align:middle;}
+  .classifica-sub-row{margin-top:3px; display:flex; align-items:center; gap:6px; flex-wrap:wrap;}
+  .classifica-lead-tag{font-size:11px; font-weight:700; color:var(--gold-strong); letter-spacing:.01em;}
+  .classifica-delta-pill{display:inline-flex; align-items:center; gap:2px; font-size:11px; font-weight:700; border-radius:999px; padding:1px 7px;}
+  .classifica-delta-pill.up{color:var(--teal); background:rgba(63,143,130,.16);}
+  .classifica-delta-pill.down{color:var(--penalty); background:rgba(193,84,63,.16);}
+  .classifica-points{text-align:right; flex:0 0 auto;}
+  .classifica-points b{font-family:'Fraunces',serif; font-size:17px; font-weight:700; font-variant-numeric:tabular-nums; color:var(--ink);}
+  .classifica-row-card.pos-1 .classifica-points b{color:var(--gold-strong);}
+  .classifica-points-sub{display:block; font-size:10px; color:var(--ink-faint);}
+  .classifica-chevron{color:var(--gold-strong); font-size:15px; flex:0 0 auto; transition:transform .2s ease;}
+  .classifica-row-card.open .classifica-chevron{transform:rotate(90deg);}
+  .classifica-row-body{padding:0 14px 16px; border-top:1px solid var(--line); padding-top:14px;}
   table{width:100%; border-collapse:collapse; font-size:13.5px;}
   th,td{text-align:left; padding:8px 10px; border-bottom:1px solid var(--line);}
   th{color:var(--ink-faint); font-weight:600; font-size:12px; text-transform:uppercase; letter-spacing:.04em;}
@@ -69,19 +115,222 @@
   .badge.warn{background:rgba(193,84,63,.2); color:var(--penalty);}
   fieldset{border:1px solid var(--line); border-radius:12px; margin:0 0 16px; padding:14px;}
   legend{padding:0 8px; font-weight:600; color:var(--gold-strong); font-size:13.5px;}
-  .bottombar{position:fixed; bottom:0; left:0; right:0; background:var(--panel); border-top:1px solid var(--line); display:flex; z-index:20;}
+  .bottombar{position:fixed; bottom:0; left:0; right:0; z-index:20; display:flex; padding-bottom:env(safe-area-inset-bottom,0px); border-top:3px solid var(--gold-dim);
+    box-shadow:0 -6px 18px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.05);
+    background-image:
+      repeating-linear-gradient(90deg, rgba(0,0,0,.12) 0px, rgba(0,0,0,0) 2px, rgba(0,0,0,0) 18px, rgba(0,0,0,.07) 20px),
+      linear-gradient(180deg,#2a1c0e,#150f08);}
   .bottombar button{flex:1; background:none; border:none; color:var(--ink-faint); font-size:11px; padding:8px 2px 10px; display:flex; flex-direction:column; align-items:center; gap:3px;}
-  .bottombar button.active{color:var(--gold-strong);}
+  .bottombar button.active{color:var(--gold-strong); text-shadow:0 0 8px rgba(232,194,106,.45);}
   .bottombar button .dot{width:6px; height:6px; border-radius:50%; background:currentColor;}
+  .bottombar button .nav-ico{width:21px; height:21px; object-fit:contain; opacity:.72;}
+  .bottombar button.active .nav-ico{opacity:1; filter:drop-shadow(0 0 3px rgba(232,194,106,.5));}
+  .nav-dots{display:flex; gap:3px; align-items:center; height:21px;}
+  .nav-dots span{width:4px; height:4px; border-radius:50%; background:currentColor; opacity:.72;}
+  .more-panel{position:absolute; bottom:100%; right:6px; margin-bottom:8px; background:var(--parchment); color:var(--ink-dark); border:1px solid #a98a4a; border-radius:12px; box-shadow:0 -8px 24px rgba(0,0,0,.5); padding:6px; display:flex; flex-direction:column; min-width:180px;}
+  .more-panel button{flex:none; flex-direction:row; justify-content:flex-start; gap:10px; padding:11px 12px; font-size:13.5px; border-radius:8px; color:var(--ink-dark); font-weight:600;}
+  .more-panel button .nav-ico{width:20px; height:20px; object-fit:contain;}
+  .more-panel button:active{background:rgba(122,90,30,.15);}
   .empty{padding:30px 16px; text-align:center; color:var(--ink-faint);}
   #toast-root{position:fixed; top:14px; left:50%; transform:translateX(-50%); z-index:99; display:flex; flex-direction:column; gap:8px;}
   .toast{background:#2a2313; border:1px solid var(--gold); color:var(--ink); padding:10px 16px; border-radius:9px; font-size:13.5px; box-shadow:0 6px 20px rgba(0,0,0,.4);}
+  #loading-overlay{position:fixed; inset:0; z-index:150; background:var(--wood-dark); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px;}
+  #loading-overlay img{width:120px; height:120px; object-fit:contain; animation:loading-spin 1.6s linear infinite;}
+  #loading-overlay span{color:var(--gold-strong); font-family:'Fraunces',serif; font-size:15px; letter-spacing:.02em;}
+  @keyframes loading-spin{from{transform:rotate(0deg);} to{transform:rotate(360deg);}}
   .banner{background:var(--panel2); border:1px solid var(--line); border-radius:10px; padding:10px 14px; margin-bottom:14px; font-size:13.5px; display:flex; justify-content:space-between; align-items:center; gap:10px;}
   .banner.warn{border-color:var(--penalty);}
   .banner.ok{border-color:var(--teal);}
   .err{color:var(--penalty); font-size:13px; margin-top:6px;}
   .muted{color:var(--ink-faint);}
+  /* --- home/brigata: gerarchia essenziale → azione → dettagli --- */
+  .greet-row{display:flex; align-items:center; gap:12px; margin-bottom:18px;}
+  .greet-illus{width:52px; height:52px; object-fit:cover; border-radius:50%; border:2px solid var(--gold); flex:0 0 auto; background:var(--wood-dark);}
+  .greet-row h1{font-size:19px; margin:0;}
+  .notice{background:linear-gradient(160deg, var(--parchment) 0%, var(--parchment2) 100%); color:var(--ink-dark); border:1px solid #b99a5c; border-radius:12px; padding:12px 14px; margin-bottom:16px; box-shadow:0 5px 14px rgba(0,0,0,.3); position:relative;}
+  .notice-head{display:flex; align-items:center; gap:8px; font-size:13.5px; font-weight:700; color:#7a4a1e; margin-bottom:2px;}
+  .notice-icon{width:20px; height:20px; object-fit:cover; border-radius:50%; flex:0 0 auto;}
+  .notice-item{display:flex; justify-content:space-between; gap:10px; font-size:13px; padding:6px 0 6px 28px; border-top:1px solid #cdb27e;}
+  .notice-when{color:#8a7550; white-space:nowrap; font-size:12px;}
+  .my-team-card{display:flex; align-items:center; gap:12px; padding:14px 16px; margin-bottom:20px; cursor:pointer; -webkit-tap-highlight-color:transparent; border-left:4px solid var(--gold); background:linear-gradient(100deg, rgba(202,162,76,.12), var(--panel) 55%);}
+  .my-team-card:active{background:var(--panel2);}
+  .my-team-pos{font-family:'Fraunces',serif; font-size:22px; font-weight:700; color:var(--gold-strong); width:38px; text-align:center; flex:0 0 auto;}
+  .my-team-info{flex:1; min-width:0;}
+  .my-team-label{font-size:11.5px; color:var(--ink-faint); text-transform:uppercase; letter-spacing:.05em;}
+  .my-team-name{font-family:'Fraunces',serif; font-size:17px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .my-team-points{text-align:right; flex:0 0 auto;}
+  .my-team-points b{font-family:'Fraunces',serif; font-size:19px; display:block;}
+  .my-team-points-sub{font-size:11px; color:var(--ink-faint);}
+  .my-team-chevron{font-size:20px; color:var(--ink-faint); flex:0 0 auto;}
+  .action-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:20px;}
+  .action-card{background:linear-gradient(160deg, var(--panel) 0%, var(--panel2) 100%); border:1px solid var(--line); border-top:2px solid var(--gold-dim); border-radius:14px; padding:14px; display:flex; flex-direction:column; align-items:flex-start; gap:8px; cursor:pointer; -webkit-tap-highlight-color:transparent; position:relative; box-shadow:0 4px 10px rgba(0,0,0,.25);}
+  .action-card::after{content:""; position:absolute; top:7px; right:9px; width:5px; height:5px; border-radius:50%; background:var(--gold-dim); box-shadow:0 1px 1px rgba(0,0,0,.5);}
+  .action-card:active{background:var(--panel2); border-color:var(--gold-dim);}
+  .action-icon-wrap{width:42px; height:42px; border-radius:50%; background:radial-gradient(circle at 35% 30%, #6a4527, var(--wood-dark) 72%); border:2px solid var(--gold); display:flex; align-items:center; justify-content:center; flex:0 0 auto; box-shadow:0 2px 6px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.1);}
+  .action-icon-wrap img{width:21px; height:21px; object-fit:contain;}
+  .action-card h3{margin:0; font-size:14.5px;}
+  .action-card span{font-size:11.5px; color:var(--ink-faint); line-height:1.3;}
+  .stat-row{display:flex; margin-bottom:18px; border:1px solid var(--line); border-radius:14px; overflow:hidden;}
+  .stat-cell{flex:1; padding:12px 8px; text-align:center; border-right:1px solid var(--line);}
+  .stat-cell:last-child{border-right:none;}
+  .stat-cell .section-sub{margin-bottom:2px; font-size:11.5px;}
+  .stat-cell .stat-val{font-family:'Fraunces',serif; font-size:21px; display:flex; align-items:center; justify-content:center; gap:5px;}
+  .disclosure{background:var(--panel); border:1px solid var(--line); border-radius:14px; margin-bottom:16px; overflow:hidden;}
+  .disclosure-head{display:flex; align-items:center; justify-content:space-between; gap:10px; padding:15px 18px; cursor:pointer; -webkit-tap-highlight-color:transparent;}
+  .disclosure-head h3{margin:0; font-size:14.5px;}
+  .disclosure-chevron{font-size:15px; color:var(--gold-strong); transition:transform .2s ease; flex:0 0 auto;}
+  .disclosure.open .disclosure-chevron{transform:rotate(90deg);}
+  .disclosure-body{padding:2px 18px 18px;}
+  .disclosure-sub{padding-top:14px; margin-top:14px; border-top:1px solid var(--line);}
+  .disclosure-sub:first-child{padding-top:0; margin-top:0; border-top:none;}
+  .brigata-head{display:flex; align-items:center; gap:10px; margin-bottom:10px;}
+  .brigata-head img{width:44px; height:44px; object-fit:cover; border-radius:50%; border:2px solid var(--gold); flex:0 0 auto;}
+  .brigata-head h3{margin:0; font-size:15px;}
+  .brigata-chips{display:flex; flex-wrap:wrap; gap:6px 8px; margin-bottom:4px;}
+  .brigata-chips .chip{margin:0; padding:6px 12px; font-size:13px;}
+  .status-line{display:flex; align-items:flex-start; gap:7px; font-size:12.5px; color:var(--ink-faint); margin:10px 0 0;}
+  .status-line img{width:14px; height:14px; object-fit:contain; flex:0 0 auto; margin-top:2px;}
+  header.topbar .btn.sm{padding:11px 14px; min-height:44px;}
+
+  /* --- sistema grafico globale: legno / pergamena / oro --- */
+  .signboard{
+    background-image:
+      repeating-linear-gradient(90deg, rgba(0,0,0,.10) 0px, rgba(0,0,0,0) 2px, rgba(0,0,0,0) 20px, rgba(0,0,0,.06) 22px),
+      linear-gradient(180deg, #6a4527 0%, #4a2c17 60%, #3a2110 100%);
+    border:2px solid var(--gold-dim); border-radius:16px;
+    box-shadow:0 8px 20px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.08); position:relative;
+  }
+  .signboard::before{content:""; position:absolute; inset:5px; border:1px solid rgba(232,194,106,.3); border-radius:11px; pointer-events:none;}
+  .parchment-panel{background:linear-gradient(160deg, var(--parchment) 0%, var(--parchment2) 100%); color:var(--ink-dark);
+    border:1px solid #b99a5c; border-radius:14px; box-shadow:0 6px 16px rgba(0,0,0,.3);}
+  .home-hero{display:flex; align-items:stretch; margin-bottom:18px; overflow:hidden; padding:0;}
+  .home-hero-img{width:100px; align-self:stretch; object-fit:cover; object-position:top center; flex:0 0 auto;
+    border-radius:13px 0 0 13px; border-right:2px solid var(--gold-dim); box-shadow:inset -10px 0 16px -12px rgba(0,0,0,.7); background:var(--wood-dark);}
+  .home-hero-text{flex:1; min-width:0; padding:14px 16px; display:flex; flex-direction:column; justify-content:center;}
+  .home-hero-text h1{font-size:19px; margin:0 0 3px; color:var(--gold-strong); text-shadow:0 2px 4px rgba(0,0,0,.4);}
+  .home-hero-tag{margin:0; font-size:12px; color:var(--ink-dim);}
+
+  /* --- breakpoint mobile: telefoni molto stretti (≤389px, es. iPhone SE/mini) --- */
+  @media (max-width: 389px){
+    main{padding:14px;}
+    .greet-row{gap:9px; margin-bottom:13px;}
+    .greet-illus{width:42px; height:42px;}
+    .greet-row h1{font-size:16.5px;}
+    .notice{padding:9px 11px; margin-bottom:13px;}
+    .notice-head{font-size:13px;}
+    .notice-item{font-size:12.5px; padding:5px 0 5px 26px;}
+    .my-team-card{padding:11px 13px; gap:10px; margin-bottom:15px;}
+    .my-team-pos{font-size:19px; width:32px;}
+    .my-team-name{font-size:15px;}
+    .my-team-points b{font-size:17px;}
+    .stat-row{margin-bottom:13px;}
+    .stat-cell{padding:9px 5px;}
+    .stat-cell .stat-val{font-size:18px;}
+    .disclosure{margin-bottom:13px;}
+    .disclosure-head{padding:13px 14px;}
+    .disclosure-body{padding:2px 14px 14px;}
+    .brigata-head img{width:38px; height:38px;}
+    .brigata-head h3{font-size:14px;}
+    .brigata-chips .chip{padding:5px 10px; font-size:12px;}
+    .classifica-row-head{padding:11px 10px; gap:9px;}
+    .classifica-row-body{padding-left:10px; padding-right:10px;}
+    .action-grid{gap:9px; margin-bottom:15px;}
+    .action-card{padding:11px;}
+    .action-icon-wrap{width:36px; height:36px;}
+    .action-icon-wrap img{width:18px; height:18px;}
+    .home-hero{margin-bottom:13px;}
+    .home-hero-img{width:78px;}
+    .home-hero-text{padding:10px 12px;}
+    .home-hero-text h1{font-size:16.5px;}
+    .home-hero-tag{font-size:11px;}
+  }
+  /* --- breakpoint mobile: telefoni standard/larghi (≥390px) — più respiro --- */
+  @media (min-width: 390px){
+    .greet-row{margin-bottom:20px;}
+    .notice{margin-bottom:18px;}
+    .my-team-card{margin-bottom:22px;}
+    .stat-row{margin-bottom:20px;}
+    .disclosure{margin-bottom:18px;}
+  }
   details summary{cursor:pointer; font-size:13px; color:var(--ink-dim); margin-top:6px;}
+
+  /* --- carte / chef / puntate / regolamento / chat: stessa filosofia essenziale→azione→dettagli --- */
+  .screen-head{display:flex; align-items:center; gap:12px; margin-bottom:16px;}
+  .screen-head-icon{width:44px; height:44px; object-fit:cover; border-radius:50%; border:2px solid var(--gold); flex:0 0 auto; background:var(--wood-dark);}
+  .screen-head h2{margin:0;}
+  .screen-head .section-sub{margin-top:2px;}
+
+  .stars-card{display:flex; align-items:center; gap:12px; padding:14px 16px; margin-bottom:18px;}
+  .stars-card img{width:28px; height:28px; object-fit:contain; flex:0 0 auto;}
+  .stars-card .stars-label{font-size:11.5px; color:var(--ink-faint); text-transform:uppercase; letter-spacing:.05em;}
+  .stars-card .stars-val{font-family:'Fraunces',serif; font-size:22px; color:var(--gold-strong); font-weight:700;}
+
+  .card-item{background:linear-gradient(160deg, var(--panel) 0%, var(--panel2) 100%); border:1px solid var(--line); border-top:2px solid var(--gold-dim); border-radius:14px; padding:14px 16px; margin-bottom:12px; box-shadow:0 4px 10px rgba(0,0,0,.25);}
+  .card-item.is-used{opacity:.82;}
+  .card-item.is-blocked{border-top-color:var(--line);}
+  .card-item-head{display:flex; align-items:center; gap:14px; margin-bottom:10px;}
+  .card-item-thumb{width:56px; height:84px; object-fit:cover; border-radius:7px; flex:0 0 auto; cursor:pointer; border:2px solid var(--gold); box-shadow:0 3px 10px rgba(0,0,0,.45);}
+  .card-item.is-used .card-item-thumb{border-color:var(--gold-dim); filter:saturate(.75) brightness(.82);}
+  .card-item.is-blocked .card-item-thumb{border-color:var(--line); filter:saturate(.55) brightness(.62);}
+  .card-item-title{flex:1; min-width:0;}
+  .card-item-title h3{margin:0 0 3px; font-size:15.5px;}
+  .card-item-cost{font-family:'Fraunces',serif; color:var(--gold-strong); font-size:13.5px; white-space:nowrap; display:inline-flex; align-items:center; gap:4px; background:rgba(202,162,76,.12); border:1px solid var(--gold-dim); border-radius:999px; padding:2px 9px;}
+  .card-item-info{font-size:12.5px; color:var(--gold-strong); cursor:pointer; -webkit-tap-highlight-color:transparent; display:inline-block; margin-bottom:2px;}
+  .card-item-desc{font-size:13px; color:var(--ink-dim); line-height:1.45; margin:8px 0 0; padding-top:10px; border-top:1px solid var(--line);}
+  .carte-group{margin-bottom:16px;}
+  .carte-group-head{display:flex; align-items:center; justify-content:space-between; gap:10px; padding:14px 16px; cursor:pointer; -webkit-tap-highlight-color:transparent; background-image:
+      repeating-linear-gradient(90deg, rgba(0,0,0,.08) 0px, rgba(0,0,0,0) 2px, rgba(0,0,0,0) 20px, rgba(0,0,0,.05) 22px),
+      linear-gradient(180deg, #513521 0%, #3a2413 100%); border:2px solid var(--gold-dim); border-radius:14px; box-shadow:0 5px 14px rgba(0,0,0,.35);}
+  .carte-group-head h3{margin:0; font-size:14.5px; color:var(--gold-strong); display:flex; align-items:center; gap:8px;}
+  .carte-group-count{background:rgba(0,0,0,.3); color:var(--ink-dim); font-size:11.5px; border-radius:999px; padding:1px 8px; font-family:'Work Sans',sans-serif; font-weight:600;}
+  .carte-group-chevron{color:var(--gold-strong); font-size:15px; transition:transform .2s ease; flex:0 0 auto;}
+  .carte-group.open .carte-group-chevron{transform:rotate(90deg);}
+  .carte-group-body{padding:12px 2px 0;}
+  .carte-group-empty{padding:14px 16px; text-align:center; color:var(--ink-faint); font-size:13px;}
+
+  .chip-row{display:flex; align-items:center; gap:12px; padding:12px 14px; border-bottom:1px solid var(--line); cursor:pointer; -webkit-tap-highlight-color:transparent;}
+  .chip-row:last-child{border-bottom:none;}
+  .chip-row-name{flex:1; min-width:0;}
+  .chip-row-points{font-weight:700; font-variant-numeric:tabular-nums; flex:0 0 auto;}
+  .chip-row-chevron{color:var(--ink-faint); flex:0 0 auto;}
+
+  .ep-card{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:14px 16px; margin-bottom:12px;}
+  .ep-card-head{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:6px;}
+  .ep-card-head h3{margin:0; font-size:15.5px;}
+  .ep-highlights{display:flex; flex-wrap:wrap; gap:6px 8px; margin:8px 0 2px;}
+  .ep-highlights .chip{margin:0;}
+  .ep-toggle{margin-top:10px; font-size:12.5px; color:var(--gold-strong); cursor:pointer; -webkit-tap-highlight-color:transparent; display:inline-block;}
+
+  .chat-top{display:flex; align-items:center; gap:10px; margin-bottom:10px; padding-bottom:10px; border-bottom:1px solid var(--line);}
+  .chat-top img{width:38px; height:38px; object-fit:cover; border-radius:50%; flex:0 0 auto;}
+  .chat-top-title{flex:1; min-width:0;}
+  .chat-top-title h2{margin:0; font-size:17px;}
+  .chat-top-title span{font-size:11px; color:var(--ink-faint);}
+  .chat-notif-toggle{display:flex; align-items:center; gap:5px; font-size:18px; flex:0 0 auto; cursor:pointer; -webkit-tap-highlight-color:transparent; padding:6px; -webkit-tap-highlight-color:transparent;}
+  .chat-notif-toggle input{margin:0;}
+  .chat-notif-toggle input:not(:checked) ~ .bell{opacity:.35;}
+
+  details.admin-disclosure{background:var(--panel); border:1px solid var(--line); border-radius:14px; margin-bottom:12px; overflow:hidden;}
+  details.admin-disclosure summary{list-style:none; cursor:pointer; display:flex; align-items:center; justify-content:space-between; gap:10px; padding:14px 16px; -webkit-tap-highlight-color:transparent;}
+  details.admin-disclosure summary::-webkit-details-marker{display:none;}
+  details.admin-disclosure summary h3{margin:0; font-size:14.5px;}
+  details.admin-disclosure summary .chev{color:var(--gold-strong); font-size:15px; transition:transform .2s ease; flex:0 0 auto;}
+  details.admin-disclosure[open] summary .chev{transform:rotate(90deg);}
+  details.admin-disclosure summary{border-bottom:1px solid transparent;}
+  details.admin-disclosure[open] summary{border-bottom-color:var(--line);}
+  details.admin-disclosure .disclosure-body{padding:14px 16px 16px;}
+  details.admin-disclosure fieldset{border:none; margin:0; padding:0;}
+  details.admin-disclosure legend{display:none;}
+
+  @media (max-width: 389px){
+    .card-item{padding:12px 13px;}
+    .card-item-thumb{width:38px; height:57px;}
+    .stars-card{padding:12px 14px;}
+    .screen-head-icon{width:38px; height:38px;}
+    .ep-card{padding:12px 13px;}
+    details.admin-disclosure summary{padding:12px 13px;}
+    details.admin-disclosure .disclosure-body{padding:12px 13px 14px;}
+  }
   #install-banner{position:fixed; left:12px; right:12px; bottom:12px; background:var(--panel); border:1px solid var(--gold); border-radius:12px; padding:12px 14px; box-shadow:0 8px 24px rgba(0,0,0,.5); z-index:50; font-size:13.5px; max-width:460px; margin:0 auto;}
   .install-banner-inner{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
   .install-banner-inner span{flex:1; min-width:180px; line-height:1.4;}
@@ -89,7 +338,123 @@
   #card-lightbox{position:fixed; inset:0; background:rgba(0,0,0,.75); display:none; align-items:center; justify-content:center; z-index:999; padding:24px;}
   #card-lightbox.open{display:flex;}
   #card-lightbox img{max-width:min(90vw,420px); max-height:85vh; border-radius:14px; box-shadow:0 10px 40px rgba(0,0,0,.5);}
+  #card-detail-modal{position:fixed; inset:0; z-index:200; display:none; align-items:flex-end; justify-content:center;}
+  #card-detail-modal.open{display:flex;}
+  .card-detail-backdrop{position:absolute; inset:0; background:rgba(0,0,0,.62);}
+  .card-detail-sheet{position:relative; z-index:1; width:100%; max-width:420px; max-height:88vh; overflow-y:auto; -webkit-overflow-scrolling:touch;
+    border-radius:18px 18px 0 0; padding:22px 20px calc(18px + env(safe-area-inset-bottom,0px));}
+  @media (min-width:480px){ #card-detail-modal{align-items:center; padding:24px;} .card-detail-sheet{border-radius:18px;} }
+  .card-detail-close{position:absolute; top:10px; right:10px; width:32px; height:32px; border-radius:50%; border:1px solid #b99a5c; background:var(--parchment2); color:var(--ink-dark); font-size:15px; line-height:1; cursor:pointer; -webkit-tap-highlight-color:transparent;}
+  .card-detail-img{display:block; margin:0 auto 12px; width:132px; border-radius:10px; border:3px solid var(--gold); box-shadow:0 8px 20px rgba(0,0,0,.4);}
+  .card-detail-sheet h3{text-align:center; color:var(--ink-dark); margin:0 0 4px;}
+  .card-detail-cost{display:block; text-align:center; color:#7a4a1e; font-size:12.5px; font-weight:700; margin-bottom:12px;}
+  .card-detail-desc{font-size:13.5px; line-height:1.55; color:#4a3a20; margin:0 0 16px; padding-bottom:14px; border-bottom:1px solid #cdb27e;}
+  .card-detail-form select{width:100%; background:#fbf3de; border:1px solid #b99a5c; color:var(--ink-dark);}
+  .card-detail-form label{color:#4a3a20;}
+  .bottombar button{position:relative;}
+  .chat-badge{position:absolute; top:3px; right:12px; background:var(--penalty); color:#fff; font-size:9.5px; min-width:15px; height:15px; line-height:15px; text-align:center; border-radius:999px; padding:0 3px;}
+  #chat-wrap{display:flex; flex-direction:column; height:calc(100vh - 210px); min-height:320px;}
+  #chat-list{flex:1; overflow-y:auto; padding:4px 2px 10px; display:flex; flex-direction:column; gap:10px;}
+  .chat-msg{max-width:84%; align-self:flex-start; display:flex; flex-direction:column;}
+  .chat-msg.mine{align-self:flex-end; align-items:flex-end;}
+  .chat-bubble{background:var(--panel2); border:1px solid var(--line); border-radius:12px; padding:8px 12px; font-size:14px; line-height:1.4; word-break:break-word;}
+  .chat-msg.mine .chat-bubble{background:rgba(202,162,76,.14); border-color:var(--gold);}
+  .chat-meta{font-size:11px; color:var(--ink-faint); margin:2px 6px;}
+  .chat-reply-preview{border-left:2px solid var(--gold-strong); padding-left:8px; margin-bottom:4px; font-size:12px; color:var(--ink-faint);}
+  .chat-img{max-width:220px; max-height:260px; border-radius:8px; display:block; margin-top:4px; cursor:pointer; object-fit:cover;}
+  .chat-avviso{align-self:center; text-align:center; font-size:12.5px; color:var(--gold-strong); background:rgba(202,162,76,.1); border:1px solid var(--line); border-radius:999px; padding:6px 14px; max-width:92%;}
+  .chat-reactions{display:flex; gap:4px; flex-wrap:wrap; margin-top:4px;}
+  .chat-react-btn{background:var(--panel2); border:1px solid var(--line); border-radius:999px; font-size:11.5px; padding:1px 7px; cursor:pointer; color:var(--ink);}
+  .chat-react-btn.mine{border-color:var(--gold);}
+  .chat-actions{font-size:11px; color:var(--ink-faint); margin-top:2px;}
+  .chat-actions span{cursor:pointer; text-decoration:underline; margin-right:10px;}
+  .chat-emoji-row{display:flex; gap:6px; margin-top:4px;}
+  .chat-emoji-row button{font-size:17px; background:var(--panel2); border:1px solid var(--line); border-radius:8px; padding:2px 6px;}
+  #chat-input-bar{display:flex; gap:8px; align-items:flex-end; padding:8px 2px 2px; border-top:1px solid var(--line);}
+  #chat-input-bar textarea{flex:1; resize:none; min-height:38px; max-height:100px; background:var(--panel2); border:1px solid var(--line); color:var(--ink); border-radius:9px; padding:9px 12px; font-size:14px; font-family:inherit;}
+  #chat-reply-bar{display:flex; justify-content:space-between; align-items:center; font-size:12px; color:var(--ink-faint); background:var(--panel2); border-radius:8px; padding:6px 10px; margin-bottom:6px;}
+  /* ============ HOME — vetrina "carta da gioco", versione unica e pulita ============
+     (sostituisce le precedenti versioni V2/V9/V12/V13, che convivevano nel file
+     e si sovrascrivevano a vicenda in modo incoerente) */
+  .home-v3{max-width:760px;margin:0 auto;padding:0 0 16px;}
+  .home-v3 .kitchen-hero{position:relative;border-radius:18px;overflow:hidden;border:2px solid var(--gold-dim);box-shadow:0 9px 22px rgba(0,0,0,.42);background:var(--wood-dark);margin-bottom:14px;}
+  .home-v3 .kitchen-hero::before{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
+    background:linear-gradient(180deg,rgba(20,10,4,.10) 0%,transparent 38%,rgba(20,10,4,.32) 100%);}
+  .home-v3 .kitchen-hero::after{content:"";position:absolute;inset:6px;z-index:2;border:1px solid rgba(232,194,106,.35);border-radius:13px;pointer-events:none;}
+  .home-v3 .kitchen-hero img{display:block;width:100%;aspect-ratio:16/10;max-height:320px;object-fit:cover;object-position:center 25%;filter:saturate(1.05) contrast(1.02);}
+  .home-v3 .welcome-plaque{position:absolute;left:14px;top:14px;right:14px;z-index:3;max-width:min(310px,70%);
+    padding:11px 15px 12px;background:linear-gradient(160deg,var(--parchment) 0%,var(--parchment2) 100%);color:var(--ink-dark);
+    border:2px solid #9c793c;border-radius:12px;box-shadow:0 7px 15px rgba(0,0,0,.4);transform:rotate(-1deg);}
+  .home-v3 .welcome-plaque .plaque-greet{display:block;font-family:'Work Sans',sans-serif;font-weight:600;font-size:11.5px;color:#7a4a1e;margin-bottom:2px;}
+  .home-v3 .welcome-plaque h1{margin:0;font-size:clamp(16px,4.6vw,22px);line-height:1.06;color:#1f160d;}
+  .home-v3 .welcome-plaque p{margin:5px 0 0;font-family:'Fraunces',serif;font-size:11px;line-height:1.25;color:#5a3b20;}
+  .home-v3 .welcome-plaque .tricolor{height:4px;margin-top:7px;max-width:110px;border-radius:4px;
+    background:linear-gradient(90deg,#4f7a3d 0 33%,#f2e6c4 33% 66%,#b33c2e 66%);}
+
+  .home-v3 .action-board{padding:9px;margin-bottom:14px;border-radius:18px;box-shadow:0 8px 18px rgba(0,0,0,.34);
+    border:2px solid #916b2e;
+    background-image:repeating-linear-gradient(90deg, rgba(255,255,255,.03) 0px, rgba(255,255,255,.03) 2px, transparent 2px, transparent 22px),
+      linear-gradient(180deg,#68401f,#351d0d);}
+  .home-v3 .home-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
+  .home-v3 .home-action{position:relative;display:grid;grid-template-columns:46px 1fr 26px;align-items:center;column-gap:9px;
+    min-height:100px;padding:10px 9px;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent;
+    background:linear-gradient(160deg,#fbefd2,#e7d4a5);color:#2b1a0d;border:2px solid #a27d3e;border-radius:12px;
+    box-shadow:0 5px 10px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.7);transition:transform .08s ease,filter .08s ease;}
+  .home-v3 .home-action:active{transform:translateY(1px);filter:brightness(.96);}
+  .home-v3 .home-action-icon{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    background:radial-gradient(circle at 35% 28%,#7b542e,#3a2413 72%);border:2px solid #c09642;box-shadow:0 3px 7px rgba(0,0,0,.34);}
+  .home-v3 .home-action-icon img{width:23px;height:23px;object-fit:contain;}
+  .home-v3 .home-action h3{margin:0;font-family:'Fraunces',serif;font-size:14.5px;line-height:1.15;}
+  .home-v3 .home-action span{display:block;margin-top:2px;font-size:10.5px;line-height:1.2;color:#62472b;}
+  .home-v3 .home-action::after{content:'›';width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    background:radial-gradient(circle at 35% 28%,#8a5c2d,#3a2110 72%);border:2px solid #c09642;color:#fff4d7;font-size:18px;line-height:1;
+    box-shadow:0 2px 5px rgba(0,0,0,.32);}
+
+  .home-v3 .home-lower{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:12px;}
+  .home-v3 .home-paper,.home-v3 .home-wood{border-radius:14px;box-shadow:0 7px 15px rgba(0,0,0,.32);overflow:hidden;}
+  .home-v3 .home-paper{border:2px solid #a27d3e;background:linear-gradient(160deg,#f8edd1,#e4cf9e);color:#2b1a0d;}
+  .home-v3 .home-paper-head{padding:9px 13px;font-family:'Fraunces',serif;font-size:16.5px;color:#fff8eb;background:#b53228;border-bottom:2px solid #702019;}
+  .home-v3 .home-paper-body{padding:12px 13px;}
+  .home-v3 .home-next-row{display:flex;gap:11px;align-items:center;}
+  .home-v3 .home-calendar{flex:0 0 72px;padding:7px 5px;text-align:center;background:#f7edcf;color:#2b2013;border:1px solid #a98a4a;border-radius:8px;box-shadow:0 3px 7px rgba(0,0,0,.22);}
+  .home-v3 .home-calendar small{display:block;font-size:9.5px;text-transform:uppercase;color:#8b3027;font-weight:700;}
+  .home-v3 .home-calendar b{display:block;font-family:'Fraunces',serif;font-size:25px;line-height:1.05;}
+  .home-v3 .home-calendar span{display:block;font-size:10px;}
+  .home-v3 .home-next-copy h3{margin:0 0 3px;font-size:15px;color:#2b2013;}
+  .home-v3 .home-next-copy p{margin:2px 0;font-size:12px;color:#5b4427;}
+  .home-v3 .home-wood{background:repeating-linear-gradient(90deg,rgba(0,0,0,.10) 0,rgba(0,0,0,0) 2px,rgba(0,0,0,0) 19px,rgba(0,0,0,.05) 21px),
+    linear-gradient(180deg,#5c3a21,#33200f);border:2px solid var(--gold-dim);color:var(--ink);}
+  .home-v3 .home-wood-head{padding:9px 13px;font-family:'Fraunces',serif;font-size:16.5px;color:var(--gold-strong);text-align:center;border-bottom:1px solid rgba(232,194,106,.25);}
+  .home-v3 .home-wood-body{padding:11px 12px;}
+  .home-v3 .home-team-strip{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:9px;}
+  .home-v3 .home-chef-pill{display:flex;align-items:center;gap:6px;padding:5px 9px;border-radius:999px;background:rgba(0,0,0,.2);border:1px solid rgba(232,194,106,.34);font-size:11.5px;}
+  .home-v3 .home-stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+  .home-v3 .home-stat{display:flex;align-items:center;gap:8px;padding:8px 9px;border-radius:9px;background:rgba(0,0,0,.18);border:1px solid rgba(232,194,106,.18);}
+  .home-v3 .home-stat-ico{font-size:19px;width:24px;text-align:center;}
+  .home-v3 .home-stat b{display:block;font-family:'Fraunces',serif;font-size:16.5px;color:var(--gold-strong);line-height:1;}
+  .home-v3 .home-stat span{display:block;font-size:10px;color:var(--ink-dim);margin-top:2px;}
+
+  .home-v3 .home-quote{margin:0 4px;padding:10px 16px;text-align:center;font-family:'Fraunces',serif;font-size:13px;
+    background:linear-gradient(160deg,#f4e8c8,#e5d1a0);color:#3c2a18;border:1px solid #a98a4a;border-radius:10px;box-shadow:0 4px 10px rgba(0,0,0,.22);}
+
+  @media (min-width:521px){
+    .home-v3 .kitchen-hero img{max-height:360px;}
+    .home-v3 .home-lower{grid-template-columns:1.15fr .85fr;}
+  }
+  @media (min-width:701px){
+    .home-v3 .home-actions{grid-template-columns:repeat(4,minmax(0,1fr));}
+    .home-v3 .home-action{min-height:118px;}
+  }
+  @media (max-width:389px){
+    .home-v3 .welcome-plaque{padding:9px 12px 10px;}
+    .home-v3 .home-action{min-height:92px;padding:8px 7px;grid-template-columns:38px 1fr 22px;}
+    .home-v3 .home-action-icon{width:36px;height:36px;}
+    .home-v3 .home-action-icon img{width:19px;height:19px;}
+    .home-v3 .home-action::after{width:20px;height:20px;font-size:15px;}
+  }
+
 </style>
+
 </head>
 <body>
 
@@ -97,27 +462,24 @@
 
 <div id="auth-screen">
   <div class="card auth-card">
+    <img src="char-login.png" alt="" class="hero-illus sm" id="auth-illus" style="margin-bottom:6px;">
     <img src="logo-auth.png" alt="Fanta MasterChef" style="display:block;margin:0 auto 14px;max-width:220px;width:60%;height:auto;">
     <h1 style="text-align:center;">Fanta MasterChef</h1>
     <p class="section-sub" style="text-align:center; margin-bottom:18px;">Stagione 2026/2027</p>
 
     <div id="login-form">
-      <div class="field"><label>Email</label><input type="email" id="login-email" autocomplete="username"></div>
+      <div class="field"><label>Username</label><input type="text" id="login-username" autocomplete="username" autocapitalize="none" autocorrect="off"></div>
       <div class="field"><label>Password</label><input type="password" id="login-password" autocomplete="current-password"></div>
       <button class="btn primary block" id="login-btn">Accedi</button>
       <p class="err hidden" id="login-error"></p>
-      <p class="tabs-link">Non hai un account? <span id="show-signup">Registrati</span></p>
-    </div>
-
-    <div id="signup-form" class="hidden">
-      <div class="field"><label>Nome da mostrare agli altri</label><input type="text" id="signup-name" placeholder="Es. Marco R."></div>
-      <div class="field"><label>Email</label><input type="email" id="signup-email" autocomplete="username"></div>
-      <div class="field"><label>Password (almeno 6 caratteri)</label><input type="password" id="signup-password" autocomplete="new-password"></div>
-      <button class="btn primary block" id="signup-btn">Crea account</button>
-      <p class="err hidden" id="signup-error"></p>
-      <p class="tabs-link">Hai già un account? <span id="show-login">Accedi</span></p>
+      <p class="tabs-link">Account smarrito o nuovo? Chiedi all'Admin della lega.</p>
     </div>
   </div>
+</div>
+
+<div id="loading-overlay" class="hidden">
+  <img src="char-loading.png" alt="">
+  <span>Sto apparecchiando…</span>
 </div>
 
 <div id="app" class="hidden">
@@ -126,29 +488,36 @@
       <img src="icon-96.png" alt="" style="height:32px;width:32px;border-radius:8px;flex:0 0 auto;">
       <div><span class="eyebrow" id="season-label-display">Stagione 2026/2027</span><h1 id="league-name-display">Fanta MasterChef</h1></div>
     </div>
-    <button class="btn ghost sm" id="logout-btn">Esci</button>
+    <button class="btn ghost sm" id="logout-btn" style="display:flex;align-items:center;gap:6px;"><img src="ico-logout.png" alt="" style="width:16px;height:16px;object-fit:contain;">Esci</button>
   </header>
   <main>
     <div id="notices-host"></div>
 
     <section class="tab-panel" data-panel="home" id="panel-home"></section>
+    <section class="tab-panel" data-panel="classifica" id="panel-classifica"></section>
     <section class="tab-panel" data-panel="squadra" id="panel-squadra"></section>
     <section class="tab-panel" data-panel="concorrenti" id="panel-concorrenti"></section>
     <section class="tab-panel" data-panel="puntate" id="panel-puntate"></section>
     <section class="tab-panel" data-panel="carte" id="panel-carte"></section>
+    <section class="tab-panel" data-panel="chat" id="panel-chat"></section>
     <section class="tab-panel" data-panel="regolamento" id="panel-regolamento"></section>
     <section class="tab-panel" data-panel="admin" id="panel-admin"></section>
   </main>
 </div>
 
 <nav class="bottombar hidden" id="bottombar">
-  <button data-tab="home"><span class="dot"></span>Home</button>
-  <button data-tab="squadra"><span class="dot"></span>Squadra</button>
-  <button data-tab="concorrenti"><span class="dot"></span>Chef</button>
-  <button data-tab="puntate"><span class="dot"></span>Puntate</button>
-  <button data-tab="carte"><span class="dot"></span>Carte</button>
-  <button data-tab="regolamento"><span class="dot"></span>Regole</button>
-  <button data-tab="admin" id="admin-nav-btn" style="display:none;"><span class="dot"></span>Admin</button>
+  <button data-tab="home"><img class="nav-ico" src="ico-home.png" alt="">Home</button>
+  <button data-tab="carte"><img class="nav-ico" src="ico-carte.png" alt="">Carte</button>
+  <button data-tab="classifica"><img class="nav-ico" src="ico-trofeo.png" alt="">Classifica</button>
+  <button data-tab="squadra"><img class="nav-ico" src="ico-brigata.png" alt="">Squadra</button>
+  <button data-tab="chat"><img class="nav-ico" src="ico-chat.png" alt="">Chat<span class="chat-badge hidden" id="chat-badge">0</span></button>
+  <button type="button" id="more-nav-btn"><span class="nav-dots"><span></span><span></span><span></span></span>Altro</button>
+  <div class="more-panel hidden" id="more-panel">
+    <button data-tab="concorrenti"><img class="nav-ico" src="ico-info.png" alt="">Chef</button>
+    <button data-tab="puntate"><img class="nav-ico" src="ico-calendario.png" alt="">Puntate</button>
+    <button data-tab="regolamento"><img class="nav-ico" src="ico-regolamento.png" alt="">Regole</button>
+    <button data-tab="admin" id="admin-nav-btn" style="display:none;"><img class="nav-ico" src="ico-impostazioni.png" alt="">Pannello Admin</button>
+  </div>
 </nav>
 
 <div id="toast-root"></div>
@@ -222,9 +591,10 @@
 
   /* ============ state ============ */
   var state = {
-    session: null, profile: null, myTeam: null,
+    session: null, profile: null, myTeam: null, profiles: [],
     meta: null, settings: {}, concorrenti: [], teams: [], teamChefs: [],
     episodes: [], events: [], cardTypes: [], purchases: [], activations: [], activationsPublic: [],
+    chatMessages: [], chatReactions: [], chatLastRead: null, chatPollTimer: null,
     activeTab: "home"
   };
 
@@ -248,44 +618,99 @@
     var s = (Math.round(n*2)/2).toString();
     return (n>0?"+":"") + s;
   }
+  // Grafico a linea disegnato a mano in SVG inline: nessuna libreria esterna,
+  // così funziona anche offline (coerente con l'impostazione PWA dell'app).
+  function svgLineChart(points, opts){
+    opts = opts || {};
+    var w = opts.width || 280, h = opts.height || 70, pad = 6;
+    if (!points || points.length < 2){
+      return '<div class="muted" style="font-size:11px;white-space:nowrap;">'+(opts.fallback||"Dati insufficienti.")+'</div>';
+    }
+    var ys = points.map(function(p){ return p.y; });
+    var minY = Math.min(0, Math.min.apply(null, ys));
+    var maxY = Math.max(0, Math.max.apply(null, ys));
+    if (maxY === minY){ maxY = minY + 1; }
+    var stepX = (w - 2*pad) / (points.length - 1);
+    function px(i){ return pad + i*stepX; }
+    function py(v){ return h - pad - ((v - minY) / (maxY - minY)) * (h - 2*pad); }
+    var path = points.map(function(p, i){ return (i===0 ? "M" : "L") + px(i).toFixed(1) + "," + py(p.y).toFixed(1); }).join(" ");
+    var dots = points.map(function(p, i){ return '<circle cx="'+px(i).toFixed(1)+'" cy="'+py(p.y).toFixed(1)+'" r="2.5" style="fill:'+(opts.color||"var(--gold-strong)")+';"></circle>'; }).join("");
+    var zeroLine = (minY < 0 && maxY > 0)
+      ? '<line x1="'+pad+'" y1="'+py(0).toFixed(1)+'" x2="'+(w-pad)+'" y2="'+py(0).toFixed(1)+'" style="stroke:var(--line);stroke-width:1;"></line>'
+      : "";
+    return '<svg viewBox="0 0 '+w+' '+h+'" width="100%" height="'+h+'" preserveAspectRatio="none" style="display:block;overflow:visible;">'
+      + zeroLine
+      + '<path d="'+path+'" fill="none" style="stroke:'+(opts.color||"var(--gold-strong)")+';stroke-width:2;"></path>'
+      + (opts.dots===false ? "" : dots)
+      + '</svg>';
+  }
+  // Grafico dell'andamento della POSIZIONE in classifica puntata dopo
+  // puntata (diverso dal grafico del punteggio cumulativo sopra). L'asse è
+  // invertito apposta: la posizione 1 (la migliore) va disegnata in alto.
+  function svgPositionChart(series, teamCount, opts){
+    opts = opts || {};
+    var w = opts.width || 280, h = opts.height || 70, pad = 10;
+    if (!series || series.length < 2){
+      return '<div class="muted" style="font-size:11px;white-space:nowrap;">Dati insufficienti.</div>';
+    }
+    var maxPos = Math.max(teamCount||1, Math.max.apply(null, series.map(function(s){ return s.pos; })));
+    var stepX = (w - 2*pad) / (series.length - 1);
+    function px(i){ return pad + i*stepX; }
+    function py(pos){ return pad + ((pos-1) / Math.max(1, maxPos-1)) * (h - 2*pad); }
+    var path = series.map(function(s, i){ return (i===0 ? "M" : "L") + px(i).toFixed(1) + "," + py(s.pos).toFixed(1); }).join(" ");
+    var dots = series.map(function(s, i){
+      return '<circle cx="'+px(i).toFixed(1)+'" cy="'+py(s.pos).toFixed(1)+'" r="2.5" style="fill:var(--teal);"><title>Puntata '+s.numero+': #'+s.pos+'</title></circle>';
+    }).join("");
+    return '<svg viewBox="0 0 '+w+' '+h+'" width="100%" height="'+h+'" preserveAspectRatio="none" style="display:block;overflow:visible;">'
+      + '<path d="'+path+'" fill="none" style="stroke:var(--teal);stroke-width:2;"></path>'
+      + dots
+      + '</svg>';
+  }
+
 
   /* ============ auth ============ */
-  document.getElementById("show-signup").addEventListener("click", function(){
-    document.getElementById("login-form").classList.add("hidden");
-    document.getElementById("signup-form").classList.remove("hidden");
-  });
-  document.getElementById("show-login").addEventListener("click", function(){
-    document.getElementById("signup-form").classList.add("hidden");
-    document.getElementById("login-form").classList.remove("hidden");
-  });
-
+  // Login by USERNAME: the browser never sees or handles the internal auth
+  // email. It calls the login-username Edge Function, which resolves the
+  // username server-side and verifies the password through Supabase Auth,
+  // returning only a session token pair. Public self-registration has been
+  // removed: accounts are created only by the Admin.
   document.getElementById("login-btn").addEventListener("click", function(){
-    var email = document.getElementById("login-email").value.trim();
+    var username = document.getElementById("login-username").value.trim();
     var password = document.getElementById("login-password").value;
     var errEl = document.getElementById("login-error");
+    var illusEl = document.getElementById("auth-illus");
     errEl.classList.add("hidden");
-    sb.auth.signInWithPassword({email:email, password:password}).then(function(res){
-      if (res.error){ errEl.textContent = "Accesso non riuscito: " + res.error.message; errEl.classList.remove("hidden"); return; }
-      onAuthed();
-    });
-  });
-
-  document.getElementById("signup-btn").addEventListener("click", function(){
-    var name = document.getElementById("signup-name").value.trim();
-    var email = document.getElementById("signup-email").value.trim();
-    var password = document.getElementById("signup-password").value;
-    var errEl = document.getElementById("signup-error");
-    errEl.classList.add("hidden");
-    if (!name || !email || password.length<6){ errEl.textContent = "Compila nome, email e una password di almeno 6 caratteri."; errEl.classList.remove("hidden"); return; }
-    sb.auth.signUp({email:email, password:password, options:{data:{username:email.split("@")[0], display_name:name}}}).then(function(res){
-      if (res.error){ errEl.textContent = "Registrazione non riuscita: " + res.error.message; errEl.classList.remove("hidden"); return; }
-      // crea la squadra collegata, se non esiste già (idempotente)
-      var uid = res.data.user && res.data.user.id;
-      if (!uid){ errEl.textContent = "Registrazione avvenuta ma senza sessione attiva: prova ad accedere."; errEl.classList.remove("hidden"); return; }
-      sb.from("teams").select("id").eq("profile_id", uid).then(function(r){
-        if (r.data && r.data.length){ onAuthed(); return; }
-        sb.from("teams").insert({profile_id:uid, nome_squadra: name}).then(function(){ onAuthed(); });
+    if (illusEl) illusEl.src = "char-login.png";
+    if (!username || !password){
+      errEl.textContent = "Inserisci username e password.";
+      errEl.classList.remove("hidden");
+      if (illusEl) illusEl.src = "char-errore.png";
+      return;
+    }
+    var btn = document.getElementById("login-btn");
+    btn.disabled = true;
+    fetch(SUPABASE_URL + "/functions/v1/login-username", {
+      method: "POST",
+      headers: {"Content-Type":"application/json", "apikey":SUPABASE_KEY, "Authorization":"Bearer "+SUPABASE_KEY},
+      body: JSON.stringify({username:username, password:password})
+    }).then(function(r){
+      return r.json().then(function(body){ return {status:r.status, body:body}; });
+    }).then(function(res){
+      btn.disabled = false;
+      if (!res.body || !res.body.session){
+        errEl.textContent = (res.body && res.body.error) || "Credenziali non valide.";
+        errEl.classList.remove("hidden");
+        if (illusEl) illusEl.src = "char-errore.png";
+        return;
+      }
+      sb.auth.setSession({access_token: res.body.session.access_token, refresh_token: res.body.session.refresh_token}).then(function(){
+        onAuthed();
       });
+    }).catch(function(){
+      btn.disabled = false;
+      errEl.textContent = "Credenziali non valide.";
+      errEl.classList.remove("hidden");
+      if (illusEl) illusEl.src = "char-errore.png";
     });
   });
 
@@ -300,6 +725,8 @@
       document.getElementById("auth-screen").classList.add("hidden");
       document.getElementById("app").classList.remove("hidden");
       document.getElementById("bottombar").classList.remove("hidden");
+      var loadingEl = document.getElementById("loading-overlay");
+      if (loadingEl) loadingEl.classList.remove("hidden");
       loadEverything();
     });
   }
@@ -319,7 +746,11 @@
       sb.from("card_types").select("*"),
       sb.from("card_purchases").select("*"),
       sb.from("card_activations").select("*"),
-      sb.from("card_activations_public").select("*")
+      sb.from("card_activations_public").select("*"),
+      sb.from("profiles").select("*"),
+      sb.from("chat_messages").select("*").order("created_at"),
+      sb.from("chat_reactions").select("*"),
+      sb.from("chat_reads").select("*").eq("profile_id", uid).maybeSingle()
     ]).then(function(res){
       var errs = res.filter(function(r){ return r.error; });
       if (errs.length){ console.error(errs); toast("Errore nel caricamento dati: " + errs[0].error.message); }
@@ -335,11 +766,18 @@
       state.purchases = res[9].data||[];
       state.activations = res[10].data||[];
       state.activationsPublic = res[11].data||[];
+      state.profiles = res[12].data||[];
+      state.chatMessages = res[13].data||[];
+      state.chatReactions = res[14].data||[];
+      state.chatLastRead = (res[15].data && res[15].data.last_read_at) || null;
       state.myTeam = state.teams.filter(function(t){ return t.profile_id===uid; })[0] || null;
       document.getElementById("league-name-display").textContent = state.meta.nome_lega;
       document.getElementById("season-label-display").textContent = "Stagione " + state.meta.stagione_label;
       document.getElementById("admin-nav-btn").style.display = state.profile.is_admin ? "" : "none";
+      sb.rpc("purge_old_chat").then(function(){}, function(){});
       renderAll();
+      var loadingEl = document.getElementById("loading-overlay");
+      if (loadingEl) loadingEl.classList.add("hidden");
     });
   }
 
@@ -374,6 +812,8 @@
     if (spento) bonus = 0;
     var salvato = findAct(episodeId, function(a){ return (a.card_key==="salvataggio"||a.card_key==="variazione_artusi") && a.team_id===team.id && a.target_concorrente_id===concorrenteId; });
     if (salvato) penalty = 0;
+    // Fornelli Spenti: dopo un eventuale annullamento, un'eventuale penalità residua raddoppia.
+    if (spento && penalty !== 0) penalty *= 2;
     var total = bonus + penalty;
     var raddoppia = findAct(episodeId, function(a){ return a.card_key==="secondo_intuito" && a.team_id===team.id && a.scelta==="x2" && a.target_concorrente_id===concorrenteId; });
     if (raddoppia) total *= 2;
@@ -388,24 +828,93 @@
       return true;
     });
   }
+  // Punteggio "pubblico" di una squadra in una puntata: SOLO Brigata (+ eventuali
+  // sostituti), MAI lo Chef Ombra. Questo garantisce che lo storico per-puntata
+  // (grafici di andamento punteggio/posizione) non venga mai riscritto
+  // retroattivamente, nemmeno dopo lo svelamento dell'Ombra.
   function teamEpisodeScore(team, episodeId){
-    var includeOmbra = !!(state.meta && state.meta.ombra_svelato);
-    var chefs = teamChefsFor(team.id, includeOmbra);
+    var chefs = teamChefsFor(team.id, false);
+    var ep = byId(state.episodes, episodeId);
     var total = 0;
-    chefs.forEach(function(tc){ total += chefContribution(team, tc.concorrente_id, episodeId); });
+    chefs.forEach(function(tc){
+      // Un Chef entrato con una sostituzione di gennaio non recupera punti
+      // dalle puntate precedenti al suo ingresso (parte da 0), anche se lui
+      // stesso, come concorrente reale, aveva già eventi in quelle puntate.
+      if (tc.da_episodio_numero && ep && ep.numero < tc.da_episodio_numero) return;
+      total += chefContribution(team, tc.concorrente_id, episodeId);
+    });
+    return total;
+  }
+  // Punteggio accumulato dallo Chef Ombra di una squadra, dalla prima puntata
+  // fino a un'eventuale eliminazione: calcolato sempre (così è pronto), ma va
+  // sommato al punteggio pubblico della squadra SOLO dopo lo svelamento, in
+  // un'unica soluzione — mai spalmato retroattivamente sulle singole puntate.
+  function teamOmbraAccumulato(team){
+    var ombraChefs = state.teamChefs.filter(function(tc){ return tc.team_id===team.id && tc.attivo && tc.ruolo==="ombra"; });
+    if (!ombraChefs.length) return 0;
+    var confirmed = state.episodes.filter(function(e){ return e.confermata; });
+    var total = 0;
+    ombraChefs.forEach(function(tc){
+      confirmed.forEach(function(ep){
+        if (tc.da_episodio_numero && ep.numero < tc.da_episodio_numero) return;
+        total += chefContribution(team, tc.concorrente_id, ep.id);
+      });
+    });
     return total;
   }
   function computeStandings(){
     var episodes = state.episodes.filter(function(e){ return e.confermata; }).slice().sort(function(a,b){ return a.numero-b.numero; });
+    var svelato = !!(state.meta && state.meta.ombra_svelato);
     var rows = state.teams.map(function(t){
       var perEp = episodes.map(function(ep){ return {numero:ep.numero, punti: teamEpisodeScore(t, ep.id)}; });
       var total = Number(t.punti_ingresso||0) + perEp.reduce(function(s,p){ return s+p.punti; },0);
+      if (svelato) total += teamOmbraAccumulato(t);
       return {team:t, total:total, perEp:perEp};
     });
     rows.sort(function(a,b){ return b.total-a.total; });
     var pos=0, last=null;
     rows.forEach(function(r,idx){ if (last===null || r.total!==last){ pos=idx+1; last=r.total; } r.pos=pos; });
     return rows;
+  }
+  // Posizioni come erano subito prima dell'ultima puntata confermata, per mostrare
+  // in classifica chi sale/scende. Vuoto se c'è meno di una puntata di storico.
+  // Usa la stessa regola di computeStandings per l'Ombra (se già svelata, la somma
+  // conta su entrambi i lati del confronto), così la freccia ▲/▼ riflette solo il
+  // movimento dovuto all'ultima puntata, non un salto dovuto allo svelamento.
+  function standingsDelta(){
+    var confirmed = state.episodes.filter(function(e){ return e.confermata; }).slice().sort(function(a,b){ return a.numero-b.numero; });
+    if (confirmed.length < 2) return {};
+    var prevEpisodes = confirmed.slice(0, -1);
+    var svelato = !!(state.meta && state.meta.ombra_svelato);
+    var rows = state.teams.map(function(t){
+      var total = Number(t.punti_ingresso||0);
+      prevEpisodes.forEach(function(ep){ total += teamEpisodeScore(t, ep.id); });
+      if (svelato) total += teamOmbraAccumulato(t);
+      return {team:t, total:total};
+    });
+    rows.sort(function(a,b){ return b.total-a.total; });
+    var pos=0, last=null, map={};
+    rows.forEach(function(r,idx){ if (last===null || r.total!==last){ pos=idx+1; last=r.total; } map[r.team.id]=pos; });
+    return map;
+  }
+  // Posizione in classifica della squadra dopo OGNI puntata confermata, per
+  // il grafico "andamento posizione" (diverso dall'andamento del punteggio).
+  function positionSeriesFor(teamId){
+    var confirmed = state.episodes.filter(function(e){ return e.confermata; }).slice().sort(function(a,b){ return a.numero-b.numero; });
+    var series = [];
+    for (var i=0; i<confirmed.length; i++){
+      var upto = confirmed.slice(0, i+1);
+      var rows = state.teams.map(function(t){
+        var total = Number(t.punti_ingresso||0);
+        upto.forEach(function(ep){ total += teamEpisodeScore(t, ep.id); });
+        return {teamId:t.id, total:total};
+      });
+      rows.sort(function(a,b){ return b.total-a.total; });
+      var pos=0, last=null, map={};
+      rows.forEach(function(r,idx){ if (last===null || r.total!==last){ pos=idx+1; last=r.total; } map[r.teamId]=pos; });
+      series.push({numero: confirmed[i].numero, pos: map[teamId]});
+    }
+    return series;
   }
   function concorrenteCumulativo(concorrenteId){
     var total = 0;
@@ -418,38 +927,460 @@
   }
   function concorrenteName(id){ var c = byId(state.concorrenti, id); return c?c.nome:"—"; }
 
+  /* ============ stelle / carte: acquisto ============ */
+  function starsSpent(teamId){
+    return state.purchases.filter(function(p){ return p.team_id===teamId; }).reduce(function(s,p){
+      var def = state.cardTypes.filter(function(c){ return c.key===p.card_key; })[0];
+      return s + (def?Number(def.costo_stelle):0);
+    }, 0);
+  }
+  function starsRemaining(team){
+    return Number(team.stelle_acquistate||1) - starsSpent(team.id);
+  }
+
+  /* ============ stelle / carte: utilizzo ============ */
+  function draftEpisodes(){
+    return state.episodes.filter(function(e){ return !e.confermata; }).slice().sort(function(a,b){ return a.numero-b.numero; });
+  }
+  function ownActionableChefs(){
+    if (!state.myTeam) return [];
+    return teamChefsFor(state.myTeam.id, true).filter(function(tc){
+      var c = byId(state.concorrenti, tc.concorrente_id);
+      return c && !c.eliminato;
+    });
+  }
+  function opponentActionableChefs(){
+    if (!state.myTeam) return [];
+    return state.teamChefs.filter(function(tc){
+      if (tc.team_id===state.myTeam.id || !tc.attivo) return false;
+      if (tc.ruolo==="ombra" && !(state.meta && state.meta.ombra_svelato)) return false;
+      var c = byId(state.concorrenti, tc.concorrente_id);
+      return c && !c.eliminato;
+    });
+  }
+  function artusiTargets(){
+    if (!state.myTeam) return [];
+    var team = state.myTeam;
+    var chefs = teamChefsFor(team.id, true);
+    var confirmed = state.episodes.filter(function(e){ return e.confermata; });
+    var out = [];
+    confirmed.forEach(function(ep){
+      chefs.forEach(function(tc){
+        var ev = eventFor(ep.id, tc.concorrente_id);
+        if (!ev || !ev.penalita) return;
+        var already = findAct(ep.id, function(a){
+          return (a.card_key==="salvataggio"||a.card_key==="variazione_artusi") && a.team_id===team.id && a.target_concorrente_id===tc.concorrente_id;
+        });
+        if (already) return;
+        out.push({episodeId: ep.id, episodeNumero: ep.numero, concorrenteId: tc.concorrente_id});
+      });
+    });
+    return out;
+  }
+  function cardWindowInfo(key){
+    var reasons = [];
+    var draft = draftEpisodes();
+    if (key==="fornelli_spenti" || key==="secondo_intuito" || key==="salvataggio"){
+      if (!draft.length) reasons.push("Nessuna puntata in bozza al momento.");
+    }
+    if (key==="fornelli_spenti"){
+      if (!(state.meta && state.meta.brigate_visibili)) reasons.push("Le Brigate avversarie non sono ancora visibili.");
+      else if (!opponentActionableChefs().length) reasons.push("Nessuno Chef avversario disponibile.");
+    } else if (key==="secondo_intuito"){
+      var hasOwn = ownActionableChefs().length>0;
+      var hasOpp = !!(state.meta && state.meta.brigate_visibili) && opponentActionableChefs().length>0;
+      if (!hasOwn && !hasOpp) reasons.push("Nessuno Chef disponibile, né tuo né avversario.");
+    } else if (key==="salvataggio"){
+      if (!ownActionableChefs().length) reasons.push("La tua Brigata non è ancora stata impostata dall'admin.");
+    } else if (key==="variazione_artusi"){
+      if (!artusiTargets().length) reasons.push("Nessun tuo Chef ha una penalità in attesa di correzione.");
+    }
+    return {open: reasons.length===0, reasons: reasons};
+  }
+  function activationSummary(a){
+    var ep = byId(state.episodes, a.episode_id);
+    var parts = [];
+    if (ep) parts.push("Puntata "+ep.numero);
+    if (a.target_concorrente_id){
+      var name = concorrenteName(a.target_concorrente_id);
+      var t = a.target_team_id ? byId(state.teams, a.target_team_id) : null;
+      parts.push(name + (t ? " ("+displayName(t)+")" : ""));
+    }
+    if (a.scelta) parts.push(a.scelta==="x2" ? "×2" : "÷2");
+    return parts.length ? ('<div class="muted" style="font-size:11.5px;margin-top:2px;">'+esc(parts.join(" · "))+'</div>') : "";
+  }
+  function activationFormHtml(c){
+    var key = c.key;
+    var draft = draftEpisodes();
+    var epOpts = draft.map(function(e){ return '<option value="'+e.id+'">Puntata '+e.numero+'</option>'; }).join("");
+    if (key==="fornelli_spenti"){
+      var opp = opponentActionableChefs();
+      var oppOpts = opp.map(function(tc){
+        var t = byId(state.teams, tc.team_id);
+        return '<option value="'+tc.team_id+'|'+tc.concorrente_id+'">'+esc(concorrenteName(tc.concorrente_id))+' ('+esc(displayName(t))+')</option>';
+      }).join("");
+      return '<div style="display:flex;flex-direction:column;gap:6px;min-width:230px;">'
+        + '<select id="act-ep">'+epOpts+'</select>'
+        + '<select id="act-target">'+oppOpts+'</select>'
+        + '<div><button class="btn sm primary" id="act-confirm">Conferma</button> <button class="btn sm ghost" id="act-cancel">Annulla</button></div>'
+        + '</div>';
+    }
+    if (key==="secondo_intuito"){
+      var own = ownActionableChefs();
+      var opp2 = opponentActionableChefs();
+      var ownOpts = own.map(function(tc){ return '<option value="'+tc.concorrente_id+'">'+esc(concorrenteName(tc.concorrente_id))+'</option>'; }).join("");
+      var oppOpts2 = opp2.map(function(tc){
+        var t = byId(state.teams, tc.team_id);
+        return '<option value="'+tc.team_id+'|'+tc.concorrente_id+'">'+esc(concorrenteName(tc.concorrente_id))+' ('+esc(displayName(t))+')</option>';
+      }).join("");
+      return '<div style="display:flex;flex-direction:column;gap:6px;min-width:250px;">'
+        + '<select id="act-ep">'+epOpts+'</select>'
+        + '<label style="font-size:12.5px;"><input type="radio" name="act-mode" value="x2" checked> Raddoppia un tuo Chef</label>'
+        + '<select id="act-own" '+(own.length?"":"disabled")+'>'+(own.length?ownOpts:'<option value="">Nessuno disponibile</option>')+'</select>'
+        + '<label style="font-size:12.5px;"><input type="radio" name="act-mode" value="dimezza"'+(opp2.length?"":" disabled")+'> Dimezza uno Chef avversario</label>'
+        + '<select id="act-opp" disabled>'+(opp2.length?oppOpts2:'<option value="">Nessuno disponibile</option>')+'</select>'
+        + '<div><button class="btn sm primary" id="act-confirm">Conferma</button> <button class="btn sm ghost" id="act-cancel">Annulla</button></div>'
+        + '</div>';
+    }
+    if (key==="salvataggio"){
+      var own2 = ownActionableChefs();
+      var ownOpts2 = own2.map(function(tc){ return '<option value="'+tc.concorrente_id+'">'+esc(concorrenteName(tc.concorrente_id))+'</option>'; }).join("");
+      return '<div style="display:flex;flex-direction:column;gap:6px;min-width:230px;">'
+        + '<select id="act-ep">'+epOpts+'</select>'
+        + '<select id="act-own">'+ownOpts2+'</select>'
+        + '<div><button class="btn sm primary" id="act-confirm">Conferma</button> <button class="btn sm ghost" id="act-cancel">Annulla</button></div>'
+        + '</div>';
+    }
+    if (key==="variazione_artusi"){
+      var targets = artusiTargets();
+      var opts = targets.map(function(t){
+        return '<option value="'+t.episodeId+'|'+t.concorrenteId+'">Puntata '+t.episodeNumero+' — '+esc(concorrenteName(t.concorrenteId))+'</option>';
+      }).join("");
+      return '<div style="display:flex;flex-direction:column;gap:6px;min-width:230px;">'
+        + '<select id="act-target">'+opts+'</select>'
+        + '<div><button class="btn sm primary" id="act-confirm">Conferma</button> <button class="btn sm ghost" id="act-cancel">Annulla</button></div>'
+        + '</div>';
+    }
+    return "";
+  }
+
+  /* ============ calendario / scadenze ============ */
+  // Le scadenze non sono un dato salvato: si calcolano al volo da calendario
+  // puntate + regolamento + stato della propria squadra, così restano sempre
+  // coerenti con quello che l'utente può davvero ancora fare.
+  function fmtEpWhen(ep){
+    if (!ep || !ep.data) return "";
+    var base = fmtDate(ep.data);
+    if (ep.ora){ return base + " alle " + String(ep.ora).slice(0,5); }
+    return base;
+  }
+  function epSortKey(ep){
+    return new Date(ep.data + "T" + (ep.ora ? ep.ora : "00:00") + ":00");
+  }
+  function computeScadenze(){
+    var items = [];
+    var draft = draftEpisodes();
+    var nextEp = (draft.length && draft[0].data) ? draft[0] : null;
+    if (nextEp){
+      items.push({label: "Puntata " + nextEp.numero + " in onda", when: fmtEpWhen(nextEp), sortKey: epSortKey(nextEp)});
+    }
+    if (state.myTeam && nextEp){
+      var myPurchases = state.purchases.filter(function(p){ return p.team_id===state.myTeam.id; });
+      ["fornelli_spenti","secondo_intuito","salvataggio"].forEach(function(key){
+        var owned = myPurchases.some(function(p){ return p.card_key===key; });
+        if (!owned) return;
+        var used = state.activations.some(function(a){ return a.team_id===state.myTeam.id && a.card_key===key; });
+        if (used) return;
+        var win = cardWindowInfo(key);
+        if (!win.open) return;
+        var def = state.cardTypes.filter(function(c){ return c.key===key; })[0];
+        items.push({
+          label: 'Usa "' + (def?def.label:key) + '" entro Puntata ' + nextEp.numero,
+          when: fmtEpWhen(nextEp),
+          sortKey: epSortKey(nextEp)
+        });
+      });
+    }
+    if (state.meta && state.meta.ombra_svelato===false && state.meta.data_svelamento){
+      var reveal = new Date(state.meta.data_svelamento + "T00:00:00");
+      var daysLeft = Math.ceil((reveal - new Date()) / 86400000);
+      if (daysLeft>=0 && daysLeft<=30){
+        items.push({label: "Lo Chef Ombra viene svelato", when: fmtDate(state.meta.data_svelamento), sortKey: reveal});
+      }
+    }
+    items.sort(function(a,b){ return a.sortKey - b.sortKey; });
+    return items;
+  }
+  function scadenzeHtml(items){
+    if (!items.length) return "";
+    return '<div class="notice">'
+      + '<div class="notice-head"><img class="notice-icon" src="char-scadenza.png" alt="">Da non perdere</div>'
+      + items.map(function(it){
+          return '<div class="notice-item"><span>'+esc(it.label)+'</span><span class="notice-when">'+esc(it.when)+'</span></div>';
+        }).join("")
+      + '</div>';
+  }
+  function fmtDeadline(d){
+    if (!d || isNaN(d)) return "";
+    var datePart = d.toLocaleDateString("it-IT", {day:"numeric", month:"long", year:"numeric"});
+    if (d.getHours()===0 && d.getMinutes()===0) return datePart;
+    return datePart + " alle " + d.toLocaleTimeString("it-IT", {hour:"2-digit", minute:"2-digit"});
+  }
+  // La Brigata iniziale è modificabile liberamente finché non scatta la
+  // scadenza: quella personale (per chi entra in ritardo, impostata
+  // dall'Admin) se presente, altrimenti l'inizio della prima puntata. In
+  // più, se l'Admin rende le Brigate visibili a tutti, si considera comunque
+  // bloccata da quel momento (coerente con "diventa visibile a tutti
+  // all'inizio della prima puntata").
+  function brigataDeadlineFor(team){
+    if (!team) return null;
+    if (team.brigata_scadenza_personale) return new Date(team.brigata_scadenza_personale + "T00:00:00");
+    var ep1 = state.episodes.filter(function(e){ return e.numero===1 && e.data; })[0];
+    if (!ep1) return null;
+    return epSortKey(ep1);
+  }
+  function brigataLocked(team){
+    if (!team) return true;
+    if (state.meta && state.meta.brigate_visibili) return true;
+    var dl = brigataDeadlineFor(team);
+    if (!dl) return false;
+    return new Date() >= dl;
+  }
+
+  // Sostituzione di gennaio: possibile UNA sola volta a stagione, solo se la
+  // squadra ha in Brigata almeno un Chef eliminato, entro la stessa data
+  // fissa di svelamento dell'Ombra (31/01) — la stessa validazione è anche
+  // nel database (trigger), questa è solo per mostrare/nascondere la UI.
+  function sostituzioneDeadline(){
+    if (!state.meta || !state.meta.data_svelamento) return null;
+    return new Date(state.meta.data_svelamento + "T00:00:00");
+  }
+  function sostituzioneClosed(){
+    var dl = sostituzioneDeadline();
+    return dl ? (new Date() >= dl) : false;
+  }
+  function teamHasEliminatoInBrigata(team){
+    if (!team) return false;
+    return teamChefsFor(team.id, false).some(function(tc){
+      if (tc.ruolo!=="brigata") return false;
+      var c = byId(state.concorrenti, tc.concorrente_id);
+      return c && c.eliminato;
+    });
+  }
+  function sostituzioneEligible(team){
+    return !!team && !team.sostituzione_usata && !sostituzioneClosed() && teamHasEliminatoInBrigata(team);
+  }
+  function sostituzioneFormHtml(team){
+    var eliminatiInBrigata = teamChefsFor(team.id, false).filter(function(tc){
+      if (tc.ruolo!=="brigata") return false;
+      var c = byId(state.concorrenti, tc.concorrente_id);
+      return c && c.eliminato;
+    });
+    var oldOpts = eliminatiInBrigata.map(function(tc){ return '<option value="'+tc.concorrente_id+'">'+esc(concorrenteName(tc.concorrente_id))+'</option>'; }).join("");
+    var ownIds = teamChefsFor(team.id, true).map(function(tc){ return tc.concorrente_id; });
+    var eligibili = state.concorrenti.filter(function(c){ return !c.eliminato && ownIds.indexOf(c.id)===-1; });
+    var newOpts = eligibili.map(function(c){ return '<option value="'+c.id+'">'+esc(c.nome)+'</option>'; }).join("");
+    return '<div style="margin-top:10px;display:flex;flex-direction:column;gap:8px;max-width:320px;">'
+      + '<label class="field"><span>Chef eliminato che stai sostituendo</span><select id="sost-old">'+oldOpts+'</select></label>'
+      + '<label class="field"><span>Nuovo Chef</span><select id="sost-new">'+(newOpts||'<option value="">Nessuno disponibile</option>')+'</select></label>'
+      + '<p class="section-sub" style="color:var(--penalty);">Attenzione: è definitiva e irrevocabile, non esiste una seconda sostituzione. Il nuovo Chef parte da 0 punti; quelli già fatti dal vecchio Chef restano acquisiti.</p>'
+      + '<div><button class="btn sm primary" id="sq-confirm-sostituzione">Conferma sostituzione (10€)</button> <button class="btn sm ghost" id="sq-cancel-sostituzione">Annulla</button></div>'
+      + '</div>';
+  }
+
   /* ============ tabs ============ */
+  // Voci "secondarie" raccolte nel menu a tendina "Altro" del bottombar, per
+  // non affollare la barra su schermi stretti (richiesto dall'utente).
+  var OVERFLOW_TABS = ["concorrenti","puntate","regolamento","admin"];
   function selectTab(tab){
+    var leavingChat = state.activeTab==="chat" && tab!=="chat";
     state.activeTab = tab;
     document.querySelectorAll(".tab-panel").forEach(function(p){ p.classList.toggle("active", p.getAttribute("data-panel")===tab); });
     document.querySelectorAll(".bottombar button[data-tab]").forEach(function(b){ b.classList.toggle("active", b.getAttribute("data-tab")===tab); });
+    var moreBtn = document.getElementById("more-nav-btn");
+    if (moreBtn) moreBtn.classList.toggle("active", OVERFLOW_TABS.indexOf(tab)!==-1);
+    var morePanel = document.getElementById("more-panel");
+    if (morePanel) morePanel.classList.add("hidden");
     window.scrollTo(0,0);
+    if (tab==="chat"){
+      state._chatScrollPending = true;
+      loadChatData();
+      markChatRead();
+      if (state.chatPollTimer) clearInterval(state.chatPollTimer);
+      state.chatPollTimer = setInterval(loadChatData, 20000);
+    } else if (leavingChat && state.chatPollTimer){
+      clearInterval(state.chatPollTimer);
+      state.chatPollTimer = null;
+    }
+    updateChatBadge();
   }
   document.getElementById("bottombar").addEventListener("click", function(e){
     var b = e.target.closest("button[data-tab]");
     if (b) selectTab(b.getAttribute("data-tab"));
   });
+  // Menu "Altro": si apre/chiude al tocco e si chiude da solo toccando
+  // altrove o scegliendo una voce (quest'ultimo già gestito in selectTab).
+  document.getElementById("more-nav-btn").addEventListener("click", function(e){
+    e.stopPropagation();
+    document.getElementById("more-panel").classList.toggle("hidden");
+  });
+  document.addEventListener("click", function(e){
+    var panel = document.getElementById("more-panel");
+    if (!panel || panel.classList.contains("hidden")) return;
+    if (e.target.closest("#more-panel") || e.target.closest("#more-nav-btn")) return;
+    panel.classList.add("hidden");
+  });
 
   /* ============ render: home / classifica ============ */
+  // La Home è il centro dell'app: 1) chi sono, 2) accesso alle funzioni
+  // principali, 3) la mia situazione, 4) informazioni dinamiche utili.
+  // Niente elenchi lunghi qui: quelli hanno una loro schermata dedicata.
   function renderHome(){
     var standings = computeStandings();
-    var started = state.episodes.some(function(e){ return e.confermata; });
-    var html = '<img src="illus-home.png" alt="" style="width:100%;max-width:260px;display:block;margin:0 auto 14px;border-radius:12px;">';
-    html += '<div class="section-head"><div><h2>Classifica</h2><p class="section-sub">Il Premio Artusi va a chi totalizza più punti a fine stagione.</p></div></div>';
-    if (!started){
-      html += '<div class="card empty" style="text-align:center;"><img src="state-nessun-risultato.png" alt="" style="width:120px;display:block;margin:0 auto 10px;">La stagione non è ancora iniziata: la classifica apparirà dopo la prima puntata confermata.</div>';
+    var myRow = state.myTeam ? standings.filter(function(r){ return r.team.id===state.myTeam.id; })[0] : null;
+    var team = state.myTeam;
+    var remaining = team ? starsRemaining(team) : 0;
+    var confirmed = state.episodes.filter(function(e){ return e.confermata; }).sort(function(a,b){ return a.numero-b.numero; });
+    var nextDraft = draftEpisodes().filter(function(e){ return e.data; })[0] || null;
+    var brigata = team ? teamChefsFor(team.id, false).filter(function(tc){ return tc.ruolo==='brigata'||tc.ruolo==='sostituto'; }) : [];
+    var myCards = team ? state.purchases.filter(function(p){ return p.team_id===team.id; }).length : 0;
+    var displayName = state.profile && state.profile.display_name ? esc(state.profile.display_name) : '';
+    var leagueName = (state.meta && state.meta.nome_lega) ? state.meta.nome_lega : 'Fanta MasterChef';
+    var html = '<div class="home-v3">';
+    html += '<div class="kitchen-hero"><img src="hero-home.png" alt="La cucina di '+esc(leagueName)+'">'
+      + '<div class="welcome-plaque"><span class="plaque-greet">Ciao '+(displayName||'Chef')+'!</span><h1>'+esc(leagueName)+'</h1><p>Cosa cuciniamo oggi in Brigata?</p><div class="tricolor"></div></div>'
+      + '</div>';
+    html += scadenzeHtml(computeScadenze());
+    html += '<div class="action-board"><div class="home-actions">'
+      +'<div class="home-action" data-goto="carte"><div class="home-action-icon"><img src="ico-carte.png" alt=""></div><h3>Le tue Carte</h3><span>'+(team?remaining+'★ disponibili':'Scopri e colleziona')+'</span></div>'
+      +'<div class="home-action" data-goto="classifica"><div class="home-action-icon"><img src="ico-trofeo.png" alt=""></div><h3>Classifica</h3><span>'+(myRow?('Sei #'+myRow.pos+' · '+fmtNum(myRow.total)+' punti'):'Vedi come va la lega')+'</span></div>'
+      +'<div class="home-action" data-goto="squadra"><div class="home-action-icon"><img src="ico-brigata.png" alt=""></div><h3>La Brigata</h3><span>'+(brigata.length?brigata.length+'/3 Chef scelti':'Costruisci la squadra')+'</span></div>'
+      +'<div class="home-action" data-goto="chat"><div class="home-action-icon"><img src="ico-chat.png" alt=""></div><h3>Chat</h3><span>Parla con la Brigata</span></div>'
+      +'</div></div>';
+    html += '<div class="home-lower"><div class="home-paper"><div class="home-paper-head">Prossima sfida</div><div class="home-paper-body">';
+    if(nextDraft){
+      var d=new Date(nextDraft.data+'T00:00:00'); var day=!isNaN(d)?d.getDate():''; var month=!isNaN(d)?d.toLocaleDateString('it-IT',{month:'long'}):'';
+      html+='<div class="home-next-row"><div class="home-calendar"><small>Puntata '+esc(nextDraft.numero)+'</small><b>'+esc(day)+'</b><span>'+esc(month)+'</span></div><div class="home-next-copy"><h3>MasterChef Italia</h3><p>📺 '+esc(nextDraft.ora?String(nextDraft.ora).slice(0,5):'Orario da definire')+'</p><p>Preparati alla prossima sfida!</p></div></div>';
+    } else if(confirmed.length){
+      html+='<div style="font-family:Fraunces,serif;font-size:16px;margin-bottom:5px;">Ultima puntata: '+esc(confirmed[confirmed.length-1].numero)+'</div><div style="font-size:12px;color:#5b4427;">La prossima sfida non è ancora programmata.</div>';
     } else {
-      html += '<div class="card">';
+      html+='<div style="font-family:Fraunces,serif;font-size:16px;margin-bottom:5px;">La stagione sta per iniziare!</div><div style="font-size:12px;color:#5b4427;">La prima puntata comparirà qui appena sarà inserita dall’Admin.</div>';
+    }
+    html+='</div></div><div class="home-wood"><div class="home-wood-head">'+(team?'La tua Brigata':'La tua squadra')+'</div><div class="home-wood-body">';
+    if(brigata.length){ html+='<div class="home-team-strip">'; brigata.slice(0,3).forEach(function(tc){ html+='<div class="home-chef-pill"><span>👨‍🍳</span><b>'+esc(concorrenteName(tc.concorrente_id))+'</b></div>'; }); html+='</div>'; }
+    else html+='<div style="font-size:12px;color:var(--ink-dim);margin-bottom:9px;">Non hai ancora impostato la tua Brigata.</div>';
+    html+='<div class="home-stat-grid"><div class="home-stat"><div class="home-stat-ico">🏆</div><div><b>'+(myRow?'#'+myRow.pos:'—')+'</b><span>posizione</span></div></div><div class="home-stat"><div class="home-stat-ico">⭐</div><div><b>'+remaining+'</b><span>stelle disponibili</span></div></div><div class="home-stat"><div class="home-stat-ico">🍴</div><div><b>'+confirmed.length+'</b><span>puntate giocate</span></div></div><div class="home-stat"><div class="home-stat-ico">🃏</div><div><b>'+myCards+'</b><span>carte acquistate</span></div></div></div></div></div></div>';
+    html+='<div class="home-quote">“La cucina è più bella quando la si condivide.” ♥</div></div>';
+    document.getElementById('panel-home').innerHTML=html; bindHomeEvents();
+  }
+  function bindHomeEvents(){
+    document.querySelectorAll("[data-goto]").forEach(function(el){
+      el.addEventListener("click", function(){ selectTab(el.getAttribute("data-goto")); });
+    });
+  }
+
+  /* ============ render: classifica ============ */
+  // Ogni squadra è una "targhetta" a sé stante (come le carte in Carte), non
+  // una riga di tabella: il primo posto e la propria squadra si riconoscono
+  // subito, dal 4° posto in poi lo stile resta sobrio per restare leggibile
+  // anche con tante squadre in lega. Dati e calcolo (computeStandings,
+  // standingsDelta, teamDetailHtml) sono ESATTAMENTE gli stessi di prima:
+  // qui cambia solo la presentazione.
+  function renderClassifica(){
+    var standings = computeStandings();
+    var started = state.episodes.some(function(e){ return e.confermata; });
+    var prevPos = started ? standingsDelta() : {};
+    var html = '<div class="screen-head"><img src="ico-trofeo-badge.png" alt="" class="screen-head-icon"><div><h2>Classifica</h2><p class="section-sub">Tocca una squadra per i dettagli.</p></div></div>';
+    if (!started){
+      html += '<div class="card empty" style="text-align:center;"><img src="char-vuoto.png" alt="" class="hero-illus sm">La stagione non è ancora iniziata: la classifica apparirà dopo la prima puntata confermata.</div>';
+    } else {
       standings.forEach(function(r){
         var mine = state.myTeam && r.team.id===state.myTeam.id;
-        html += '<div class="rank-row" style="'+(mine?'background:rgba(202,162,76,.08);':'')+'">'
-          + '<div class="rank-num">'+r.pos+'</div>'
-          + '<div class="rank-name">'+esc(displayName(r.team))+'</div>'
-          + '<div class="rank-points">'+fmtNum(r.total)+'</div></div>';
+        var open = state._expandedTeamClassifica===r.team.id;
+        var medalEmoji = r.pos===1 ? "🥇" : (r.pos===2 ? "🥈" : (r.pos===3 ? "🥉" : null));
+        var numHtml = medalEmoji ? '<span class="medal">'+medalEmoji+'</span>' : '<span class="plain">'+r.pos+'</span>';
+        var prev = prevPos[r.team.id];
+        var subBits = [];
+        if (r.pos===1) subBits.push('<span class="classifica-lead-tag">🏆 In testa alla lega</span>');
+        if (prev!=null && prev!==r.pos){
+          subBits.push(prev>r.pos
+            ? '<span class="classifica-delta-pill up">▲ '+(prev-r.pos)+'</span>'
+            : '<span class="classifica-delta-pill down">▼ '+(r.pos-prev)+'</span>');
+        }
+        var subHtml = subBits.length ? '<div class="classifica-sub-row">'+subBits.join("")+'</div>' : "";
+        html += '<div class="classifica-row-card pos-'+r.pos+(mine?' mine':'')+(open?' open':'')+'">'
+          + '<div class="classifica-row-head" data-team-row="'+r.team.id+'">'
+          + '<div class="classifica-num">'+numHtml+'</div>'
+          + '<div class="classifica-name"><span class="team-name">'+esc(displayName(r.team))+'</span>'+(mine?'<span class="classifica-mine-tag">Tu</span>':'')+subHtml+'</div>'
+          + '<div class="classifica-points"><b>'+fmtNum(r.total)+'</b><span class="classifica-points-sub">punti</span></div>'
+          + '<div class="classifica-chevron">›</div>'
+          + '</div>';
+        // dettagli squadra: solo se l'utente tocca una riga
+        if (open){
+          html += '<div class="classifica-row-body">'+teamDetailHtml(r)+'</div>';
+        }
+        html += '</div>';
       });
-      html += '</div>';
     }
-    document.getElementById("panel-home").innerHTML = html;
+    document.getElementById("panel-classifica").innerHTML = html;
+    bindClassificaEvents();
+  }
+  function bindClassificaEvents(){
+    document.querySelectorAll("[data-team-row]").forEach(function(el){
+      el.addEventListener("click", function(){
+        var id = el.getAttribute("data-team-row");
+        state._expandedTeamClassifica = (state._expandedTeamClassifica===id) ? null : id;
+        renderClassifica();
+      });
+    });
+  }
+  function teamDetailHtml(row){
+    var team = row.team;
+    var brigata = teamChefsFor(team.id, true).filter(function(tc){ return tc.ruolo==="brigata"||tc.ruolo==="sostituto"; });
+    var ombra = state.teamChefs.filter(function(tc){ return tc.team_id===team.id && tc.ruolo==="ombra" && tc.attivo; })[0];
+    var isMine = state.myTeam && state.myTeam.id===team.id;
+    var html = '<div style="margin-bottom:12px;"><span class="section-sub">Brigata</span><div style="margin-top:4px;">';
+    if (brigata.length){
+      brigata.forEach(function(tc){
+        var cc = byId(state.concorrenti, tc.concorrente_id);
+        var elimTag = (cc && cc.eliminato) ? ' <span class="badge warn" style="font-size:9px;">Eliminato</span>' : '';
+        html += '<span class="chip">'+esc(concorrenteName(tc.concorrente_id))+' <span class="muted">'+fmtNum(concorrenteCumulativo(tc.concorrente_id))+'</span>'+elimTag+'</span>';
+      });
+    } else if (!isMine && !(state.meta && state.meta.brigate_visibili)){
+      html += '<span class="muted">Le Brigate non sono ancora state rese visibili dall\'Admin.</span>';
+    } else {
+      html += '<span class="muted">Non ancora impostata dall\'admin.</span>';
+    }
+    if (ombra){
+      html += '<span class="chip ombra">Chef Ombra: '+(state.meta.ombra_svelato?esc(concorrenteName(ombra.concorrente_id)):"segreto")+'</span>';
+    }
+    html += '</div></div>';
+    if (row.perEp.length){
+      var running = Number(team.punti_ingresso||0);
+      var series = row.perEp.map(function(p){ running += p.punti; return {y:running}; });
+      var tableRows = row.perEp.slice().reverse().map(function(p){ return '<tr><td>Puntata '+p.numero+'</td><td class="num">'+fmtNum(p.punti)+'</td></tr>'; }).join("");
+      var posSeries = positionSeriesFor(team.id);
+      // Lo Chef Ombra, una volta svelato, si somma al totale in un'unica soluzione:
+      // qui aggiungiamo UN solo punto in più a grafici/tabella (non riscriviamo le
+      // puntate passate), così il totale mostrato in classifica torna coerente.
+      var ombraLump = (state.meta && state.meta.ombra_svelato) ? teamOmbraAccumulato(team) : 0;
+      if (ombraLump){
+        running += ombraLump;
+        series.push({y:running});
+        tableRows = '<tr><td>Svelamento Chef Ombra</td><td class="num">'+fmtNum(ombraLump)+'</td></tr>' + tableRows;
+        posSeries = posSeries.concat([{numero:"Svelamento", pos: row.pos}]);
+      }
+      html += '<div class="section-sub" style="margin-bottom:4px;">Andamento punti totali</div>'
+        + '<div style="margin-bottom:12px;">'+svgLineChart(series, {width:520, height:90})+'</div>';
+      html += '<div class="section-sub" style="margin-bottom:4px;">Andamento posizione in classifica</div>'
+        + '<div style="margin-bottom:12px;">'+svgPositionChart(posSeries, state.teams.length, {width:520, height:90})+'</div>';
+      html += '<div class="table-wrap"><table><thead><tr><th>Puntata</th><th class="num">Punti</th></tr></thead><tbody>'
+        + tableRows
+        + '</tbody></table></div>';
+    } else {
+      html += '<span class="muted">Nessuna puntata confermata ancora.</span>';
+    }
+    return html;
   }
 
   /* ============ render: la mia squadra ============ */
@@ -464,120 +1395,867 @@
     var row = standings.filter(function(r){ return r.team.id===team.id; })[0];
     var brigata = teamChefsFor(team.id, true).filter(function(tc){ return tc.ruolo==="brigata"||tc.ruolo==="sostituto"; });
     var ombra = state.teamChefs.filter(function(tc){ return tc.team_id===team.id && tc.ruolo==="ombra" && tc.attivo; })[0];
-    var spentStars = state.purchases.filter(function(p){ return p.team_id===team.id; }).reduce(function(s,p){
-      var ct = byId(state.cardTypes, null); // placeholder
-      var def = state.cardTypes.filter(function(c){return c.key===p.card_key;})[0];
-      return s + (def?Number(def.costo_stelle):0);
-    }, 0);
-    var remaining = Number(team.stelle_acquistate||1) - spentStars;
+    var remaining = starsRemaining(team);
+    var locked = brigataLocked(team);
+    var dl = brigataDeadlineFor(team);
+    var editing = !!state._editingBrigata;
 
-    var html = '<div class="section-head"><div><h2>'+esc(displayName(team))+'</h2><p class="section-sub">Il tuo cruscotto personale.</p></div></div>';
-    html += '<div class="card" style="padding:16px; margin-bottom:16px; display:flex; gap:24px; flex-wrap:wrap;">'
-      + '<div><div class="section-sub">Posizione</div><div style="font-family:Fraunces,serif; font-size:26px;">'+(row?"#"+row.pos:"—")+'</div></div>'
-      + '<div><div class="section-sub">Punti totali</div><div style="font-family:Fraunces,serif; font-size:26px;">'+(row?fmtNum(row.total):"0")+'</div></div>'
-      + '<div><div class="section-sub">Stelle disponibili</div><div style="font-family:Fraunces,serif; font-size:26px;">'+remaining+' / '+(team.stelle_acquistate||1)+'</div></div>'
+    // 1) essenziale: nome squadra + tre numeri chiave, un solo colpo d'occhio
+    var html = '<div class="section-head" style="margin-bottom:12px;"><div><h2>'+esc(displayName(team))+'</h2></div></div>';
+    html += '<div class="stat-row">'
+      + '<div class="stat-cell"><div class="section-sub">Posizione</div><div class="stat-val">'+(row?"#"+row.pos:"—")+'</div></div>'
+      + '<div class="stat-cell"><div class="section-sub">Punti</div><div class="stat-val">'+(row?fmtNum(row.total):"0")+'</div></div>'
+      + '<div class="stat-cell"><div class="section-sub">Stelle</div><div class="stat-val"><img src="ico-stelle.png" alt="" style="width:17px;height:17px;object-fit:contain;">'+remaining+'/'+(team.stelle_acquistate||1)+'</div></div>'
       + '</div>';
 
-    html += '<img src="illus-brigata.png" alt="" style="width:100%;max-width:220px;display:block;margin:0 auto 14px;border-radius:12px;">';
-    html += '<div class="card" style="padding:16px; margin-bottom:16px;"><h3 style="font-size:15px;">Brigata</h3><div>';
+    // 2) azione principale di questa schermata: la Brigata
+    html += '<div class="card" style="padding:16px 16px 15px; margin-bottom:16px;">'
+      + '<div class="brigata-head"><img src="char-brigata.png" alt="">'
+      + '<h3>I tuoi 3 Chef'+(locked?' <img src="ico-lucchetto.png" alt="" style="width:13px;height:13px;object-fit:contain;vertical-align:middle;margin-left:2px;">':'')+'</h3></div>';
+    html += '<div class="brigata-chips">';
     if (brigata.length){
-      brigata.forEach(function(tc){ html += '<span class="chip">'+esc(concorrenteName(tc.concorrente_id))+' <span class="muted">'+fmtNum(concorrenteCumulativo(tc.concorrente_id))+'</span></span>'; });
-    } else { html += '<span class="muted">Non ancora impostata dall\'admin.</span>'; }
+      brigata.forEach(function(tc){
+        var cc = byId(state.concorrenti, tc.concorrente_id);
+        var elimTag = (cc && cc.eliminato) ? ' <span class="badge warn" style="font-size:9px;">Eliminato</span>' : '';
+        html += '<span class="chip">'+esc(concorrenteName(tc.concorrente_id))+' <span class="muted">'+fmtNum(concorrenteCumulativo(tc.concorrente_id))+'</span>'+elimTag+'</span>';
+      });
+    } else { html += '<span class="muted">Non hai ancora scelto la tua Brigata.</span>'; }
+    html += '</div>';
     if (ombra){
-      html += '<span class="chip ombra">Chef Ombra: '+(state.meta.ombra_svelato?esc(concorrenteName(ombra.concorrente_id)):"segreto, lo sai solo tu")+'</span>';
+      html += '<div style="margin-top:2px;"><span class="chip ombra">Chef Ombra: '+(state.meta.ombra_svelato?esc(concorrenteName(ombra.concorrente_id)):"segreto, lo sai solo tu")+'</span></div>';
     }
-    html += '</div></div>';
+    if (locked){
+      html += '<p class="status-line"><img src="ico-lucchetto.png" alt=""><span>Brigata bloccata'+(dl?(' dal '+esc(fmtDeadline(dl))):'')+'. Per un cambio eccezionale contatta l\'Admin.</span></p>';
+    } else {
+      html += '<p class="status-line"><span>'+(dl?('Puoi cambiare i tuoi 3 Chef fino al '+esc(fmtDeadline(dl))+'.'):'Modificabile liberamente finché l\'Admin non fissa la data della prima puntata.')+'</span></p>';
+      if (editing){
+        var eligibili = state.concorrenti.filter(function(c){ return !c.eliminato; });
+        var curBrigata = brigata.filter(function(tc){ return tc.ruolo==="brigata"; });
+        var selHtml = [0,1,2].map(function(i){
+          var cur = curBrigata[i] ? curBrigata[i].concorrente_id : "";
+          var opts = eligibili.map(function(c){ return '<option value="'+c.id+'" '+(cur===c.id?"selected":"")+'>'+esc(c.nome)+'</option>'; }).join("");
+          return '<select data-sq-brigata="'+i+'" style="width:100%;">'+'<option value="">—</option>'+opts+'</select>';
+        }).join("");
+        html += '<div style="margin-top:10px;display:flex;flex-direction:column;gap:8px;">'+selHtml
+          + '<button class="btn primary block" id="sq-save-brigata" style="margin-top:2px;">Salva Brigata</button></div>';
+      }
+      html += '<button class="btn '+(editing?"ghost":"primary")+' block" id="sq-edit-brigata" style="margin-top:10px;">'+(editing?"Annulla":"Modifica Brigata")+'</button>';
+    }
+    html += '</div>';
 
-    if (row && row.perEp.length){
-      html += '<div class="card" style="padding:16px;"><h3 style="font-size:15px;">Storico puntata per puntata</h3>'
-        + '<div class="table-wrap"><table><thead><tr><th>Puntata</th><th class="num">Punti</th></tr></thead><tbody>'
-        + row.perEp.slice().reverse().map(function(p){ return '<tr><td>Puntata '+p.numero+'</td><td class="num">'+fmtNum(p.punti)+'</td></tr>'; }).join("")
-        + '</tbody></table></div></div>';
+    if (sostituzioneEligible(team)){
+      html += '<div class="card" style="padding:16px; margin-bottom:16px;">'
+        + '<h3 style="font-size:14.5px;margin:0 0 8px;">Sostituzione di gennaio disponibile</h3>'
+        + '<p class="section-sub">Un tuo Chef in Brigata è stato eliminato: puoi sostituirlo con un altro Chef ancora in gara, una sola volta per tutta la stagione'+(sostituzioneDeadline()?(', entro il '+esc(fmtDeadline(sostituzioneDeadline()))):'')+'. Costa 10€, da versare all\'Admin fuori dall\'app, separati dal tuo budget Stelle/Carte.</p>'
+        + (state._showSostituzione ? sostituzioneFormHtml(team) : '<button class="btn primary block" id="sq-open-sostituzione">Sostituisci un Chef</button>')
+        + '</div>';
     }
+
+    // 3) dettagli: chiusi di default, l'utente li apre solo se vuole approfondire
+    var detOpen = !!state._squadraDettagliOpen;
+    html += '<div class="disclosure'+(detOpen?' open':'')+'">'
+      + '<div class="disclosure-head" id="sq-toggle-dettagli"><h3>Dettagli e statistiche</h3><span class="disclosure-chevron">›</span></div>';
+    if (detOpen){
+      html += '<div class="disclosure-body">';
+      html += '<div class="disclosure-sub" style="display:flex; gap:14px; align-items:flex-start; flex-wrap:wrap;">'
+        + '<img src="char-profilo.png" alt="" style="width:56px;height:56px;object-fit:cover;border-radius:50%;border:2px solid var(--gold);flex:0 0 auto;">'
+        + '<div style="flex:1;min-width:180px;">'
+        + '<div class="section-sub" style="margin-bottom:6px;">Il tuo nome visualizzato</div>'
+        + '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;">'
+        + '<label class="field" style="flex:1;min-width:160px;margin-bottom:0;"><span>Nome</span><input id="sq-display-name" value="'+esc(state.profile.display_name||"")+'"></label>'
+        + '<button class="btn sm" id="sq-save-display-name">Salva</button>'
+        + '</div></div></div>';
+      if (row && row.perEp.length){
+        var posSeriesMine = positionSeriesFor(team.id);
+        var tableRowsMine = row.perEp.slice().reverse().map(function(p){ return '<tr><td>Puntata '+p.numero+'</td><td class="num">'+fmtNum(p.punti)+'</td></tr>'; }).join("");
+        var ombraLumpMine = (state.meta && state.meta.ombra_svelato) ? teamOmbraAccumulato(team) : 0;
+        if (ombraLumpMine){
+          tableRowsMine = '<tr><td>Svelamento Chef Ombra</td><td class="num">'+fmtNum(ombraLumpMine)+'</td></tr>' + tableRowsMine;
+          posSeriesMine = posSeriesMine.concat([{numero:"Svelamento", pos: row.pos}]);
+        }
+        html += '<div class="disclosure-sub"><div class="section-sub" style="margin-bottom:6px;">Andamento posizione in classifica</div>'
+          + svgPositionChart(posSeriesMine, state.teams.length, {width:520, height:90}) + '</div>';
+        html += '<div class="disclosure-sub"><div class="section-sub" style="margin-bottom:6px;">Storico puntata per puntata</div>'
+          + '<div class="table-wrap"><table><thead><tr><th>Puntata</th><th class="num">Punti</th></tr></thead><tbody>'
+          + tableRowsMine
+          + '</tbody></table></div></div>';
+      }
+      html += '</div>';
+    }
+    html += '</div>';
+
     el.innerHTML = html;
+    bindSquadraEvents();
+  }
+  function bindSquadraEvents(){
+    var editBtn = document.getElementById("sq-edit-brigata");
+    if (editBtn){
+      editBtn.addEventListener("click", function(){
+        state._editingBrigata = !state._editingBrigata;
+        renderSquadra();
+      });
+    }
+    var saveBtn = document.getElementById("sq-save-brigata");
+    if (saveBtn){
+      saveBtn.addEventListener("click", function(){
+        if (!state.myTeam) return;
+        var ids = Array.prototype.map.call(document.querySelectorAll("[data-sq-brigata]"), function(sel){ return sel.value; });
+        saveBrigata(state.myTeam.id, ids, "Brigata salvata.");
+      });
+    }
+    var openSost = document.getElementById("sq-open-sostituzione");
+    if (openSost){
+      openSost.addEventListener("click", function(){ state._showSostituzione = true; renderSquadra(); });
+    }
+    var cancelSost = document.getElementById("sq-cancel-sostituzione");
+    if (cancelSost){
+      cancelSost.addEventListener("click", function(){ state._showSostituzione = false; renderSquadra(); });
+    }
+    var confirmSost = document.getElementById("sq-confirm-sostituzione");
+    if (confirmSost){
+      confirmSost.addEventListener("click", function(){
+        if (!state.myTeam) return;
+        var newSel = document.getElementById("sost-new");
+        var newId = newSel ? newSel.value : "";
+        if (!newId){ toast("Scegli il nuovo Chef."); return; }
+        if (!confirm("Confermi la sostituzione? È definitiva e irrevocabile, non esiste una seconda sostituzione, e comporta un costo di 10€ da versare all'Admin fuori dall'app.")) return;
+        sb.from("team_chefs").insert({team_id: state.myTeam.id, concorrente_id: newId, ruolo: "sostituto"}).then(function(res){
+          if (res.error){ toast("Errore: " + res.error.message); return; }
+          state._showSostituzione = false;
+          reload("Sostituzione registrata.");
+        });
+      });
+    }
+    var saveNameBtn = document.getElementById("sq-save-display-name");
+    if (saveNameBtn){
+      saveNameBtn.addEventListener("click", function(){
+        var inp = document.getElementById("sq-display-name");
+        var val = inp ? inp.value.trim() : "";
+        if (!val){ toast("Il nome non può essere vuoto."); return; }
+        sb.from("profiles").update({display_name: val}).eq("id", state.profile.id).then(afterWrite("Nome aggiornato."));
+      });
+    }
+    var toggleDet = document.getElementById("sq-toggle-dettagli");
+    if (toggleDet){
+      toggleDet.addEventListener("click", function(){
+        state._squadraDettagliOpen = !state._squadraDettagliOpen;
+        renderSquadra();
+      });
+    }
   }
   /* ============ render: concorrenti ============ */
   function renderConcorrenti(){
-    var html = '<div class="section-head"><div><h2>Concorrenti</h2><p class="section-sub">Il tabellone si aggiorna con le puntate confermate.</p></div></div>';
-    html += '<div class="table-wrap"><table><thead><tr><th>Nome</th><th>Stato</th><th class="num">Punti</th></tr></thead><tbody>';
-    state.concorrenti.forEach(function(c){
-      html += '<tr><td>'+esc(c.nome)+'</td><td>'+(c.eliminato?'<span class="badge warn">Eliminato</span>':'<span class="badge ok">In gara</span>')+'</td><td class="num">'+fmtNum(concorrenteCumulativo(c.id))+'</td></tr>';
+    var html = '<div class="section-head"><div><h2>Chef</h2><p class="section-sub">Tocca uno Chef per la scheda.</p></div></div>';
+    var rows = state.concorrenti.slice().sort(function(a,b){
+      return concorrenteCumulativo(b.id)-concorrenteCumulativo(a.id) || String(a.nome).localeCompare(String(b.nome));
     });
-    html += '</tbody></table></div>';
+    html += '<div class="card" style="padding:4px 0;">';
+    rows.forEach(function(c){
+      var open = state._expandedConc===c.id;
+      html += '<div class="chip-row" data-conc-row="'+c.id+'">'
+        + '<div class="chip-row-name">'+esc(c.nome)+(c.eliminato?' <span class="badge warn">Eliminato</span>':' <span class="badge ok">In gara</span>')+'</div>'
+        + '<div class="chip-row-points">'+fmtNum(concorrenteCumulativo(c.id))+'</div>'
+        + '<div class="chip-row-chevron">'+(open?'⌃':'›')+'</div>'
+        + '</div>';
+      if (open){
+        html += '<div style="padding:2px 14px 18px;border-bottom:1px solid var(--line);">'+concorrenteDetailHtml(c)+'</div>';
+      }
+    });
+    html += '</div>';
     document.getElementById("panel-concorrenti").innerHTML = html;
+    bindConcorrentiEvents();
+  }
+  function concorrenteDetailHtml(c){
+    var confirmed = state.episodes.filter(function(e){ return e.confermata; }).slice().sort(function(a,b){ return a.numero-b.numero; });
+    if (!confirmed.length){ return '<span class="muted">Nessuna puntata confermata ancora.</span>'; }
+    var running = 0;
+    var series = [];
+    var rowsHtml = confirmed.map(function(ep){
+      var e = eventFor(ep.id, c.id);
+      var bp = basePoints(ep.id, c.id);
+      running += bp.bonus + bp.penalty;
+      series.push({y:running});
+      if (!e) return '<tr><td>Puntata '+ep.numero+'</td><td colspan="2" class="muted">Non in gara / nessun dato</td><td class="num">'+fmtNum(0)+'</td></tr>';
+      var bonusStr = [e.mystery_box&&"Mystery Box", e.vince_esterna&&"Esterna", e.vince_cucina&&"Cucina", e.miglior_piatto&&"Miglior piatto"].filter(Boolean).join(", ") || "—";
+      var penStr = e.penalita==="nero" ? "Grembiule Nero" : (e.penalita==="esterna" ? "Persa Esterna" : "—");
+      return '<tr><td>Puntata '+ep.numero+'</td><td>'+esc(bonusStr)+'</td><td>'+esc(penStr)+'</td><td class="num">'+fmtNum(bp.bonus+bp.penalty)+'</td></tr>';
+    }).join("");
+    return '<div class="section-sub" style="margin-bottom:4px;">Andamento punti</div>'
+      + '<div style="margin-bottom:10px;">'+svgLineChart(series, {width:500, height:80})+'</div>'
+      + '<div class="table-wrap"><table><thead><tr><th>Puntata</th><th>Bonus</th><th>Penalità</th><th class="num">Punti</th></tr></thead><tbody>'+rowsHtml+'</tbody></table></div>';
+  }
+  function bindConcorrentiEvents(){
+    document.querySelectorAll("[data-conc-row]").forEach(function(el){
+      el.addEventListener("click", function(){
+        var id = el.getAttribute("data-conc-row");
+        state._expandedConc = (state._expandedConc===id) ? null : id;
+        renderConcorrenti();
+      });
+    });
   }
 
   /* ============ render: puntate ============ */
   function renderPuntate(){
-    var html = '<div class="section-head"><div><h2>Puntate</h2><p class="section-sub">Risultati puntata per puntata.</p></div></div>';
+    if (!state._puntateExpanded) state._puntateExpanded = {};
+    var html = '<div class="screen-head"><img src="char-dettaglio.png" alt="" class="screen-head-icon"><div><h2>Puntate</h2><p class="section-sub">Risultati puntata per puntata.</p></div></div>';
     var episodes = state.episodes.filter(function(e){ return state.profile.is_admin || e.confermata; }).slice().sort(function(a,b){return b.numero-a.numero;});
-    if (!episodes.length){ html += '<div class="card empty">Nessuna puntata ancora confermata.</div>'; }
-    episodes.forEach(function(ep){
-      html += '<div class="card" style="padding:16px; margin-bottom:14px;">'
-        + '<div class="section-head" style="margin-bottom:8px;"><h3 style="font-size:16px;">Puntata '+ep.numero+(ep.confermata?'':' <span class="badge warn">Bozza</span>')+'</h3><span class="section-sub">'+esc(fmtDate(ep.data))+'</span></div>'
-        + '<div class="table-wrap"><table><thead><tr><th>Concorrente</th><th>Bonus</th><th>Penalità</th><th class="num">Punti base</th></tr></thead><tbody>';
+    if (!episodes.length){ html += '<div class="card empty" style="text-align:center;"><img src="char-vuoto.png" alt="" class="hero-illus sm">Nessuna puntata ancora confermata.</div>'; }
+    episodes.forEach(function(ep, idx){
+      var stored = state._puntateExpanded[ep.id];
+      var open = (stored===undefined) ? (idx===0) : stored;
+
+      // 1) essenziale: cosa è successo in questa puntata, a colpo d'occhio
+      var mysteryBox=[], esterna=[], cucina=[], miglior=[], nero=[], persaEsterna=[];
+      var rowsHtml = "";
       state.concorrenti.forEach(function(c){
         var e = eventFor(ep.id, c.id);
         if (!e) return;
+        if (e.mystery_box) mysteryBox.push(c.nome);
+        if (e.vince_esterna) esterna.push(c.nome);
+        if (e.vince_cucina) cucina.push(c.nome);
+        if (e.miglior_piatto) miglior.push(c.nome);
+        if (e.penalita==="nero") nero.push(c.nome);
+        if (e.penalita==="esterna") persaEsterna.push(c.nome);
         var bp = basePoints(ep.id, c.id);
         var bonusStr = [e.mystery_box&&"Mystery Box", e.vince_esterna&&"Esterna", e.vince_cucina&&"Cucina", e.miglior_piatto&&"Miglior piatto"].filter(Boolean).join(", ") || "—";
         var penStr = e.penalita==="nero"?"Grembiule Nero":(e.penalita==="esterna"?"Persa Esterna":"—");
-        html += '<tr><td>'+esc(c.nome)+'</td><td>'+esc(bonusStr)+'</td><td>'+esc(penStr)+'</td><td class="num">'+fmtNum(bp.bonus+bp.penalty)+'</td></tr>';
+        rowsHtml += '<tr><td>'+esc(c.nome)+'</td><td>'+esc(bonusStr)+'</td><td>'+esc(penStr)+'</td><td class="num">'+fmtNum(bp.bonus+bp.penalty)+'</td></tr>';
       });
-      html += '</tbody></table></div></div>';
+      html += '<div class="ep-card">'
+        + '<div class="ep-card-head"><h3>Puntata '+ep.numero+(ep.confermata?'':' <span class="badge warn">Bozza</span>')+'</h3><span class="section-sub">'+esc(fmtEpWhen(ep))+'</span></div>';
+      html += '<div class="ep-highlights">';
+      if (cucina.length) html += '<span class="chip">🏆 Cucina: '+esc(cucina.join(", "))+'</span>';
+      if (esterna.length) html += '<span class="chip">🌍 Esterna: '+esc(esterna.join(", "))+'</span>';
+      if (mysteryBox.length) html += '<span class="chip">📦 Mystery Box: '+esc(mysteryBox.join(", "))+'</span>';
+      if (miglior.length) html += '<span class="chip">🍽️ Miglior piatto: '+esc(miglior.join(", "))+'</span>';
+      if (nero.length) html += '<span class="chip">⚫ Grembiule Nero: '+esc(nero.join(", "))+'</span>';
+      if (persaEsterna.length) html += '<span class="chip">❌ Persa Esterna: '+esc(persaEsterna.join(", "))+'</span>';
+      if (!rowsHtml) html += '<span class="muted">Nessun punteggio inserito ancora.</span>';
+      html += '</div>';
+
+      // 2) dettagli: punteggio completo, solo se richiesto
+      if (rowsHtml){
+        if (open){
+          html += '<div class="table-wrap" style="margin-top:10px;"><table><thead><tr><th>Concorrente</th><th>Bonus</th><th>Penalità</th><th class="num">Punti base</th></tr></thead><tbody>'+rowsHtml+'</tbody></table></div>';
+          html += '<span class="ep-toggle" data-ep-toggle="'+ep.id+'">Nascondi punteggi completi ‹</span>';
+        } else {
+          html += '<span class="ep-toggle" data-ep-toggle="'+ep.id+'">Vedi punteggi completi ›</span>';
+        }
+      }
+      html += '</div>';
     });
     document.getElementById("panel-puntate").innerHTML = html;
+    bindPuntateEvents();
+  }
+  function bindPuntateEvents(){
+    document.querySelectorAll("[data-ep-toggle]").forEach(function(el){
+      el.addEventListener("click", function(){
+        var id = el.getAttribute("data-ep-toggle");
+        var currentlyOpen = el.textContent.indexOf("Nascondi")===0;
+        state._puntateExpanded[id] = !currentlyOpen;
+        renderPuntate();
+      });
+    });
   }
 
   /* ============ render: carte ============ */
+  // La schermata Carte è organizzata come un vero tavolo da gioco: tre gruppi
+  // sempre riconoscibili — Disponibili (puoi comprarla o usarla ora),
+  // Utilizzate (storico personale), Non utilizzabili ora (motivo sempre visibile).
+  // L'azione "Usa" apre un popup dedicato (cardDetailModalHtml) invece di un
+  // modulo inline, così la carta resta il centro visivo della conferma.
   function renderCarte(){
-    var html = '<img src="illus-carte.png" alt="" style="width:100%;max-width:260px;display:block;margin:0 auto 14px;border-radius:12px;">';
-    html += '<div class="section-head"><div><h2>Carte</h2><p class="section-sub">Ogni carta si acquista una sola volta per squadra. Tocca l\'immagine per vederla intera.</p></div></div>';
-    html += '<div class="table-wrap" style="margin-bottom:20px;"><table><thead><tr><th>Carta</th><th class="num">Costo</th><th>Descrizione</th></tr></thead><tbody>';
-    state.cardTypes.forEach(function(c){
-      html += '<tr><td><img src="'+(CARD_IMG[c.key]||"")+'" alt="" class="card-thumb" data-card-img="'+(CARD_IMG[c.key]||"")+'" data-card-label="'+esc(c.label)+'" style="width:34px;height:51px;object-fit:cover;border-radius:4px;vertical-align:middle;cursor:pointer;margin-right:8px;"> '+esc(c.label)+'</td><td class="num">'+c.costo_stelle+'★</td><td>'+esc(c.descrizione)+'</td></tr>';
-    });
-    html += '</tbody></table></div>';
+    var team = state.myTeam;
+    var remaining = team ? starsRemaining(team) : 0;
+    var myPurchases = team ? state.purchases.filter(function(p){ return p.team_id===team.id; }) : [];
 
-    html += '<div class="section-head"><h3 style="font-size:15px;">Storico attivazioni</h3></div>';
-    if (!state.activationsPublic.length){
-      html += '<div class="card empty" style="text-align:center;"><img src="state-nessuna-carta.png" alt="" style="width:120px;display:block;margin:0 auto 10px;">Nessuna carta attivata finora.</div>';
-    } else {
-      html += '<div class="table-wrap"><table><thead><tr><th>Puntata</th><th>Squadra</th><th>Carta</th></tr></thead><tbody>';
-      state.activationsPublic.slice().reverse().forEach(function(a){
-        var ep = byId(state.episodes, a.episode_id);
-        var t = byId(state.teams, a.team_id);
-        var ct = state.cardTypes.filter(function(c){return c.key===a.card_key;})[0];
-        html += '<tr><td>'+(ep?ep.numero:"?")+'</td><td>'+esc(t?displayName(t):"?")+'</td><td>'+esc(ct?ct.label:a.card_key)+'</td></tr>';
-      });
-      html += '</tbody></table></div>';
+    if (!state._cardInfoOpen) state._cardInfoOpen = {};
+    if (!state._carteGroupOpen) state._carteGroupOpen = {disponibili:true, utilizzate:false, bloccate:false};
+
+    // 1) essenziale: quante Stelle ho
+    var html = '<div class="screen-head"><img src="char-carte.png" alt="" class="screen-head-icon"><div><h2>Carte</h2><p class="section-sub">Tocca l\'immagine per vederla intera.</p></div></div>';
+    if (team){
+      html += '<div class="card stars-card"><img src="ico-stelle.png" alt=""><div><div class="stars-label">Stelle disponibili</div><div class="stars-val">'+remaining+' / '+(team.stelle_acquistate||1)+'</div></div></div>';
     }
+
+    // 2) azione: una card per ogni tipo di carta, smistata in uno dei tre gruppi
+    var buckets = {disponibili:[], utilizzate:[], bloccate:[]};
+    state.cardTypes.forEach(function(c){
+      var actionHtml = "";
+      var bucket = "disponibili";
+      if (team){
+        var owned = myPurchases.some(function(p){ return p.card_key===c.key; });
+        if (owned && c.key==="chef_ombra"){
+          actionHtml = '<span class="badge ok">Posseduta</span>';
+          bucket = "utilizzate";
+        } else if (owned){
+          var myAct = state.activations.filter(function(a){ return a.team_id===team.id && a.card_key===c.key; })[0];
+          if (myAct){
+            actionHtml = '<span class="badge ok">Utilizzata</span>' + activationSummary(myAct);
+            bucket = "utilizzate";
+          } else {
+            var win = cardWindowInfo(c.key);
+            if (win.open){
+              actionHtml = '<button class="btn primary block" data-activate-card="'+esc(c.key)+'">Usa</button>';
+              bucket = "disponibili";
+            } else {
+              actionHtml = '<button class="btn ghost block" disabled>Non ancora utilizzabile</button>'
+                + '<p class="muted" style="font-size:12px;margin:6px 0 0;">'+esc(win.reasons.join(" · "))+'</p>';
+              bucket = "bloccate";
+            }
+          }
+        } else if (c.key==="chef_ombra" && state._pickingOmbra){
+          var taken = teamChefsFor(team.id, true).map(function(tc){ return tc.concorrente_id; });
+          var eligibili = state.concorrenti.filter(function(x){ return !x.eliminato && taken.indexOf(x.id)===-1; });
+          actionHtml = eligibili.length
+            ? ('<div style="display:flex;flex-direction:column;gap:8px;"><select id="ombra-select">' + eligibili.map(function(x){ return '<option value="'+x.id+'">'+esc(x.nome)+'</option>'; }).join("") + '</select>'
+              + '<div><button class="btn sm primary" id="ombra-confirm">Conferma</button> '
+              + '<button class="btn sm ghost" id="ombra-cancel">Annulla</button></div></div>')
+            : '<span class="muted">Nessuno Chef disponibile</span>';
+          bucket = "disponibili";
+        } else {
+          var afford = remaining >= Number(c.costo_stelle);
+          actionHtml = '<button class="btn '+(afford?'primary':'ghost')+' block" data-buy-card="'+esc(c.key)+'" '+(afford?'':'disabled title="Stelle insufficienti"')+'>Compra</button>'
+            + (afford ? '' : '<p class="muted" style="font-size:12px;margin:6px 0 0;">Stelle insufficienti per questo acquisto.</p>');
+          bucket = afford ? "disponibili" : "bloccate";
+        }
+      }
+      var infoOpen = !!state._cardInfoOpen[c.key];
+      var stateClass = bucket==="utilizzate" ? " is-used" : (bucket==="bloccate" ? " is-blocked" : "");
+      var itemHtml = '<div class="card-item'+stateClass+'">'
+        + '<div class="card-item-head">'
+        + '<img src="'+(CARD_IMG[c.key]||"")+'" alt="" class="card-item-thumb card-thumb" data-card-img="'+(CARD_IMG[c.key]||"")+'" data-card-label="'+esc(c.label)+'">'
+        + '<div class="card-item-title"><h3>'+esc(c.label)+'</h3><span class="card-item-cost">'+c.costo_stelle+'★</span></div>'
+        + '</div>'
+        + '<span class="card-item-info" data-card-info-toggle="'+esc(c.key)+'">'+(infoOpen?'Nascondi spiegazione ‹':'Come funziona ›')+'</span>'
+        + (infoOpen ? '<p class="card-item-desc">'+esc(c.descrizione)+(team?' Ogni carta si utilizza una sola volta; se non è disponibile, il motivo è indicato al posto del pulsante. La conferma è definitiva.':'')+'</p>' : '')
+        + '<div class="card-item-status" style="margin-top:10px;">'+actionHtml+'</div>'
+        + '</div>';
+      buckets[bucket].push(itemHtml);
+    });
+
+    html += carteGroupHtml("disponibili", "Carte disponibili", buckets.disponibili, "Qui non c'è ancora niente da comprare o usare.");
+    html += carteGroupHtml("utilizzate", "Carte utilizzate", buckets.utilizzate, "Non hai ancora usato nessuna carta.");
+    html += carteGroupHtml("bloccate", "Non utilizzabili ora", buckets.bloccate, "Nessuna carta bloccata al momento.");
+
+    // 3) dettagli secondari: storico, chiuso di default
+    var storicoOpen = !!state._carteStoricoOpen;
+    html += '<div class="disclosure'+(storicoOpen?' open':'')+'"><div class="disclosure-head" id="carte-toggle-storico"><h3>Storico attivazioni</h3><span class="disclosure-chevron">›</span></div>';
+    if (storicoOpen){
+      html += '<div class="disclosure-body">';
+      if (!state.activationsPublic.length){
+        html += '<p class="muted">Nessuna carta attivata finora.</p>';
+      } else {
+        state.activationsPublic.slice().reverse().forEach(function(a){
+          var ep = byId(state.episodes, a.episode_id);
+          var t = byId(state.teams, a.team_id);
+          var ct = state.cardTypes.filter(function(c){return c.key===a.card_key;})[0];
+          html += '<div class="disclosure-sub" style="display:flex;justify-content:space-between;gap:10px;font-size:13.5px;"><span>'+esc(ct?ct.label:a.card_key)+' — '+esc(t?displayName(t):"?")+'</span><span class="muted">Puntata '+(ep?ep.numero:"?")+'</span></div>';
+        });
+      }
+      html += '</div>';
+    }
+    html += '</div>';
+
+    html += cardDetailModalHtml();
+
     document.getElementById("panel-carte").innerHTML = html;
+    bindCarteEvents();
+  }
+  function carteGroupHtml(key, title, items, emptyHint){
+    var open = !!state._carteGroupOpen[key];
+    var body = items.length ? items.join("") : ('<div class="carte-group-empty">'+esc(emptyHint)+'</div>');
+    return '<div class="carte-group'+(open?' open':'')+'">'
+      + '<div class="carte-group-head" data-carte-group-toggle="'+key+'"><h3>'+esc(title)+' <span class="carte-group-count">'+items.length+'</span></h3><span class="carte-group-chevron">›</span></div>'
+      + (open ? '<div class="carte-group-body">'+body+'</div>' : '')
+      + '</div>';
+  }
+  // Popup di dettaglio/utilizzo: appare sopra la schermata Carte senza farle
+  // perdere il contesto (nessuna navigazione), con la carta come centro visivo.
+  function cardDetailModalHtml(){
+    var key = state._activatingCard;
+    var open = !!key;
+    var c = key ? state.cardTypes.filter(function(x){ return x.key===key; })[0] : null;
+    var inner = "";
+    if (c){
+      inner = '<img class="card-detail-img" src="'+(CARD_IMG[c.key]||"")+'" alt="">'
+        + '<h3>'+esc(c.label)+'</h3>'
+        + '<span class="card-detail-cost">'+c.costo_stelle+'★ · si usa una sola volta, la conferma è definitiva</span>'
+        + '<p class="card-detail-desc">'+esc(c.descrizione)+'</p>'
+        + '<div class="card-detail-form">'+activationFormHtml(c)+'</div>';
+    }
+    return '<div id="card-detail-modal" class="'+(open?'open':'')+'">'
+      + '<div class="card-detail-backdrop" data-modal-close></div>'
+      + '<div class="card-detail-sheet parchment-panel">'
+      + '<button type="button" class="card-detail-close" data-modal-close aria-label="Chiudi">✕</button>'
+      + inner
+      + '</div></div>';
+  }
+
+  function bindCarteEvents(){
+    document.querySelectorAll("[data-card-info-toggle]").forEach(function(el){
+      el.addEventListener("click", function(){
+        var key = el.getAttribute("data-card-info-toggle");
+        if (!state._cardInfoOpen) state._cardInfoOpen = {};
+        state._cardInfoOpen[key] = !state._cardInfoOpen[key];
+        renderCarte();
+      });
+    });
+    var storicoToggle = document.getElementById("carte-toggle-storico");
+    if (storicoToggle){
+      storicoToggle.addEventListener("click", function(){
+        state._carteStoricoOpen = !state._carteStoricoOpen;
+        renderCarte();
+      });
+    }
+    document.querySelectorAll("[data-carte-group-toggle]").forEach(function(el){
+      el.addEventListener("click", function(){
+        var key = el.getAttribute("data-carte-group-toggle");
+        if (!state._carteGroupOpen) state._carteGroupOpen = {};
+        state._carteGroupOpen[key] = !state._carteGroupOpen[key];
+        renderCarte();
+      });
+    });
+    document.querySelectorAll("[data-modal-close]").forEach(function(el){
+      el.addEventListener("click", function(){
+        state._activatingCard = null;
+        renderCarte();
+      });
+    });
+    document.querySelectorAll("[data-buy-card]").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        var key = btn.getAttribute("data-buy-card");
+        if (key === "chef_ombra"){
+          state._pickingOmbra = true;
+          renderCarte();
+          return;
+        }
+        var def = state.cardTypes.filter(function(c){ return c.key===key; })[0];
+        if (!def || !state.myTeam) return;
+        if (!confirm('Confermi l\'acquisto di "'+def.label+'" per '+def.costo_stelle+'★? L\'acquisto è definitivo.')) return;
+        sb.from("card_purchases").insert({team_id: state.myTeam.id, card_key: key}).then(function(res){
+          if (res.error){ toast("Acquisto non riuscito: " + res.error.message); return; }
+          afterWrite("Carta acquistata.")(res);
+        });
+      });
+    });
+    var ombraConfirm = document.getElementById("ombra-confirm");
+    if (ombraConfirm){
+      ombraConfirm.addEventListener("click", function(){
+        var sel = document.getElementById("ombra-select");
+        var conc = sel && byId(state.concorrenti, sel.value);
+        if (!conc){ toast("Scelta non valida."); return; }
+        var def = state.cardTypes.filter(function(c){ return c.key==="chef_ombra"; })[0];
+        if (!confirm('Confermi "'+conc.nome+'" come tuo Chef Ombra segreto, per '+(def?def.costo_stelle:2)+'★? La scelta resta segreta fino al 31/01/2027 ed è definitiva.')) return;
+        sb.from("card_purchases").insert({team_id: state.myTeam.id, card_key:"chef_ombra"}).then(function(res){
+          if (res.error){ toast("Acquisto non riuscito: " + res.error.message); return; }
+          sb.from("team_chefs").insert({team_id: state.myTeam.id, concorrente_id: conc.id, ruolo:"ombra"}).then(function(res2){
+            if (res2.error){ toast("Errore: " + res2.error.message); return; }
+            state._pickingOmbra = false;
+            afterWrite("Chef Ombra scelto in segreto.")(res2);
+          });
+        });
+      });
+    }
+    var ombraCancel = document.getElementById("ombra-cancel");
+    if (ombraCancel){
+      ombraCancel.addEventListener("click", function(){ state._pickingOmbra = false; renderCarte(); });
+    }
+
+    document.querySelectorAll("[data-activate-card]").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        state._activatingCard = btn.getAttribute("data-activate-card");
+        renderCarte();
+      });
+    });
+
+    var modeRadios = document.querySelectorAll('input[name="act-mode"]');
+    if (modeRadios.length){
+      var syncIntuitoMode = function(){
+        var checked = document.querySelector('input[name="act-mode"]:checked');
+        var mode = checked ? checked.value : "x2";
+        var ownEl = document.getElementById("act-own");
+        var oppEl = document.getElementById("act-opp");
+        if (ownEl) ownEl.disabled = (mode!=="x2");
+        if (oppEl) oppEl.disabled = (mode!=="dimezza");
+      };
+      modeRadios.forEach(function(r){ r.addEventListener("change", syncIntuitoMode); });
+      syncIntuitoMode();
+    }
+
+    var actConfirm = document.getElementById("act-confirm");
+    if (actConfirm){
+      actConfirm.addEventListener("click", function(){
+        var key = state._activatingCard;
+        var team = state.myTeam;
+        if (!key || !team) return;
+        var def = state.cardTypes.filter(function(c){ return c.key===key; })[0];
+        var payload = null;
+
+        if (key==="fornelli_spenti"){
+          var epEl = document.getElementById("act-ep");
+          var tgEl = document.getElementById("act-target");
+          if (!epEl || !epEl.value || !tgEl || !tgEl.value){ toast("Seleziona puntata e bersaglio."); return; }
+          var parts = tgEl.value.split("|");
+          payload = {team_id:team.id, card_key:key, episode_id:epEl.value, target_team_id:parts[0], target_concorrente_id:parts[1], scelta:null};
+        } else if (key==="secondo_intuito"){
+          var epEl2 = document.getElementById("act-ep");
+          if (!epEl2 || !epEl2.value){ toast("Seleziona la puntata."); return; }
+          var checked = document.querySelector('input[name="act-mode"]:checked');
+          var mode = checked ? checked.value : "x2";
+          if (mode==="x2"){
+            var ownEl = document.getElementById("act-own");
+            if (!ownEl || !ownEl.value){ toast("Seleziona un tuo Chef."); return; }
+            payload = {team_id:team.id, card_key:key, episode_id:epEl2.value, target_team_id:null, target_concorrente_id:ownEl.value, scelta:"x2"};
+          } else {
+            var oppEl = document.getElementById("act-opp");
+            if (!oppEl || !oppEl.value){ toast("Seleziona uno Chef avversario."); return; }
+            var oparts = oppEl.value.split("|");
+            payload = {team_id:team.id, card_key:key, episode_id:epEl2.value, target_team_id:oparts[0], target_concorrente_id:oparts[1], scelta:"dimezza"};
+          }
+        } else if (key==="salvataggio"){
+          var epEl3 = document.getElementById("act-ep");
+          var ownEl2 = document.getElementById("act-own");
+          if (!epEl3 || !epEl3.value || !ownEl2 || !ownEl2.value){ toast("Seleziona puntata e Chef."); return; }
+          payload = {team_id:team.id, card_key:key, episode_id:epEl3.value, target_team_id:null, target_concorrente_id:ownEl2.value, scelta:null};
+        } else if (key==="variazione_artusi"){
+          var tgEl2 = document.getElementById("act-target");
+          if (!tgEl2 || !tgEl2.value){ toast("Seleziona puntata e Chef."); return; }
+          var vparts = tgEl2.value.split("|");
+          payload = {team_id:team.id, card_key:key, episode_id:vparts[0], target_team_id:null, target_concorrente_id:vparts[1], scelta:null};
+        }
+
+        if (!payload) return;
+        if (!confirm('Confermi l\'utilizzo di "'+(def?def.label:key)+'"? L\'utilizzo è definitivo e irrevocabile.')) return;
+        sb.from("card_activations").insert(payload).then(function(res){
+          if (res.error){ toast("Utilizzo non riuscito: " + res.error.message); return; }
+          state._activatingCard = null;
+          afterWrite("Carta utilizzata.")(res);
+        });
+      });
+    }
+    var actCancel = document.getElementById("act-cancel");
+    if (actCancel){
+      actCancel.addEventListener("click", function(){ state._activatingCard = null; renderCarte(); });
+    }
+  }
+
+  /* ============ chat + avvisi ============ */
+  var CHAT_EMOJIS = ["👍","❤️","😂","😮","😢","🎉"];
+  function fmtDateTime(iso){
+    if (!iso) return "";
+    var d = new Date(iso);
+    if (isNaN(d)) return iso;
+    var now = new Date();
+    var time = d.toLocaleTimeString("it-IT", {hour:"2-digit", minute:"2-digit"});
+    if (d.toDateString()===now.toDateString()) return time;
+    return d.toLocaleDateString("it-IT", {day:"numeric", month:"short"}) + " " + time;
+  }
+  function chatProfileName(id){
+    var p = state.profiles.filter(function(x){ return x.id===id; })[0];
+    return p ? p.display_name : "Qualcuno";
+  }
+  function chatFindMsg(id){ return state.chatMessages.filter(function(m){ return m.id===id; })[0]; }
+  function chatImageUrl(path){ return sb.storage.from("chat-media").getPublicUrl(path).data.publicUrl; }
+
+  function renderChat(){
+    var el = document.getElementById("panel-chat");
+    updateChatBadge();
+    if (!state.profile){ el.innerHTML = ""; return; }
+
+    var reactionsByMsg = {};
+    state.chatReactions.forEach(function(r){
+      reactionsByMsg[r.message_id] = reactionsByMsg[r.message_id] || {};
+      reactionsByMsg[r.message_id][r.emoji] = reactionsByMsg[r.message_id][r.emoji] || [];
+      reactionsByMsg[r.message_id][r.emoji].push(r.profile_id);
+    });
+
+    var html = '<div class="chat-top"><img src="char-chat.png" alt=""><div class="chat-top-title"><h2>Chat</h2><span>Messaggi visibili 20 giorni</span></div>'
+      + '<label class="chat-notif-toggle" title="Notifiche per gli avvisi importanti"><input type="checkbox" id="chat-notif-toggle" '+(state.profile.notifiche_attive?"checked":"")+'><span class="bell">🔔</span></label>'
+      + '</div>';
+
+    html += '<div id="chat-wrap"><div id="chat-list">';
+    if (!state.chatMessages.length){
+      html += '<div class="empty" style="text-align:center;">Nessun messaggio ancora. Scrivi il primo!</div>';
+    }
+    state.chatMessages.forEach(function(m){
+      if (m.is_avviso){
+        html += '<div class="chat-avviso">📣 '+esc(m.testo)+'<div class="chat-meta" style="margin:2px 0 0;">'+fmtDateTime(m.created_at)+'</div></div>';
+        return;
+      }
+      var mine = m.author_id===state.profile.id;
+      var replyMsg = m.reply_to_id ? chatFindMsg(m.reply_to_id) : null;
+      html += '<div class="chat-msg'+(mine?" mine":"")+'" data-msg-id="'+m.id+'">';
+      html += '<div class="chat-meta">'+esc(chatProfileName(m.author_id))+' · '+fmtDateTime(m.created_at)+'</div>';
+      html += '<div class="chat-bubble">';
+      if (replyMsg){
+        var snippet = replyMsg.testo ? (replyMsg.testo.length>60 ? replyMsg.testo.slice(0,60)+"…" : replyMsg.testo) : "📷 foto";
+        html += '<div class="chat-reply-preview">↩ '+esc(chatProfileName(replyMsg.author_id))+': '+esc(snippet)+'</div>';
+      }
+      if (m.testo){ html += '<div>'+esc(m.testo).replace(/\n/g,"<br>")+'</div>'; }
+      if (m.image_path){
+        var url = chatImageUrl(m.image_path);
+        html += '<img class="chat-img" src="'+esc(url)+'" alt="">';
+      }
+      html += '</div>';
+      var reacts = reactionsByMsg[m.id] || {};
+      var reactKeys = Object.keys(reacts);
+      if (reactKeys.length){
+        html += '<div class="chat-reactions">';
+        reactKeys.forEach(function(em){
+          var who = reacts[em].map(chatProfileName).join(", ");
+          var mineReacted = reacts[em].indexOf(state.profile.id)!==-1;
+          html += '<button class="chat-react-btn'+(mineReacted?" mine":"")+'" data-toggle-react="'+m.id+'|'+em+'" title="'+esc(who)+'">'+em+' '+reacts[em].length+'</button>';
+        });
+        html += '</div>';
+      }
+      html += '<div class="chat-actions"><span data-reply-to="'+m.id+'">Rispondi</span><span data-open-react="'+m.id+'">Reagisci</span></div>';
+      if (state._reactingMsg===m.id){
+        html += '<div class="chat-emoji-row">' + CHAT_EMOJIS.map(function(em){ return '<button type="button" data-toggle-react="'+m.id+'|'+em+'">'+em+'</button>'; }).join("") + '</div>';
+      }
+      html += '</div>';
+    });
+    html += '</div>';
+
+    if (state._chatReplyTo){
+      var rm = chatFindMsg(state._chatReplyTo);
+      if (rm){
+        var rsnippet = rm.testo ? (rm.testo.length>60 ? rm.testo.slice(0,60)+"…" : rm.testo) : "📷 foto";
+        html += '<div id="chat-reply-bar"><span>↩ Rispondendo a '+esc(chatProfileName(rm.author_id))+': '+esc(rsnippet)+'</span><span style="cursor:pointer;" id="chat-reply-cancel">✕</span></div>';
+      }
+    }
+    html += '<div id="chat-input-bar">'
+      + '<input type="file" accept="image/*" id="chat-photo-input" class="hidden">'
+      + '<button class="btn sm ghost" id="chat-photo-btn" type="button" title="Allega una foto"><img src="ico-fotocamera.png" alt="" style="width:16px;height:16px;object-fit:contain;vertical-align:middle;"></button>'
+      + '<textarea id="chat-text-input" placeholder="Scrivi un messaggio…" rows="1"></textarea>'
+      + '<button class="btn sm primary" id="chat-send-btn" type="button">Invia</button>'
+      + '</div>';
+    html += '</div>';
+
+    el.innerHTML = html;
+    bindChatEvents();
+    if (state._chatScrollPending){
+      var list = document.getElementById("chat-list");
+      if (list) list.scrollTop = list.scrollHeight;
+      state._chatScrollPending = false;
+    }
+  }
+
+  function bindChatEvents(){
+    var notifToggle = document.getElementById("chat-notif-toggle");
+    if (notifToggle){
+      notifToggle.addEventListener("change", function(){
+        var next = notifToggle.checked;
+        sb.from("profiles").update({notifiche_attive: next}).eq("id", state.profile.id).then(function(res){
+          if (res.error){ toast("Errore: " + res.error.message); notifToggle.checked = !next; return; }
+          state.profile.notifiche_attive = next;
+          toast(next ? "Notifiche attivate." : "Notifiche disattivate.");
+        });
+      });
+    }
+    document.querySelectorAll("[data-reply-to]").forEach(function(el){
+      el.addEventListener("click", function(){
+        state._chatReplyTo = el.getAttribute("data-reply-to");
+        state._reactingMsg = null;
+        renderChat();
+        var input = document.getElementById("chat-text-input");
+        if (input) input.focus();
+      });
+    });
+    var replyCancel = document.getElementById("chat-reply-cancel");
+    if (replyCancel){ replyCancel.addEventListener("click", function(){ state._chatReplyTo = null; renderChat(); }); }
+
+    document.querySelectorAll("[data-open-react]").forEach(function(el){
+      el.addEventListener("click", function(){
+        var id = el.getAttribute("data-open-react");
+        state._reactingMsg = (state._reactingMsg===id) ? null : id;
+        renderChat();
+      });
+    });
+    document.querySelectorAll("[data-toggle-react]").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        var parts = btn.getAttribute("data-toggle-react").split("|");
+        var msgId = parts[0], emoji = parts[1];
+        var existing = state.chatReactions.filter(function(r){ return r.message_id===msgId && r.profile_id===state.profile.id && r.emoji===emoji; })[0];
+        if (existing){
+          sb.from("chat_reactions").delete().eq("id", existing.id).then(function(res){
+            if (res.error){ toast("Errore: " + res.error.message); return; }
+            loadChatData();
+          });
+        } else {
+          sb.from("chat_reactions").insert({message_id: msgId, profile_id: state.profile.id, emoji: emoji}).then(function(res){
+            if (res.error){ toast("Errore: " + res.error.message); return; }
+            state._reactingMsg = null;
+            loadChatData();
+          });
+        }
+      });
+    });
+
+    var photoBtn = document.getElementById("chat-photo-btn");
+    var photoInput = document.getElementById("chat-photo-input");
+    if (photoBtn && photoInput){
+      photoBtn.addEventListener("click", function(){ photoInput.click(); });
+      photoInput.addEventListener("change", function(){
+        var file = photoInput.files && photoInput.files[0];
+        if (!file) return;
+        if (file.size > 8*1024*1024){ toast("Foto troppo grande (massimo 8 MB)."); photoInput.value=""; return; }
+        var path = state.profile.id + "/" + Date.now() + "-" + file.name.replace(/[^a-zA-Z0-9_.-]/g,"_");
+        toast("Caricamento foto…");
+        sb.storage.from("chat-media").upload(path, file).then(function(res){
+          if (res.error){ toast("Caricamento non riuscito: " + res.error.message); return; }
+          sendChatMessage(null, path);
+        });
+        photoInput.value = "";
+      });
+    }
+
+    var sendBtn = document.getElementById("chat-send-btn");
+    var textInput = document.getElementById("chat-text-input");
+    if (sendBtn && textInput){
+      sendBtn.addEventListener("click", function(){
+        var text = textInput.value.trim();
+        if (!text) return;
+        sendChatMessage(text, null);
+      });
+      textInput.addEventListener("keydown", function(e){
+        if (e.key==="Enter" && !e.shiftKey){ e.preventDefault(); sendBtn.click(); }
+      });
+    }
+  }
+
+  function sendChatMessage(testo, imagePath){
+    var payload = {
+      author_id: state.profile.id,
+      testo: testo || null,
+      image_path: imagePath || null,
+      reply_to_id: state._chatReplyTo || null,
+      is_avviso: false
+    };
+    sb.from("chat_messages").insert(payload).then(function(res){
+      if (res.error){ toast("Invio non riuscito: " + res.error.message); return; }
+      state._chatReplyTo = null;
+      var textInput = document.getElementById("chat-text-input");
+      if (textInput) textInput.value = "";
+      state._chatScrollPending = true;
+      loadChatData();
+    });
+  }
+
+  function loadChatData(){
+    Promise.all([
+      sb.from("chat_messages").select("*").order("created_at"),
+      sb.from("chat_reactions").select("*")
+    ]).then(function(res){
+      if (res[0].error || res[1].error) return;
+      state.chatMessages = res[0].data||[];
+      state.chatReactions = res[1].data||[];
+      if (state.activeTab==="chat"){ renderChat(); } else { updateChatBadge(); }
+    });
+  }
+  function markChatRead(){
+    if (!state.profile) return;
+    var now = new Date().toISOString();
+    state.chatLastRead = now;
+    updateChatBadge();
+    sb.from("chat_reads").upsert({profile_id: state.profile.id, last_read_at: now}).then(function(){});
+  }
+  function updateChatBadge(){
+    var badge = document.getElementById("chat-badge");
+    if (!badge || !state.profile) return;
+    var lastRead = state.chatLastRead ? new Date(state.chatLastRead) : null;
+    var count = state.chatMessages.filter(function(m){
+      if (m.author_id===state.profile.id) return false;
+      if (!lastRead) return true;
+      return new Date(m.created_at) > lastRead;
+    }).length;
+    if (count>0 && state.activeTab!=="chat"){
+      badge.textContent = count>99 ? "99+" : String(count);
+      badge.classList.remove("hidden");
+    } else {
+      badge.classList.add("hidden");
+    }
   }
 
   /* ============ render: regolamento ============ */
   function renderRegolamento(){
     var maxSpend = regola("costo_stella_eur",10) * regola("max_stelle",5);
-    var html = '<img src="illus-regolamento.png" alt="" style="width:100%;max-width:260px;display:block;margin:0 auto 14px;border-radius:12px;">';
-    html += '<div class="section-head"><div><h2>Regolamento</h2></div></div>';
-    html += '<div class="card" style="padding:16px; margin-bottom:14px;"><h3 style="font-size:14px;">Come si fanno i punti</h3>'
+    var html = '<div class="screen-head"><img src="hero-regolamento.png" alt="" class="screen-head-icon"><div><h2>Regolamento</h2><p class="section-sub">Tocca un argomento per aprirlo.</p></div></div>';
+    html += '<details class="admin-disclosure" open><summary><h3>Come si fanno i punti</h3><span class="chev">›</span></summary><div class="disclosure-body">'
       + '<p class="section-sub">Bonus: Mystery Box +'+regola("bonus_mystery_box",3)+' · Esterna +'+regola("bonus_esterna",4)+' · Cucina +'+regola("bonus_cucina",4)+' · Miglior piatto +'+regola("bonus_miglior_piatto",2)+'</p>'
       + '<p class="section-sub">Penalità: Grembiule Nero '+regola("penalita_nero",-3)+' · Persa Esterna '+regola("penalita_esterna",-2)+' (non cumulabili tra loro)</p>'
-      + '<p class="section-sub">Sono ammessi mezzi punti dove previsto dalle carte.</p></div>';
-    html += '<div class="card" style="padding:16px; margin-bottom:14px;"><h3 style="font-size:14px;">Stelle</h3>'
-      + '<p class="section-sub">€'+regola("costo_stella_eur",10)+' = 1★. Massimo '+regola("max_stelle",5)+'★ (tetto €'+maxSpend+') per Stelle e Carte.</p></div>';
-    html += '<div class="card" style="padding:16px;"><h3 style="font-size:14px;">Chef Ombra</h3>'
-      + '<p class="section-sub">Quarto Chef segreto, costa 2★. Punti calcolati da subito ma mostrati e conteggiati in classifica solo al 31/01/2027.</p></div>';
+      + '<p class="section-sub" style="margin-bottom:0;">Sono ammessi mezzi punti dove previsto dalle carte.</p></div></details>';
+    html += '<details class="admin-disclosure"><summary><h3>Stelle</h3><span class="chev">›</span></summary><div class="disclosure-body">'
+      + '<p class="section-sub" style="margin-bottom:0;">€'+regola("costo_stella_eur",10)+' = 1★. Massimo '+regola("max_stelle",5)+'★ (tetto €'+maxSpend+') per Stelle e Carte.</p></div></details>';
+    html += '<details class="admin-disclosure"><summary><h3>Chef Ombra</h3><span class="chev">›</span></summary><div class="disclosure-body">'
+      + '<p class="section-sub" style="margin-bottom:0;">Quarto Chef segreto, costa 2★. Punti calcolati da subito ma mostrati e conteggiati in classifica solo al 31/01/2027.</p></div></details>';
     document.getElementById("panel-regolamento").innerHTML = html;
   }
 
   /* ============ render: admin ============ */
-  function fieldset(legend, inner){ return '<fieldset><legend>'+esc(legend)+'</legend>'+inner+'</fieldset>'; }
+  function fieldset(legend, inner, id, openDefault){
+    return '<details class="admin-disclosure"'+(id?' id="'+esc(id)+'"':'')+(openDefault?' open':'')+'>'
+      + '<summary><h3>'+esc(legend)+'</h3><span class="chev">›</span></summary>'
+      + '<div class="disclosure-body">'+inner+'</div>'
+      + '</details>';
+  }
+
+  // Dashboard Admin: anomalie calcolate al volo (non salvate), con priorità
+  // urgente/importante/avviso come da regolamento. Nessuno storico: quando
+  // la condizione che le genera sparisce, l'anomalia sparisce con lei.
+  function computeAnomalie(){
+    var items = [];
+    var withoutTeam = state.profiles.filter(function(p){
+      if (!p.attivo || p.is_admin) return false;
+      return !state.teams.some(function(t){ return t.profile_id===p.id; });
+    });
+    if (withoutTeam.length){
+      items.push({priority:"urgente", text: withoutTeam.length+" account attivi senza squadra collegata: "+withoutTeam.map(function(p){return p.display_name;}).join(", ")+".", anchor:"admin-sec-account"});
+    }
+    state.teams.forEach(function(t){
+      var count = state.teamChefs.filter(function(tc){ return tc.team_id===t.id && tc.ruolo==="brigata" && tc.attivo; }).length;
+      if (count>=3) return;
+      var locked = brigataLocked(t);
+      var dl = brigataDeadlineFor(t);
+      if (locked){
+        items.push({priority:"urgente", text: '"'+(t.nome_squadra||"Squadra")+'" ha la Brigata incompleta ('+count+'/3) ed è già bloccata.', anchor:"admin-sec-squadre"});
+      } else if (dl){
+        var daysLeft = Math.ceil((dl - new Date()) / 86400000);
+        if (daysLeft<=3){
+          items.push({priority:"importante", text: '"'+(t.nome_squadra||"Squadra")+'" ha la Brigata incompleta ('+count+'/3), scadenza tra '+(daysLeft<=0?"meno di un giorno":daysLeft+" giorni")+".", anchor:"admin-sec-squadre"});
+        }
+      }
+    });
+    state.episodes.filter(function(e){ return !e.confermata && e.data; }).forEach(function(e){
+      var days = Math.floor((new Date() - new Date(e.data+"T00:00:00")) / 86400000);
+      if (days>=2){
+        items.push({priority:"importante", text: "Puntata "+e.numero+" è andata in onda ma non è ancora stata confermata.", anchor:"admin-sec-puntate"});
+      }
+    });
+    var hasAnyDraft = state.episodes.some(function(e){ return !e.confermata; });
+    var hasFutureDraft = state.episodes.some(function(e){ return !e.confermata && e.data; });
+    if (hasAnyDraft && !hasFutureDraft){
+      items.push({priority:"avviso", text: "C'è una puntata in bozza senza data: ricordati di impostarla.", anchor:"admin-sec-puntate"});
+    }
+    var order = {urgente:0, importante:1, avviso:2};
+    items.sort(function(a,b){ return order[a.priority]-order[b.priority]; });
+    return items;
+  }
+  function anomalieHtml(items){
+    if (!items.length) return '<p class="section-sub">Nessun problema da segnalare.</p>';
+    var labels = {urgente:"Urgente", importante:"Importante", avviso:"Avviso"};
+    return items.map(function(it){
+      return '<div class="banner '+(it.priority==="avviso"?"":"warn")+'"><span><span class="badge '+(it.priority==="avviso"?"ok":"warn")+'" style="margin-right:6px;">'+labels[it.priority]+'</span>'+esc(it.text)+'</span>'
+        + '<button class="btn sm ghost" data-goto="'+esc(it.anchor)+'">Vai</button></div>';
+    }).join("");
+  }
 
   function renderAdmin(){
     var el = document.getElementById("panel-admin");
     if (!state.profile.is_admin){ el.innerHTML = ""; return; }
-    var html = '<div class="section-head"><div><h2>Pannello Admin</h2></div></div>';
+    var html = '<div class="section-head"><div><h2>Pannello Admin</h2><p class="section-sub">Solo tu vedi questa sezione.</p></div><img src="ico-impostazioni.png" alt="" style="width:34px;height:34px;object-fit:contain;opacity:.85;flex:0 0 auto;"></div>';
+
+    html += fieldset("Dashboard", anomalieHtml(computeAnomalie()), "admin-sec-dashboard", true);
 
     html += fieldset("Impostazioni lega", ''
       + '<div class="field-row">'
@@ -587,7 +2265,41 @@
       + '<div class="banner '+(state.meta.brigate_visibili?"ok":"warn")+'"><span>Brigate: '+(state.meta.brigate_visibili?"visibili a tutti":"private")+'</span>'
       + '<button class="btn sm" id="a-toggle-brigate">'+(state.meta.brigate_visibili?"Nascondi":"Rendi visibili")+'</button></div>'
       + '<div class="banner '+(state.meta.ombra_svelato?"ok":"warn")+'"><span>Chef Ombra: '+(state.meta.ombra_svelato?"svelati":"segreti")+'</span>'
-      + '<button class="btn sm danger" id="a-toggle-ombra">'+(state.meta.ombra_svelato?"Nascondi di nuovo":"Svela tutti")+'</button></div>'
+      + '<button class="btn sm danger" id="a-toggle-ombra">'+(state.meta.ombra_svelato?"Nascondi di nuovo":"Svela tutti")+'</button></div>',
+      "admin-sec-impostazioni"
+    );
+
+    var accountRows = state.profiles.slice().sort(function(a,b){ return (a.display_name||"").localeCompare(b.display_name||""); }).map(function(p){
+      var t = state.teams.filter(function(tt){ return tt.profile_id===p.id; })[0];
+      return '<div class="banner" style="flex-wrap:wrap;">'
+        + '<span style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">'
+          + '<input data-player-name="'+p.id+'" value="'+esc(p.display_name||"")+'" style="width:140px;">'
+          + '<span class="muted">('+esc(p.username)+')</span>'
+          + (t ? ' — '+esc(t.nome_squadra) : ' <span class="badge warn">senza squadra</span>')
+          + (p.is_admin ? ' <span class="badge ok">Admin</span>' : '')
+          + (!p.attivo ? ' <span class="badge warn">Disattivato</span>' : '')
+        + '</span>'
+        + '<span style="white-space:nowrap;"><button class="btn sm ghost" data-reset-pw="'+p.id+'">Reset password</button> '
+        + (p.id===state.profile.id
+            ? '<span class="muted" title="Non puoi disattivare il tuo stesso account.">—</span>'
+            : '<button class="btn sm ghost" data-toggle-active="'+p.id+'">'+(p.attivo?"Disattiva":"Riattiva")+'</button>')
+        + '</span>'
+        + '</div>';
+    }).join("") || '<p class="section-sub">Nessun account ancora.</p>';
+    html += fieldset("Account giocatori", accountRows
+      + '<h4 style="margin:14px 0 6px;font-size:13.5px;color:var(--gold-strong);">Nuovo giocatore</h4>'
+      + '<div class="field-row">'
+      + '<label class="field"><span>Username</span><input id="a-new-username" autocapitalize="none" autocorrect="off"></label>'
+      + '<label class="field"><span>Nome visualizzato</span><input id="a-new-displayname"></label>'
+      + '<label class="field"><span>Nome squadra</span><input id="a-new-teamname"></label>'
+      + '</div>'
+      + '<div class="field-row" style="align-items:flex-end;">'
+      + '<label class="field"><span>Password iniziale</span><input id="a-new-password" value="'+esc(genPassword())+'"></label>'
+      + '<button class="btn sm ghost" id="a-new-pw-gen" type="button" style="margin-bottom:12px;">Genera nuova</button>'
+      + '</div>'
+      + '<button class="btn sm primary" id="a-create-player">Crea account e squadra</button>'
+      + '<p class="section-sub" style="margin-top:8px;">Username e password vanno comunicati tu stesso al giocatore, fuori dall\'app. Il giocatore non può ancora cambiare la password da solo: se serve, torna qui e usa "Reset password".</p>',
+      "admin-sec-account"
     );
 
     var concList = state.concorrenti.map(function(c){
@@ -595,35 +2307,70 @@
         + '<span><button class="btn sm ghost" data-toggle-elim="'+c.id+'">'+(c.eliminato?"Riammetti":"Elimina")+'</button></span></div>';
     }).join("");
     html += fieldset("Concorrenti", concList
-      + '<div class="field-row"><input id="a-new-conc" placeholder="Nome concorrente" style="flex:1;"><button class="btn sm" id="a-add-conc">Aggiungi</button></div>'
+      + '<div class="field-row"><input id="a-new-conc" placeholder="Nome concorrente" style="flex:1;"><button class="btn sm" id="a-add-conc">Aggiungi</button></div>',
+      "admin-sec-concorrenti"
     );
 
     var teamBlocks = state.teams.map(function(t){
-      var opts = state.concorrenti.map(function(c){ return '<option value="'+c.id+'">'+esc(c.nome)+'</option>'; }).join("");
+      var eligibili = state.concorrenti.filter(function(c){ return !c.eliminato; });
+      var optsFor = function(selectedId){
+        return eligibili.map(function(c){ return '<option value="'+c.id+'" '+(selectedId===c.id?"selected":"")+'>'+esc(c.nome)+'</option>'; }).join("");
+      };
       var cur = state.teamChefs.filter(function(tc){ return tc.team_id===t.id && tc.attivo; });
+      var curBrigata = cur.filter(function(tc){ return tc.ruolo==="brigata"; });
       var b = [0,1,2].map(function(i){
-        var slot = cur.filter(function(tc){return tc.ruolo==="brigata";})[i];
-        return '<select data-brigata="'+i+'" data-team="'+t.id+'"><option value="">—</option>'+opts+'</select>';
+        var slot = curBrigata[i];
+        return '<select data-team-brigata="'+i+'">'
+          + '<option value="">—</option>' + optsFor(slot?slot.concorrente_id:null)
+          + '</select>';
       });
       var ombraSel = cur.filter(function(tc){return tc.ruolo==="ombra";})[0];
-      return '<div class="card" style="padding:14px; margin-bottom:10px;">'
+      var sostRow = cur.filter(function(tc){ return tc.ruolo==="sostituto"; })[0];
+      var eligibiliSost = state.concorrenti.filter(function(c){ return !c.eliminato && cur.every(function(tc){ return tc.concorrente_id!==c.id; }); });
+      var sostBlock;
+      if (sostRow){
+        sostBlock = '<div class="field-row"><span class="section-sub" style="align-self:center;">Sostituzione gennaio:</span>'
+          + '<span class="badge ok">Usata — '+esc(concorrenteName(sostRow.concorrente_id))+'</span> '
+          + '<button class="btn sm ghost" data-undo-sostituzione="'+t.id+'" data-sost-row="'+sostRow.id+'">Annulla sostituzione</button></div>';
+      } else if (t.sostituzione_usata){
+        sostBlock = '<div class="field-row"><span class="section-sub" style="align-self:center;">Sostituzione gennaio:</span><span class="badge warn">Segnata come usata</span></div>';
+      } else {
+        var sostOpts = eligibiliSost.map(function(c){ return '<option value="'+c.id+'">'+esc(c.nome)+'</option>'; }).join("");
+        sostBlock = '<div class="field-row" style="align-items:flex-end;"><span class="section-sub" style="align-self:center;">Sostituzione gennaio:</span>'
+          + '<select data-team-sostituto="'+t.id+'"><option value="">— nessuna —</option>'+sostOpts+'</select>'
+          + '<button class="btn sm ghost" data-save-team-sostituto="'+t.id+'">Registra sostituzione</button></div>';
+      }
+      return '<div class="card" style="padding:14px; margin-bottom:10px;" data-team-block="'+t.id+'">'
         + '<div class="field-row" style="align-items:flex-end;">'
         + '<label class="field"><span>Nome squadra</span><input data-team-name="'+t.id+'" value="'+esc(t.nome_squadra||"")+'"></label>'
         + '<label class="field"><span>Stelle</span><input type="number" min="0" max="'+regola("max_stelle",5)+'" data-team-stars="'+t.id+'" value="'+(t.stelle_acquistate||1)+'"></label>'
         + '<label class="field"><span>Punti ingresso</span><input type="number" data-team-entry="'+t.id+'" value="'+(t.punti_ingresso||0)+'"></label>'
         + '</div>'
-        + '<div class="field-row"><span class="section-sub" style="align-self:center;">Brigata:</span>' + b.join("") + '</div>'
-        + '<div class="field-row"><span class="section-sub" style="align-self:center;">Chef Ombra:</span><select data-ombra="1" data-team="'+t.id+'"><option value="">Nessuno</option>'+opts+'</select></div>'
+        + '<div class="field-row" style="align-items:flex-end;">'
+        + '<span class="section-sub" style="align-self:center;">Brigata:</span>' + b.join("")
+        + '<button class="btn sm" data-save-team-brigata="'+t.id+'">Salva Brigata</button>'
+        + '</div>'
+        + '<div class="field-row"><span class="section-sub" style="align-self:center;">Chef Ombra:</span><select data-ombra="1" data-team="'+t.id+'"><option value="">Nessuno</option>'+optsFor(ombraSel?ombraSel.concorrente_id:null)+'</select></div>'
+        + '<div class="field-row"><label class="field"><span>Scadenza Brigata personalizzata (facoltativa, per chi entra in ritardo)</span><input type="date" data-team-scadenza-brigata="'+t.id+'" value="'+(t.brigata_scadenza_personale||"")+'"></label></div>'
+        + sostBlock
         + '</div>';
     }).join("");
-    html += fieldset("Giocatori & Squadre", teamBlocks);
+    html += fieldset("Giocatori & Squadre", teamBlocks, "admin-sec-squadre");
 
     var epRows = state.episodes.slice().sort(function(a,b){return b.numero-a.numero;}).map(function(e){
-      return '<div class="banner"><span>Puntata '+e.numero+' — '+(e.confermata?'<span class="badge ok">Confermata</span>':'<span class="badge warn">Bozza</span>')+'</span>'
+      return '<div class="banner"><span>Puntata '+e.numero+(e.data?' — '+esc(fmtEpWhen(e)):'')+' '+(e.confermata?'<span class="badge ok">Confermata</span>':'<span class="badge warn">Bozza</span>')+'</span>'
         + '<span><button class="btn sm ghost" data-edit-ep="'+e.id+'">Modifica</button> '
         + (e.confermata?'<button class="btn sm ghost" data-unconfirm-ep="'+e.id+'">Riporta in bozza</button>':'<button class="btn sm primary" data-confirm-ep="'+e.id+'">Conferma</button>')+'</span></div>';
     }).join("");
-    html += fieldset("Puntate & Risultati", epRows || '<p class="section-sub">Nessuna puntata registrata.</p>');
+    html += fieldset("Puntate & Risultati", epRows || '<p class="section-sub">Nessuna puntata registrata.</p>', "admin-sec-puntate");
+
+    var calRows = state.episodes.slice().sort(function(a,b){return a.numero-b.numero;}).map(function(e){
+      return '<div class="banner"><span>Puntata '+e.numero+'</span><span class="muted" style="font-size:12.5px;">'+(e.data?esc(fmtEpWhen(e)):'Data non ancora impostata')+'</span></div>';
+    }).join("");
+    calRows += '<div class="banner"><span>Svelamento Chef Ombra</span><span class="muted" style="font-size:12.5px;">'+(state.meta&&state.meta.ombra_svelato?'Già svelato':esc(fmtDate(state.meta&&state.meta.data_svelamento)))+'</span></div>';
+    html += fieldset("Calendario & Scadenze", ''
+      + '<p class="section-sub" style="margin-top:-4px;">Calendario delle puntate (correggibile qui sotto in "Nuova puntata"/"Modifica") e scadenze fisse della stagione. Le scadenze personali di ogni giocatore (es. carte da usare) si vedono automaticamente nella loro Home.</p>'
+      + calRows, "admin-sec-calendario");
 
     var editingEp = state._editingEp ? byId(state.episodes, state._editingEp) : null;
     var concForEp = state.concorrenti.filter(function(c){ return !c.eliminato; });
@@ -641,15 +2388,17 @@
       + '<div class="field-row">'
       + '<label class="field"><span>Numero</span><input type="number" id="a-ep-num" value="'+(editingEp?editingEp.numero:nextNum)+'" '+(editingEp?"readonly":"")+'></label>'
       + '<label class="field"><span>Data</span><input type="date" id="a-ep-data" value="'+(editingEp&&editingEp.data?editingEp.data:"")+'"></label>'
+      + '<label class="field"><span>Ora</span><input type="time" id="a-ep-ora" value="'+(editingEp&&editingEp.ora?String(editingEp.ora).slice(0,5):"")+'"></label>'
       + '</div>'
       + '<div class="table-wrap"><table><thead><tr><th>Concorrente</th><th>Mystery</th><th>Esterna</th><th>Cucina</th><th>Piatto</th><th>Penalità</th></tr></thead><tbody>'+evRows+'</tbody></table></div>'
       + '<div style="margin-top:10px;"><button class="btn sm" id="a-save-ep">'+(editingEp?"Salva modifiche":"Salva puntata (bozza)")+'</button> '
-      + (editingEp?'<button class="btn sm ghost" id="a-cancel-ep">Annulla</button>':'')+'</div>'
+      + (editingEp?'<button class="btn sm ghost" id="a-cancel-ep">Annulla</button>':'')+'</div>',
+      "admin-sec-nuova-puntata", !!editingEp
     );
 
     var teamOpts = state.teams.map(function(t){return '<option value="'+t.id+'">'+esc(displayName(t))+'</option>';}).join("");
     var epOpts = state.episodes.slice().sort(function(a,b){return b.numero-a.numero;}).map(function(e){return '<option value="'+e.id+'">Puntata '+e.numero+'</option>';}).join("");
-    var cardOpts = state.cardTypes.map(function(c){return '<option value="'+c.key+'">'+esc(c.label)+'</option>';}).join("");
+    var cardOpts = state.cardTypes.filter(function(c){return c.key!=="chef_ombra";}).map(function(c){return '<option value="'+c.key+'">'+esc(c.label)+'</option>';}).join("");
     var concOpts = state.concorrenti.map(function(c){return '<option value="'+c.id+'">'+esc(c.nome)+'</option>';}).join("");
     html += fieldset("Stelle & Carte — attivazione", ''
       + '<div class="field-row">'
@@ -661,13 +2410,54 @@
       + '<label class="field"><span>Squadra bersaglio</span><select id="a-act-target-team"><option value="">—</option>'+teamOpts+'</select></label>'
       + '<label class="field"><span>Concorrente bersaglio</span><select id="a-act-target-conc">'+concOpts+'</select></label>'
       + '<label class="field"><span>Scelta (Secondo Intuito)</span><select id="a-act-choice"><option value="x2">Raddoppia</option><option value="dimezza">Dimezza</option></select></label>'
-      + '</div><button class="btn sm" id="a-save-act">Registra attivazione</button>'
+      + '</div><button class="btn sm" id="a-save-act">Registra attivazione</button>',
+      "admin-sec-carte-attivazione"
     );
 
     var settingsKeys = [["bonus_mystery_box","Bonus Mystery Box"],["bonus_esterna","Bonus Esterna"],["bonus_cucina","Bonus Cucina"],["bonus_miglior_piatto","Bonus Miglior Piatto"],["penalita_nero","Penalità Nero"],["penalita_esterna","Penalità Esterna"],["costo_stella_eur","Costo Stella (€)"],["max_stelle","Stelle massime"]];
     html += fieldset("Regolamento & Parametri", '<div class="field-row">'
       + settingsKeys.map(function(k){ return '<label class="field"><span>'+esc(k[1])+'</span><input type="number" data-setting="'+k[0]+'" value="'+regola(k[0])+'"></label>'; }).join("")
-      + '</div><button class="btn sm" id="a-save-settings">Salva parametri</button>'
+      + '</div><button class="btn sm" id="a-save-settings">Salva parametri</button>',
+      "admin-sec-parametri"
+    );
+
+    // Il regolamento non prevede notifiche manuali: questa sezione è solo di
+    // lettura, per rivedere gli ultimi avvisi automatici generati dal
+    // sistema e vedere quanti giocatori hanno le notifiche disattivate.
+    var avvisiRecenti = state.chatMessages.filter(function(m){ return m.is_avviso; })
+      .slice().sort(function(a,b){ return new Date(b.created_at)-new Date(a.created_at); }).slice(0,15);
+    var attivi = state.profiles.filter(function(p){ return p.attivo; });
+    var notifOff = attivi.filter(function(p){ return p.notifiche_attive===false; }).length;
+    html += fieldset("Notifiche & Avvisi", ''
+      + '<p class="section-sub" style="margin-top:-4px;">Gli avvisi sono automatici (nessun invio manuale, come da regolamento). '+notifOff+' giocatori su '+attivi.length+' hanno le notifiche disattivate.</p>'
+      + (avvisiRecenti.length ? avvisiRecenti.map(function(m){
+          return '<div class="banner"><span>'+esc(m.testo)+(m.target_profile_id?' <span class="badge ok">personale</span>':'')+'</span><span class="muted" style="font-size:12px;white-space:nowrap;">'+esc(fmtDateTime(m.created_at))+'</span></div>';
+        }).join("") : '<p class="section-sub">Nessun avviso ancora.</p>'),
+      "admin-sec-notifiche"
+    );
+
+    // Strumenti di correzione: la specifica non dettaglia il contenuto di
+    // questa sezione oltre al nome, quindi qui copro il caso più concreto
+    // già previsto dal regolamento ("l'Admin può correggere"): annullare
+    // un'attivazione o un acquisto carta sbagliati.
+    var actRows = state.activations.slice().sort(function(a,b){ return new Date(b.creato_il||0)-new Date(a.creato_il||0); }).map(function(a){
+      var ep = byId(state.episodes, a.episode_id);
+      var t = byId(state.teams, a.team_id);
+      var ct = state.cardTypes.filter(function(c){return c.key===a.card_key;})[0];
+      return '<div class="banner"><span>'+(ep?"Puntata "+ep.numero:"—")+' — '+esc(t?displayName(t):"?")+' — '+esc(ct?ct.label:a.card_key)+'</span><button class="btn sm ghost" data-remove-act="'+a.id+'" style="display:inline-flex;align-items:center;gap:5px;"><img src="ico-cestino.png" alt="" style="width:14px;height:14px;object-fit:contain;">Annulla</button></div>';
+    }).join("") || '<p class="section-sub">Nessuna attivazione registrata.</p>';
+    var purRows = state.purchases.slice().map(function(p){
+      var t = byId(state.teams, p.team_id);
+      var ct = state.cardTypes.filter(function(c){return c.key===p.card_key;})[0];
+      var hasAct = state.activations.some(function(a){ return a.team_id===p.team_id && a.card_key===p.card_key; });
+      return '<div class="banner"><span>'+esc(t?displayName(t):"?")+' — '+esc(ct?ct.label:p.card_key)+'</span>'
+        + (hasAct ? '<span class="muted" style="font-size:12px;">Già attivata: annulla prima quella</span>' : '<button class="btn sm ghost" data-remove-purchase="'+p.id+'" style="display:inline-flex;align-items:center;gap:5px;"><img src="ico-cestino.png" alt="" style="width:14px;height:14px;object-fit:contain;">Annulla acquisto</button>')
+        + '</div>';
+    }).join("") || '<p class="section-sub">Nessun acquisto registrato.</p>';
+    html += fieldset("Strumenti Admin", ''
+      + '<h4 style="margin:0 0 6px;font-size:13.5px;color:var(--gold-strong);">Correggi attivazioni carte</h4>' + actRows
+      + '<h4 style="margin:14px 0 6px;font-size:13.5px;color:var(--gold-strong);">Correggi acquisti carte</h4>' + purRows,
+      "admin-sec-strumenti"
     );
 
     el.innerHTML = html;
@@ -676,6 +2466,24 @@
 
   function bindAdminEvents(){
     var g = function(id){ return document.getElementById(id); };
+    document.querySelectorAll("[data-goto]").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        var target = g(btn.getAttribute("data-goto"));
+        if (target){ target.open = true; target.scrollIntoView({behavior:"smooth", block:"start"}); }
+      });
+    });
+    document.querySelectorAll("[data-remove-act]").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        if (!confirm("Annullare questa attivazione? La carta tornerà disponibile per l'uso.")) return;
+        sb.from("card_activations").delete().eq("id", btn.getAttribute("data-remove-act")).then(afterWrite("Attivazione annullata."));
+      });
+    });
+    document.querySelectorAll("[data-remove-purchase]").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        if (!confirm("Annullare questo acquisto carta?")) return;
+        sb.from("card_purchases").delete().eq("id", btn.getAttribute("data-remove-purchase")).then(afterWrite("Acquisto annullato."));
+      });
+    });
     g("a-save-meta") && g("a-save-meta").addEventListener("click", function(){
       sb.from("league_meta").update({nome_lega:g("a-nome-lega").value.trim(), stagione_label:g("a-stagione").value.trim()}).eq("id", true).then(afterWrite("Impostazioni salvate."));
     });
@@ -685,6 +2493,52 @@
     g("a-toggle-ombra") && g("a-toggle-ombra").addEventListener("click", function(){
       if (!confirm("Confermi la rivelazione/nascondimento degli Chef Ombra?")) return;
       sb.from("league_meta").update({ombra_svelato: !state.meta.ombra_svelato}).eq("id", true).then(afterWrite("Fatto."));
+    });
+    g("a-new-pw-gen") && g("a-new-pw-gen").addEventListener("click", function(){ g("a-new-password").value = genPassword(); });
+    g("a-create-player") && g("a-create-player").addEventListener("click", function(){
+      var username = g("a-new-username").value.trim();
+      var displayName = g("a-new-displayname").value.trim();
+      var teamName = g("a-new-teamname").value.trim();
+      var password = g("a-new-password").value;
+      if (!username || !teamName || password.length<6){ toast("Username, nome squadra e password (almeno 6 caratteri) sono obbligatori."); return; }
+      if (!confirm('Confermi la creazione dell\'account "'+username+'" e della squadra "'+teamName+'"?')) return;
+      // Account e squadra vengono creati insieme in un'unica operazione atomica
+      // lato server (Edge Function admin-manage-user): se la squadra non può
+      // essere creata, l'account appena creato viene eliminato automaticamente,
+      // cosi' non resta mai un profilo "orfano" senza squadra.
+      callAdminManage({action:"create", username:username, display_name:displayName, password:password, team_name:teamName}).then(function(res){
+        if (res.status!==200 || !res.body || !res.body.ok){
+          toast("Creazione non riuscita: " + ((res.body&&res.body.error)||"errore sconosciuto"));
+          return;
+        }
+        reload('Giocatore "'+username+'" creato.');
+      }).catch(function(){ toast("Creazione non riuscita: errore di rete."); });
+    });
+    document.querySelectorAll("[data-reset-pw]").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        var id = btn.getAttribute("data-reset-pw");
+        var pw = prompt("Nuova password per questo account (almeno 6 caratteri). Puoi lasciare quella proposta oppure sceglierne un'altra:", genPassword());
+        if (pw===null) return;
+        if (pw.length<6){ toast("La password deve avere almeno 6 caratteri."); return; }
+        if (!confirm("Confermi il reset della password? Comunicala tu stesso al giocatore.")) return;
+        callAdminManage({action:"reset_password", target_user_id:id, password:pw}).then(function(res){
+          if (res.status!==200 || !res.body || !res.body.ok){ toast("Reset non riuscito: " + ((res.body&&res.body.error)||"errore sconosciuto")); return; }
+          toast("Password aggiornata.");
+        });
+      });
+    });
+    document.querySelectorAll("[data-toggle-active]").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        var id = btn.getAttribute("data-toggle-active");
+        var p = state.profiles.filter(function(x){ return x.id===id; })[0];
+        if (!p) return;
+        var next = !p.attivo;
+        if (!confirm((next?"Riattivare":"Disattivare")+' l\'account di "'+p.display_name+'"?')) return;
+        callAdminManage({action:"set_active", target_user_id:id, attivo:next}).then(function(res){
+          if (res.status!==200 || !res.body || !res.body.ok){ toast("Operazione non riuscita: " + ((res.body&&res.body.error)||"errore sconosciuto")); return; }
+          reload("Fatto.");
+        });
+      });
     });
     g("a-add-conc") && g("a-add-conc").addEventListener("click", function(){
       var name = g("a-new-conc").value.trim(); if (!name) return;
@@ -696,6 +2550,13 @@
         sb.from("concorrenti").update({eliminato: !c.eliminato}).eq("id", c.id).then(afterWrite("Fatto."));
       });
     });
+    document.querySelectorAll("[data-player-name]").forEach(function(inp){
+      inp.addEventListener("change", function(){
+        var val = inp.value.trim();
+        if (!val){ toast("Il nome non può essere vuoto."); return; }
+        sb.from("profiles").update({display_name:val}).eq("id", inp.getAttribute("data-player-name")).then(afterWrite("Salvato."));
+      });
+    });
     document.querySelectorAll("[data-team-name]").forEach(function(inp){
       inp.addEventListener("change", function(){ sb.from("teams").update({nome_squadra:inp.value.trim()}).eq("id", inp.getAttribute("data-team-name")).then(afterWrite("Salvato.")); });
     });
@@ -705,24 +2566,58 @@
     document.querySelectorAll("[data-team-entry]").forEach(function(inp){
       inp.addEventListener("change", function(){ sb.from("teams").update({punti_ingresso:Number(inp.value)||0}).eq("id", inp.getAttribute("data-team-entry")).then(afterWrite("Salvato.")); });
     });
-    document.querySelectorAll("[data-brigata]").forEach(function(sel){
-      sel.addEventListener("change", function(){
-        var teamId = sel.getAttribute("data-team");
-        upsertTeamChef(teamId, sel.value, "brigata");
+    document.querySelectorAll("[data-save-team-brigata]").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        var teamId = btn.getAttribute("data-save-team-brigata");
+        var block = btn.closest("[data-team-block]");
+        var ids = Array.prototype.map.call(block.querySelectorAll("[data-team-brigata]"), function(sel){ return sel.value; });
+        saveBrigata(teamId, ids, "Brigata salvata.");
+      });
+    });
+    document.querySelectorAll("[data-team-scadenza-brigata]").forEach(function(inp){
+      inp.addEventListener("change", function(){
+        sb.from("teams").update({brigata_scadenza_personale: inp.value || null}).eq("id", inp.getAttribute("data-team-scadenza-brigata")).then(afterWrite("Salvato."));
+      });
+    });
+    document.querySelectorAll("[data-save-team-sostituto]").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        var teamId = btn.getAttribute("data-save-team-sostituto");
+        var sel = document.querySelector('[data-team-sostituto="'+teamId+'"]');
+        var newId = sel ? sel.value : "";
+        if (!newId){ toast("Scegli il nuovo Chef."); return; }
+        if (!confirm("Registrare questa sostituzione di gennaio per questa squadra? È un'operazione una tantum: dopo non se ne potranno registrare altre, salvo usare \"Annulla sostituzione\".")) return;
+        sb.from("team_chefs").insert({team_id:teamId, concorrente_id:newId, ruolo:"sostituto"}).then(function(res){
+          if (res.error){ toast("Errore: " + res.error.message); return; }
+          reload("Sostituzione registrata.");
+        });
+      });
+    });
+    document.querySelectorAll("[data-undo-sostituzione]").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        var teamId = btn.getAttribute("data-undo-sostituzione");
+        var rowId = btn.getAttribute("data-sost-row");
+        if (!confirm("Annullare la sostituzione di gennaio di questa squadra? Il giocatore potrà eventualmente rifarla da capo.")) return;
+        // Operazione atomica lato database (RPC admin_undo_sostituzione): rimuove il
+        // sostituto e resetta il flag "usata" in un'unica transazione, così un errore
+        // a metà non lascia mai la squadra senza sostituto e bloccata per sempre.
+        sb.rpc("admin_undo_sostituzione", {p_team_id: teamId, p_team_chefs_id: rowId}).then(afterWrite("Sostituzione annullata."));
       });
     });
     document.querySelectorAll("[data-ombra]").forEach(function(sel){
       sel.addEventListener("change", function(){
         var teamId = sel.getAttribute("data-team");
-        // rimuove il precedente ombra e ne imposta uno nuovo
-        var prev = state.teamChefs.filter(function(tc){return tc.team_id===teamId && tc.ruolo==="ombra";});
-        Promise.all(prev.map(function(tc){ return sb.from("team_chefs").delete().eq("id", tc.id); })).then(function(){
-          if (!sel.value){ afterWrite("Fatto.")(); return; }
-          sb.from("team_chefs").insert({team_id:teamId, concorrente_id:sel.value, ruolo:"ombra"}).then(afterWrite("Fatto."));
-        });
+        // Sostituzione atomica lato database (RPC admin_set_ombra): rimuove il vecchio
+        // Chef Ombra e imposta il nuovo (o nessuno) in un'unica transazione, così un
+        // errore a metà non lascia mai la squadra senza alcun Chef Ombra assegnato.
+        sb.rpc("admin_set_ombra", {p_team_id: teamId, p_concorrente_id: sel.value || null}).then(afterWrite("Fatto."));
       });
     });
-    document.querySelectorAll("[data-edit-ep]").forEach(function(b){ b.addEventListener("click", function(){ state._editingEp = b.getAttribute("data-edit-ep"); renderAdmin(); }); });
+    document.querySelectorAll("[data-edit-ep]").forEach(function(b){ b.addEventListener("click", function(){
+      state._editingEp = b.getAttribute("data-edit-ep");
+      renderAdmin();
+      var target = g("admin-sec-nuova-puntata");
+      if (target) target.scrollIntoView({behavior:"smooth", block:"start"});
+    }); });
     g("a-cancel-ep") && g("a-cancel-ep").addEventListener("click", function(){ state._editingEp = null; renderAdmin(); });
     document.querySelectorAll("[data-confirm-ep]").forEach(function(b){
       b.addEventListener("click", function(){ sb.from("episodes").update({confermata:true}).eq("id", b.getAttribute("data-confirm-ep")).then(afterWrite("Puntata confermata.")); });
@@ -733,30 +2628,30 @@
     g("a-save-ep") && g("a-save-ep").addEventListener("click", function(){
       var numero = parseInt(g("a-ep-num").value,10);
       var data = g("a-ep-data").value || null;
+      var ora = g("a-ep-ora").value || null;
       if (!numero){ toast("Numero puntata mancante."); return; }
       var editing = state._editingEp ? byId(state.episodes, state._editingEp) : null;
-      var doAfter = function(episodeId){
-        var rows = state.concorrenti.filter(function(c){return !c.eliminato;}).map(function(c){
-          var mb = document.querySelector('[data-ev-mb="'+c.id+'"]').checked;
-          var est = document.querySelector('[data-ev-est="'+c.id+'"]').checked;
-          var cuc = document.querySelector('[data-ev-cuc="'+c.id+'"]').checked;
-          var mp = document.querySelector('[data-ev-mp="'+c.id+'"]').checked;
-          var pen = document.querySelector('[data-ev-pen="'+c.id+'"]').value || null;
-          return {episode_id:episodeId, concorrente_id:c.id, mystery_box:mb, vince_esterna:est, vince_cucina:cuc, miglior_piatto:mp, penalita:pen};
-        });
-        sb.from("episode_events").upsert(rows, {onConflict:"episode_id,concorrente_id"}).then(function(){
-          state._editingEp = null;
-          afterWrite("Puntata salvata.")();
-        });
-      };
-      if (editing){
-        sb.from("episodes").update({data:data}).eq("id", editing.id).then(function(){ doAfter(editing.id); });
-      } else {
-        sb.from("episodes").insert({numero:numero, data:data, confermata:false}).select().single().then(function(res){
-          if (res.error){ toast(res.error.message); return; }
-          doAfter(res.data.id);
-        });
-      }
+      var events = state.concorrenti.filter(function(c){return !c.eliminato;}).map(function(c){
+        return {
+          concorrente_id: c.id,
+          mystery_box: document.querySelector('[data-ev-mb="'+c.id+'"]').checked,
+          vince_esterna: document.querySelector('[data-ev-est="'+c.id+'"]').checked,
+          vince_cucina: document.querySelector('[data-ev-cuc="'+c.id+'"]').checked,
+          miglior_piatto: document.querySelector('[data-ev-mp="'+c.id+'"]').checked,
+          penalita: document.querySelector('[data-ev-pen="'+c.id+'"]').value || null
+        };
+      });
+      // Salvataggio atomico lato database (RPC admin_save_episode): la puntata e
+      // TUTTI gli eventi vengono scritti in un'unica transazione, così un errore a
+      // metà non lascia mai data/ora aggiornate con eventi non salvati (o viceversa).
+      sb.rpc("admin_save_episode", {
+        p_episode_id: editing ? editing.id : null,
+        p_numero: numero, p_data: data, p_ora: ora, p_events: events
+      }).then(function(res){
+        if (res.error){ toast("Errore: " + res.error.message); return; }
+        state._editingEp = null;
+        afterWrite("Puntata salvata.")(res);
+      });
     });
     g("a-save-act") && g("a-save-act").addEventListener("click", function(){
       var payload = {
@@ -779,11 +2674,55 @@
       loadEverything();
     };
   }
-  function upsertTeamChef(teamId, concorrenteId, ruolo){
-    var existing = state.teamChefs.filter(function(tc){ return tc.team_id===teamId && tc.ruolo===ruolo; });
-    Promise.all(existing.map(function(tc){ return sb.from("team_chefs").delete().eq("id", tc.id); })).then(function(){
-      if (!concorrenteId){ afterWrite("Fatto.")(); return; }
-      sb.from("team_chefs").insert({team_id:teamId, concorrente_id:concorrenteId, ruolo:ruolo}).then(afterWrite("Fatto."));
+  function reload(msg){ toast(msg); loadEverything(); }
+
+  /* ============ admin: gestione account giocatori ============ */
+  // Nessuna registrazione pubblica: gli account (username + password) sono
+  // creati e resettati solo dall'Admin, tramite la funzione server-side
+  // "admin-manage-user" (l'email interna di Supabase Auth non è mai
+  // visibile qui: la gestisce solo la funzione, con la service-role key).
+  function genPassword(){
+    var alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789";
+    var out = "";
+    for (var i=0;i<10;i++){ out += alphabet.charAt(Math.floor(Math.random()*alphabet.length)); }
+    return out;
+  }
+  function callAdminManage(payload){
+    return fetch(SUPABASE_URL + "/functions/v1/admin-manage-user", {
+      method: "POST",
+      headers: {"Content-Type":"application/json", "apikey":SUPABASE_KEY, "Authorization":"Bearer "+state.session.access_token},
+      body: JSON.stringify(payload)
+    }).then(function(r){
+      return r.json().then(function(body){ return {status:r.status, body:body}; });
+    });
+  }
+  // Salva l'intera Brigata (fino a 3 Chef) come insieme coerente: calcola il
+  // differenziale rispetto a quella attuale e rimuove prima, aggiunge dopo,
+  // così il conteggio "massimo 3" lato database non scatta mai per errore
+  // durante il salvataggio. Usata sia dal giocatore (Squadra) sia dall'Admin.
+  // Il salvataggio della Brigata (rimuovi i vecchi Chef, aggiungi i nuovi) avviene
+  // in un'UNICA chiamata atomica lato database (RPC replace_brigata): se una
+  // qualunque regola non è rispettata (scadenza, max 3, Chef eliminato...) NON
+  // viene tolto nessuno dei Chef attuali — niente più stati intermedi con la
+  // Brigata a metà in caso di doppio click, rete lenta o errore a metà salvataggio.
+  function saveBrigata(teamId, rawIds, doneMsg){
+    var seen = {};
+    var wanted = [];
+    (rawIds||[]).forEach(function(id){
+      if (!id || seen[id]) return;
+      seen[id] = true;
+      wanted.push(id);
+    });
+    var saveBtn = document.getElementById("sq-save-brigata");
+    if (saveBtn){ if (saveBtn.disabled) return; saveBtn.disabled = true; }
+    sb.rpc("replace_brigata", {p_team_id: teamId, p_concorrente_ids: wanted}).then(function(res){
+      if (res.error){
+        toast("Errore: " + res.error.message);
+        if (saveBtn) saveBtn.disabled = false;
+        return;
+      }
+      state._editingBrigata = false;
+      afterWrite(doneMsg||"Fatto.")(res);
     });
   }
 
@@ -795,13 +2734,20 @@
       document.getElementById("card-lightbox").classList.add("open");
       return;
     }
+    var ci = ev.target.closest(".chat-img");
+    if (ci){
+      document.getElementById("card-lightbox-img").src = ci.getAttribute("src");
+      document.getElementById("card-lightbox-img").alt = "";
+      document.getElementById("card-lightbox").classList.add("open");
+      return;
+    }
     if (ev.target.closest("#card-lightbox")){
       document.getElementById("card-lightbox").classList.remove("open");
     }
   });
 
   function renderAll(){
-    renderHome(); renderSquadra(); renderConcorrenti(); renderPuntate(); renderCarte(); renderRegolamento(); renderAdmin();
+    renderHome(); renderClassifica(); renderSquadra(); renderConcorrenti(); renderPuntate(); renderCarte(); renderChat(); renderRegolamento(); renderAdmin();
     selectTab(state.activeTab);
   }
 
@@ -810,6 +2756,15 @@
     if (res.data.session){ onAuthed(); }
   });
 })();
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('./service-worker.js').catch(function(err){
+      console.warn('Service worker non registrato:', err);
+    });
+  });
+}
 </script>
 </body>
 </html>
