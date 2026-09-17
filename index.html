@@ -1449,13 +1449,13 @@
     var dl = brigataDeadlineFor(team);
     var editing = !!state._editingBrigata;
 
-    // 1) essenziale: nome squadra + tre numeri chiave, un solo colpo d'occhio
-    var html = '<div class="section-head" style="margin-bottom:12px;"><div><h2>'+esc(displayName(team))+'</h2></div></div>';
+    // 1) essenziale: nome squadra + numeri chiave, un solo colpo d'occhio
+    var html = '<div class="screen-head"><img src="char-brigata.png" alt="" class="screen-head-icon"><div><h2>Brigata</h2><p class="section-sub">'+esc(displayName(team))+'</p></div></div>';
     html += '<div class="stat-row">'
       + '<div class="stat-cell"><div class="section-sub">Posizione</div><div class="stat-val">'+(row?"#"+row.pos:"—")+'</div></div>'
       + '<div class="stat-cell"><div class="section-sub">Punti</div><div class="stat-val">'+(row?fmtNum(row.total):"0")+'</div></div>'
-      + '<div class="stat-cell"><div class="section-sub">Stelle</div><div class="stat-val"><img src="ico-stelle.png" alt="" style="width:17px;height:17px;object-fit:contain;">'+remaining+'/'+(team.stelle_acquistate||1)+'</div></div>'
       + '</div>';
+    html += '<div class="card stars-card"><img src="ico-stelle.png" alt=""><div><div class="stars-label">Stelle disponibili</div><div class="stars-val">'+remaining+' / '+(team.stelle_acquistate||1)+'</div></div></div>';
 
     // 2) azione principale di questa schermata: la Brigata
     html += '<div class="card" style="padding:16px 16px 15px; margin-bottom:16px;">'
@@ -1532,6 +1532,7 @@
       html += '</div>';
     }
     html += '</div>';
+    html += '<div class="section-quote">"Tre Chef, un’unica Brigata: la vittoria si costruisce insieme." ♥</div>';
 
     el.innerHTML = html;
     bindSquadraEvents();
