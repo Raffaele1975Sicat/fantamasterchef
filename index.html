@@ -524,7 +524,7 @@
 
 
 /* =========================================================
-   HOME V6 — ILLUSTRATED KITCHEN / MOBILE FIRST
+   HOME V7 — ILLUSTRATED KITCHEN / MOBILE FIRST
    Final visual pass: preserve all application logic.
    ========================================================= */
 .home-v2{width:100%;max-width:1120px;margin:0 auto;padding:0 0 10px;}
@@ -547,9 +547,10 @@
 .home-v2 .home-quote{margin:0 6px 5px;padding:10px 12px;border-radius:12px;border:2px solid #9a7734;box-shadow:0 5px 12px rgba(0,0,0,.3);}
 @media(max-width:700px){
   .home-v2{padding-bottom:8px;}
-  .home-v2 .home-welcome{height:270px;min-height:270px;margin:0 0 10px;border-radius:18px;border-width:2px;}
-  .home-v2 .home-welcome-img{object-position:center center;}
-  .home-v2 .home-welcome-shade{background:linear-gradient(180deg,rgba(10,5,2,.01),rgba(10,5,2,.04) 65%,rgba(10,5,2,.24));}
+  /* V7: mobile hero keeps the complete illustration visible; no horizontal crop. */
+  .home-v2 .home-welcome{height:238px;min-height:238px;margin:0 0 10px;border-radius:18px;border-width:2px;background:#3b2110;}
+  .home-v2 .home-welcome-img{object-fit:contain;object-position:center center;background:#3b2110;}
+  .home-v2 .home-welcome-shade{background:linear-gradient(180deg,rgba(10,5,2,.01),rgba(10,5,2,.02) 70%,rgba(10,5,2,.18));}
   .home-v2 .home-actions{margin:0 0 10px;padding:8px;gap:8px;grid-template-columns:repeat(2,minmax(0,1fr));border-radius:16px;}
   .home-v2 .home-action{min-height:114px;height:114px;padding:10px 7px 8px;border-radius:13px;}
   .home-v2 .home-action-icon{width:43px;height:43px;margin-bottom:6px;}
@@ -564,7 +565,7 @@
   .home-v2 .home-quote{margin:0 0 4px;padding:9px 10px;font-size:12px;}
 }
 @media(max-width:389px){
-  .home-v2 .home-welcome{height:245px;min-height:245px;}
+  .home-v2 .home-welcome{height:220px;min-height:220px;}
   .home-v2 .home-actions{gap:7px;padding:7px;}
   .home-v2 .home-action{height:108px;min-height:108px;padding:9px 5px 7px;}
   .home-v2 .home-action-icon{width:39px;height:39px;}
