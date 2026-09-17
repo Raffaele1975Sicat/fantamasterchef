@@ -2020,7 +2020,7 @@
       reactionsByMsg[r.message_id][r.emoji].push(r.profile_id);
     });
 
-    var html = '<div class="chat-top"><img src="char-chat.png" alt=""><div class="chat-top-title"><h2>Chat</h2><span>Messaggi visibili 20 giorni</span></div>'
+    var html = '<div class="screen-head"><img src="char-chat.png" alt="" class="screen-head-icon"><div style="flex:1;min-width:0;"><h2>Chat</h2><p class="section-sub">Messaggi visibili 20 giorni</p></div>'
       + '<label class="chat-notif-toggle" title="Notifiche per gli avvisi importanti"><input type="checkbox" id="chat-notif-toggle" '+(state.profile.notifiche_attive?"checked":"")+'><span class="bell">🔔</span></label>'
       + '</div>';
 
