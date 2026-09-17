@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>Fanta MasterChef</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#151109">
@@ -34,8 +34,26 @@
   a{color:var(--gold-strong);}
   button{font-family:inherit; cursor:pointer;}
   .hidden{display:none !important;}
-  #auth-screen{min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px;
-    background:radial-gradient(900px 600px at 20% -10%, #241708 0%, transparent 60%), radial-gradient(800px 600px at 100% 0%, #1e1409 0%, transparent 55%), var(--bg);}
+  #auth-screen{min-height:100vh; min-height:100dvh; display:flex; align-items:center; justify-content:center; padding:28px 16px;
+    background-image:url(bg-legno-texture.png); background-size:240px; background-repeat:repeat; position:relative;}
+  #auth-screen:before{content:""; position:fixed; inset:0; background:rgba(10,6,3,.55); pointer-events:none;}
+  .auth-wrap{max-width:400px; width:100%; position:relative; z-index:1;}
+  .auth-hero{position:relative; width:82%; margin:0 auto; z-index:2;}
+  .auth-hero .auth-sign{display:block; width:100%; height:auto; filter:drop-shadow(0 6px 12px rgba(0,0,0,.45));}
+  .auth-sign-text{position:absolute; left:15%; right:12%; top:26%; bottom:24%; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; color:#2b1a0d;}
+  .auth-sign-text h1{font-family:'Fraunces',serif; font-size:clamp(15px,5vw,23px); line-height:1.05; margin:0 0 3px;}
+  .auth-sign-text small{font-family:'Work Sans',sans-serif; font-weight:500; color:#5a3c22; font-size:clamp(8px,2.3vw,11px); line-height:1.15;}
+  .auth-mascotte{position:absolute; right:-6%; bottom:-8%; width:34%; filter:drop-shadow(-5px 5px 8px rgba(0,0,0,.45));}
+  .auth-board{position:relative; z-index:1; margin:-9% 0 0; padding:28px 20px 22px; background-image:url(bg-pergamena-texture.png); background-size:220px; background-repeat:repeat; border:2px solid #a27d3e; border-radius:16px; box-shadow:0 12px 28px rgba(0,0,0,.4); color:#2b1a0d;}
+  .auth-illus-sm{width:46px; height:46px; object-fit:cover; border-radius:50%; border:2px solid #a27d3e; display:block; margin:0 auto 10px; box-shadow:0 3px 8px rgba(0,0,0,.3);}
+  .auth-board h2{font-family:'Fraunces',serif; text-align:center; margin:0 0 4px; font-size:21px;}
+  .auth-board .auth-sub{text-align:center; color:#5a3c22; font-size:12.5px; margin:0 0 18px;}
+  #auth-screen .field label{color:#6b4a26;}
+  #auth-screen .field input{background:rgba(255,255,255,.55); border:1px solid #b99a5c; color:#2b1a0d;}
+  #auth-screen .tabs-link{color:#6b4a26;}
+  #auth-screen .tabs-link span{color:#8a5a1e;}
+  .auth-quote{text-align:center; font-family:'Fraunces',serif; font-size:12.5px; color:#5a3c22; margin:14px 0 0;}
+  @media (max-width:360px){ .auth-board{padding:22px 16px 18px;} }
   .card{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:20px;}
   .auth-card{max-width:380px; width:100%; position:relative; border-top:2px solid var(--gold-dim);}
   .field{margin-bottom:12px; display:flex; flex-direction:column; gap:4px;}
@@ -466,18 +484,24 @@
 <div id="card-lightbox"><img id="card-lightbox-img" src="" alt=""></div>
 
 <div id="auth-screen">
-  <div class="card auth-card">
-    <img src="char-login.png" alt="" class="hero-illus sm" id="auth-illus" style="margin-bottom:6px;">
-    <img src="logo-auth.png" alt="Fanta MasterChef" style="display:block;margin:0 auto 14px;max-width:220px;width:60%;height:auto;">
-    <h1 style="text-align:center;">Fanta MasterChef</h1>
-    <p class="section-sub" style="text-align:center; margin-bottom:18px;">Stagione 2026/2027</p>
-
-    <div id="login-form">
-      <div class="field"><label>Username</label><input type="text" id="login-username" autocomplete="username" autocapitalize="none" autocorrect="off"></div>
-      <div class="field"><label>Password</label><input type="password" id="login-password" autocomplete="current-password"></div>
-      <button class="btn primary block" id="login-btn">Accedi</button>
-      <p class="err hidden" id="login-error"></p>
-      <p class="tabs-link">Account smarrito o nuovo? Chiedi all'Admin della lega.</p>
+  <div class="auth-wrap">
+    <div class="auth-hero">
+      <img class="auth-sign" src="deco-insegna.png" alt="">
+      <div class="auth-sign-text"><h1>Fanta MasterChef</h1><small>Stagione 2026/2027</small></div>
+      <img class="auth-mascotte" src="char-mascotte-base.png" alt="">
+    </div>
+    <div class="auth-board">
+      <img src="char-login.png" alt="" class="auth-illus-sm" id="auth-illus">
+      <h2>Bentornato, Chef!</h2>
+      <p class="auth-sub">Accedi con le tue credenziali</p>
+      <div id="login-form">
+        <div class="field"><label>Username</label><input type="text" id="login-username" autocomplete="username" autocapitalize="none" autocorrect="off"></div>
+        <div class="field"><label>Password</label><input type="password" id="login-password" autocomplete="current-password"></div>
+        <button class="btn primary block" id="login-btn">Accedi</button>
+        <p class="err hidden" id="login-error"></p>
+        <p class="tabs-link">Account smarrito o nuovo? Chiedi all'Admin della lega.</p>
+      </div>
+      <p class="auth-quote">"La cucina è più bella quando la si condivide." ♥</p>
     </div>
   </div>
 </div>
