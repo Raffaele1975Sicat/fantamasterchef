@@ -342,6 +342,8 @@
   details.admin-disclosure summary{list-style:none; cursor:pointer; display:flex; align-items:center; justify-content:space-between; gap:10px; padding:14px 16px; -webkit-tap-highlight-color:transparent;}
   details.admin-disclosure summary::-webkit-details-marker{display:none;}
   details.admin-disclosure summary h3{margin:0; font-size:14.5px;}
+  .reg-topic{display:flex; align-items:center; gap:9px; min-width:0;}
+  .reg-topic-ico{width:22px; height:22px; object-fit:contain; flex:0 0 auto;}
   details.admin-disclosure summary .chev{color:var(--gold-strong); font-size:15px; transition:transform .2s ease; flex:0 0 auto;}
   details.admin-disclosure[open] summary .chev{transform:rotate(90deg);}
   details.admin-disclosure summary{border-bottom:1px solid transparent;}
@@ -2240,13 +2242,13 @@
   function renderRegolamento(){
     var maxSpend = regola("costo_stella_eur",10) * regola("max_stelle",5);
     var html = '<div class="screen-head"><img src="hero-regolamento.png" alt="" class="screen-head-icon"><div><h2>Regolamento</h2><p class="section-sub">Tocca un argomento per aprirlo.</p></div></div>';
-    html += '<details class="admin-disclosure" open><summary><h3>Come si fanno i punti</h3><span class="chev">›</span></summary><div class="disclosure-body">'
+    html += '<details class="admin-disclosure" open><summary><span class="reg-topic"><img src="ico-trofeo.png" alt="" class="reg-topic-ico"><h3>Come si fanno i punti</h3></span><span class="chev">›</span></summary><div class="disclosure-body">'
       + '<p class="section-sub">Bonus: Mystery Box +'+regola("bonus_mystery_box",3)+' · Esterna +'+regola("bonus_esterna",4)+' · Cucina +'+regola("bonus_cucina",4)+' · Miglior piatto +'+regola("bonus_miglior_piatto",2)+'</p>'
       + '<p class="section-sub">Penalità: Grembiule Nero '+regola("penalita_nero",-3)+' · Persa Esterna '+regola("penalita_esterna",-2)+' (non cumulabili tra loro)</p>'
       + '<p class="section-sub" style="margin-bottom:0;">Sono ammessi mezzi punti dove previsto dalle carte.</p></div></details>';
-    html += '<details class="admin-disclosure"><summary><h3>Stelle</h3><span class="chev">›</span></summary><div class="disclosure-body">'
+    html += '<details class="admin-disclosure"><summary><span class="reg-topic"><img src="ico-stelle.png" alt="" class="reg-topic-ico"><h3>Stelle</h3></span><span class="chev">›</span></summary><div class="disclosure-body">'
       + '<p class="section-sub" style="margin-bottom:0;">€'+regola("costo_stella_eur",10)+' = 1★. Massimo '+regola("max_stelle",5)+'★ (tetto €'+maxSpend+') per Stelle e Carte.</p></div></details>';
-    html += '<details class="admin-disclosure"><summary><h3>Chef Ombra</h3><span class="chev">›</span></summary><div class="disclosure-body">'
+    html += '<details class="admin-disclosure"><summary><span class="reg-topic"><img src="ico-lucchetto.png" alt="" class="reg-topic-ico"><h3>Chef Ombra</h3></span><span class="chev">›</span></summary><div class="disclosure-body">'
       + '<p class="section-sub" style="margin-bottom:0;">Quarto Chef segreto, costa 2★. Punti calcolati da subito ma mostrati e conteggiati in classifica solo al 31/01/2027.</p></div></details>';
     document.getElementById("panel-regolamento").innerHTML = html;
   }
