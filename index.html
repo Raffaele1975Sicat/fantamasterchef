@@ -486,6 +486,8 @@
 
 .home-v3 .home-profile-badge{position:absolute;right:18px;top:18px;z-index:10;display:flex;align-items:center;gap:8px;padding:5px 12px 5px 5px;background:rgba(28,17,9,.82);border:2px solid rgba(232,194,106,.75);border-radius:999px;color:#fff3d6;box-shadow:0 5px 14px rgba(0,0,0,.45);backdrop-filter:blur(3px);}
 .home-v3 .home-profile-badge img{width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid #e8c26a;background:#3a2110;}
+.avatar-edit-wrap{position:relative;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.avatar-edit-pin{position:absolute;right:-2px;bottom:-2px;width:17px;height:17px;border-radius:50%;background:var(--gold);color:#2a1a08;font-size:10px;display:flex;align-items:center;justify-content:center;border:1.5px solid #2a1a08;}
 .home-v3 .home-profile-badge div{display:flex;flex-direction:column;line-height:1.02;min-width:72px;}
 .home-v3 .home-profile-badge small{font-family:'Work Sans',sans-serif;font-size:10px;color:#e7d6b3;}
 .home-v3 .home-profile-badge b{font-family:'Fraunces',serif;font-size:17px;color:#fff5df;}
@@ -818,7 +820,7 @@
       sb.from("league_meta").select("*").single(),
       sb.from("settings").select("*"),
       sb.from("concorrenti").select("*").order("nome"),
-      sb.from("teams").select("*, profiles(display_name, username)"),
+      sb.from("teams").select("*, profiles(display_name, username, avatar_url)"),
       sb.from("team_chefs").select("*"),
       sb.from("episodes").select("*").order("numero"),
       sb.from("episode_events").select("*"),
@@ -1011,6 +1013,15 @@
     for (var i=0; i<s.length; i++){ hash = s.charCodeAt(i) + ((hash<<5)-hash); }
     var hue = Math.abs(hash) % 360;
     return 'hsl('+hue+',44%,36%)';
+  }
+  // Mostra la foto vera del giocatore, se ne ha caricata una; altrimenti il
+  // pallino colorato con l'iniziale (comportamento di sempre, invariato).
+  function teamAvatarHtml(team){
+    var url = team.profiles && team.profiles.avatar_url;
+    if (url){
+      return '<img class="classifica-avatar" src="'+esc(url)+'" alt="" style="object-fit:cover;">';
+    }
+    return '<div class="classifica-avatar" style="background:'+teamAvatarColor(team.id)+';">'+esc(displayName(team).charAt(0).toUpperCase())+'</div>';
   }
   function concorrenteName(id){ var c = byId(state.concorrenti, id); return c?c.nome:"—"; }
 
@@ -1333,7 +1344,11 @@
     var myCards = team ? state.purchases.filter(function(p){ return p.team_id===team.id; }).length : 0;
     var displayName = state.profile && state.profile.display_name ? esc(state.profile.display_name) : '';
     var html = '<div class="home-v3">';
-    html += '<div class="home-profile-badge"><img src="char-profilo.png" alt=""><div><small>Ciao</small><b>'+ (displayName||'Chef') +'</b></div></div>';
+    var myAvatarUrl = state.profile && state.profile.avatar_url;
+    html += '<div class="home-profile-badge"><div class="avatar-edit-wrap" id="my-avatar-badge" title="Cambia la tua foto"><img src="'+(myAvatarUrl?esc(myAvatarUrl):'char-profilo.png')+'" alt=""><span class="avatar-edit-pin">✎</span></div>'
+      + '<div><small>Ciao</small><b>'+ (displayName||'Chef') +'</b></div>'
+      + '<input type="file" accept="image/*" id="avatar-file-input" class="hidden">'
+      + '</div>';
     html += '<div class="kitchen-hero">'
       + '<div class="hero-sign-wrap"><img src="deco-insegna.png" alt="">'
       + '<div class="hero-sign-text"><h1>'+esc(state.meta.nome_lega||'Fanta MasterChef')+'</h1><small>Una Brigata di amici, un piatto alla volta.</small></div></div>'
@@ -1366,6 +1381,54 @@
   function bindHomeEvents(){
     document.querySelectorAll("[data-goto]").forEach(function(el){
       el.addEventListener("click", function(){ selectTab(el.getAttribute("data-goto")); });
+    });
+    var avatarWrap = document.getElementById("my-avatar-badge");
+    var avatarInput = document.getElementById("avatar-file-input");
+    if (avatarWrap && avatarInput){
+      avatarWrap.addEventListener("click", function(){ avatarInput.click(); });
+      avatarInput.addEventListener("change", function(){
+        var file = avatarInput.files && avatarInput.files[0];
+        avatarInput.value = "";
+        if (!file) return;
+        if (!/^image\//.test(file.type)){ toast("Scegli una foto (immagine)."); return; }
+        if (file.size > 12*1024*1024){ toast("Foto troppo grande (massimo 12 MB)."); return; }
+        toast("Caricamento foto…");
+        resizeImageToBlob(file, 480, 0.85).then(function(blob){
+          var path = state.profile.id + "/avatar.jpg";
+          return sb.storage.from("avatars").upload(path, blob, {upsert:true, contentType:"image/jpeg"});
+        }).then(function(res){
+          if (res.error) throw res.error;
+          var pub = sb.storage.from("avatars").getPublicUrl(state.profile.id + "/avatar.jpg");
+          var url = pub.data.publicUrl + "?t=" + Date.now();
+          return sb.from("profiles").update({avatar_url:url}).eq("id", state.profile.id);
+        }).then(afterWrite("Foto profilo aggiornata!"))
+          .catch(function(err){ toast("Caricamento non riuscito: " + (err&&err.message?err.message:err)); });
+      });
+    }
+  }
+  // Ritaglia la foto al centro in un quadrato e la comprime, così le foto
+  // degli amici (scattate col telefono, spesso enormi) restano leggere.
+  function resizeImageToBlob(file, maxSize, quality){
+    return new Promise(function(resolve, reject){
+      var reader = new FileReader();
+      reader.onload = function(e){
+        var img = new Image();
+        img.onload = function(){
+          var side = Math.min(img.width, img.height);
+          var sx = (img.width-side)/2, sy = (img.height-side)/2;
+          var canvas = document.createElement("canvas");
+          canvas.width = maxSize; canvas.height = maxSize;
+          var ctx = canvas.getContext("2d");
+          ctx.drawImage(img, sx, sy, side, side, 0, 0, maxSize, maxSize);
+          canvas.toBlob(function(blob){
+            if (blob) resolve(blob); else reject(new Error("Conversione immagine non riuscita."));
+          }, "image/jpeg", quality);
+        };
+        img.onerror = function(){ reject(new Error("Immagine non valida.")); };
+        img.src = e.target.result;
+      };
+      reader.onerror = function(){ reject(new Error("Lettura del file non riuscita.")); };
+      reader.readAsDataURL(file);
     });
   }
 
@@ -1406,7 +1469,7 @@
         html += '<div class="classifica-row-card pos-'+r.pos+(mine?' mine':'')+(open?' open':'')+'">'
           + '<div class="classifica-row-head" data-team-row="'+r.team.id+'">'
           + '<div class="classifica-num">'+numHtml+'</div>'
-          + '<div class="classifica-avatar" style="background:'+teamAvatarColor(r.team.id)+';">'+esc(displayName(r.team).charAt(0).toUpperCase())+'</div>'
+          + teamAvatarHtml(r.team)
           + '<div class="classifica-name"><span class="team-name">'+esc(displayName(r.team))+'</span>'+(mine?'<span class="classifica-mine-tag">Tu</span>':'')+subHtml+'</div>'
           + '<div class="classifica-points"><b>'+fmtNum(r.total)+'</b><span class="classifica-points-sub">punti</span></div>'
           + '<div class="classifica-chevron">›</div>'
