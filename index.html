@@ -102,6 +102,8 @@
   .classifica-row-card.mine{border-color:var(--gold);}
   .classifica-row-card.pos-1{border:2px solid #9c7734; background-image:url(bg-legno-texture.png); background-size:200px; background-repeat:repeat; box-shadow:0 6px 18px rgba(0,0,0,.35);}
   .classifica-row-card.pos-1:before{content:""; position:absolute; inset:0; background:rgba(20,10,4,.4); pointer-events:none;}
+  .classifica-confetti-strip{display:block; width:100%; max-height:56px; object-fit:cover; object-position:top; margin:0 0 2px; opacity:.9; pointer-events:none;}
+  .classifica-leading-msg{text-align:center; color:var(--gold-strong); font-family:'Fraunces',serif; font-size:14px; font-weight:600; margin:0 0 10px;}
   .classifica-row-card.pos-1 .classifica-row-head, .classifica-row-card.pos-1 .classifica-row-body{position:relative;}
   .classifica-row-card.pos-2, .classifica-row-card.pos-3{border-top:2px solid var(--gold-dim);}
   .classifica-row-head{display:flex; align-items:center; gap:12px; padding:13px 14px; cursor:pointer; -webkit-tap-highlight-color:transparent;}
@@ -115,6 +117,7 @@
   /* --- frase calda in fondo a una schermata: stesso stile della Home, riutilizzabile ovunque --- */
   .section-quote{position:relative; margin:10px 2px 4px; padding:11px 14px; background-image:url(bg-pergamena-texture.png); background-size:220px; background-repeat:repeat; border:2px solid #a27d3e; border-radius:12px; color:#3c2a18; font-family:'Fraunces',serif; font-size:13px; text-align:center; box-shadow:0 5px 10px rgba(0,0,0,.25);}
   .section-quote:before{content:""; position:absolute; top:-13px; left:-8px; width:62px; height:41px; background-image:url(deco-fregio-1.png); background-size:contain; background-repeat:no-repeat; pointer-events:none;}
+  .section-quote.variant-b:before{left:auto; right:-8px; width:56px; height:56px; background-image:url(deco-fregio-2.png);}
   .classifica-name{flex:1; min-width:0;}
   .classifica-name .team-name{font-weight:600; font-size:14.5px;}
   .classifica-mine-tag{display:inline-block; margin-left:6px; font-size:10px; font-weight:700; color:var(--gold-strong); background:rgba(202,162,76,.16); border:1px solid var(--gold-dim); border-radius:999px; padding:1px 7px; vertical-align:middle;}
@@ -1381,6 +1384,11 @@
     if (!started){
       html += '<div class="card empty" style="text-align:center;"><img src="char-vuoto.png" alt="" class="hero-illus sm">La stagione non è ancora iniziata: la classifica apparirà dopo la prima puntata confermata.</div>';
     } else {
+      var myLeading = state.myTeam && standings.length && standings[0].team.id===state.myTeam.id;
+      if (myLeading){
+        html += '<img src="deco-coriandoli-1.png" alt="" class="classifica-confetti-strip">'
+          + '<p class="classifica-leading-msg">Sei in testa alla lega! ♥</p>';
+      }
       standings.forEach(function(r){
         var mine = state.myTeam && r.team.id===state.myTeam.id;
         var open = state._expandedTeamClassifica===r.team.id;
@@ -1409,7 +1417,7 @@
         }
         html += '</div>';
       });
-      html += '<div class="section-quote">"Stesse ricette, storie diverse. Un’unica grande Brigata." ♥</div>';
+      html += '<div class="section-quote">"Stessa lega, Brigate diverse. Che vinca la più unita!" ♥</div>';
     }
     document.getElementById("panel-classifica").innerHTML = html;
     bindClassificaEvents();
@@ -1572,7 +1580,7 @@
       html += '</div>';
     }
     html += '</div>';
-    html += '<div class="section-quote">"Tre Chef, un’unica Brigata: la vittoria si costruisce insieme." ♥</div>';
+    html += '<div class="section-quote variant-b">"Tre Chef, un’unica Brigata: la vittoria si costruisce insieme." ♥</div>';
 
     el.innerHTML = html;
     bindSquadraEvents();
