@@ -363,6 +363,13 @@
   }
   #install-banner{position:fixed; left:12px; right:12px; bottom:12px; background:var(--panel); border:1px solid var(--gold); border-radius:12px; padding:12px 14px; box-shadow:0 8px 24px rgba(0,0,0,.5); z-index:50; font-size:13.5px; max-width:460px; margin:0 auto;}
   .install-banner-inner{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+  .install-banner-ico{width:44px; height:44px; border-radius:50%; object-fit:cover; border:2px solid var(--gold); flex:0 0 auto;}
+  #install-guide-modal{position:fixed; inset:0; z-index:210; display:flex; align-items:flex-end; justify-content:center;}
+  @media (min-width:480px){ #install-guide-modal{align-items:center; padding:24px;} }
+  .install-guide-img{display:block; margin:0 auto 12px; width:min(70vw,200px); border-radius:14px; box-shadow:0 8px 20px rgba(0,0,0,.4);}
+  .step-row{display:flex; align-items:flex-start; gap:10px; margin-bottom:10px;}
+  .step-num{flex:0 0 auto; width:24px; height:24px; border-radius:50%; background:var(--gold-strong); color:#2a1a08; font-weight:800; font-size:13px; display:flex; align-items:center; justify-content:center;}
+  .step-text{font-size:13.5px; line-height:1.45; color:#4a3a20;}
   .install-banner-inner span{flex:1; min-width:180px; line-height:1.4;}
   .install-banner-inner .btn{flex-shrink:0;}
   #card-lightbox{position:fixed; inset:0; background:rgba(0,0,0,.75); display:none; align-items:center; justify-content:center; z-index:999; padding:24px;}
@@ -583,7 +590,7 @@
     shown = true;
     var b = document.createElement('div');
     b.id = 'install-banner';
-    b.innerHTML = '<div class="install-banner-inner"><span>'+msg+'</span>'
+    b.innerHTML = '<div class="install-banner-inner"><img src="char-installa-ico.png" alt="" class="install-banner-ico"><span>'+msg+'</span>'
       + (onInstallClick ? '<button class="btn sm primary" id="install-btn">Installa</button>' : '')
       + '<button class="btn sm ghost" id="install-dismiss">Chiudi</button></div>';
     document.body.appendChild(b);
@@ -596,8 +603,37 @@
     }
   }
 
+  function showInstallGuide(){
+    if (shown) return;
+    shown = true;
+    var m = document.createElement('div');
+    m.id = 'install-guide-modal';
+    m.innerHTML = '<div class="card-detail-backdrop" data-guide-close></div>'
+      + '<div class="card-detail-sheet parchment-panel">'
+      + '<button type="button" class="card-detail-close" data-guide-close aria-label="Chiudi" style="background:transparent;border:none;padding:0;"><img src="ico-chiudi.png" alt="" style="width:32px;height:32px;object-fit:contain;"></button>'
+      + '<img src="char-installa.png" alt="" class="install-guide-img">'
+      + '<h3>Porta Fanta MasterChef sempre con te!</h3>'
+      + '<p class="card-detail-cost">Un\'icona sulla tua Home, come una vera app.</p>'
+      + '<div class="step-row"><span class="step-num">1</span><span class="step-text">Tocca <b>Condividi</b> nella barra di Safari (il quadrato con la freccia in su).</span></div>'
+      + '<div class="step-row"><span class="step-num">2</span><span class="step-text">Scorri e scegli <b>"Aggiungi alla schermata Home"</b>.</span></div>'
+      + '<div class="step-row" style="margin-bottom:16px;"><span class="step-num">3</span><span class="step-text">Fatto! Da ora lo trovi sempre lì, come una vera app.</span></div>'
+      + '<button type="button" class="btn primary" style="width:100%;" data-guide-close>Ho capito!</button>'
+      + '</div>';
+    document.body.appendChild(m);
+    m.querySelectorAll('[data-guide-close]').forEach(function(el){
+      el.addEventListener('click', function(){
+        m.remove();
+        localStorage.setItem('installGuideSeen','1');
+      });
+    });
+  }
+
   if (isIOS){
-    showBanner('📲 Per trovarlo sempre: tocca <b>Condividi</b> (il quadrato con la freccia in su) e poi <b>"Aggiungi alla schermata Home"</b>.');
+    if (!localStorage.getItem('installGuideSeen')){
+      showInstallGuide();
+    } else {
+      showBanner('📲 Per trovarlo sempre: tocca <b>Condividi</b> (il quadrato con la freccia in su) e poi <b>"Aggiungi alla schermata Home"</b>.');
+    }
   } else {
     window.addEventListener('beforeinstallprompt', function(e){
       e.preventDefault();
@@ -1297,7 +1333,7 @@
     html += '<div class="home-profile-badge"><img src="char-profilo.png" alt=""><div><small>Ciao</small><b>'+ (displayName||'Chef') +'</b></div></div>';
     html += '<div class="kitchen-hero">'
       + '<div class="hero-sign-wrap"><img src="deco-insegna.png" alt="">'
-      + '<div class="hero-sign-text"><h1>La Brigata</h1><small>Più che un’app… una famiglia di cucina!</small></div></div>'
+      + '<div class="hero-sign-text"><h1>'+esc(state.meta.nome_lega||'Fanta MasterChef')+'</h1><small>Una Brigata di amici, un piatto alla volta.</small></div></div>'
       + '<img class="hero-mascotte" src="char-mascotte-base.png" alt="">'
       + '</div>';
     html += '<div class="action-board"><div class="home-actions">'
