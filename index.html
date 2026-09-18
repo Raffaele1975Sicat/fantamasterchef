@@ -113,7 +113,8 @@
   .classifica-avatar{width:34px; height:34px; border-radius:50%; flex:0 0 auto; display:flex; align-items:center; justify-content:center; font-family:'Fraunces',serif; font-weight:700; font-size:14px; color:#fff3de; border:2px solid rgba(232,194,106,.55); box-shadow:0 2px 5px rgba(0,0,0,.35);}
   .classifica-row-card.pos-1 .classifica-avatar{border-color:#f3d98c;}
   /* --- frase calda in fondo a una schermata: stesso stile della Home, riutilizzabile ovunque --- */
-  .section-quote{margin:10px 2px 4px; padding:11px 14px; background-image:url(bg-pergamena-texture.png); background-size:220px; background-repeat:repeat; border:2px solid #a27d3e; border-radius:12px; color:#3c2a18; font-family:'Fraunces',serif; font-size:13px; text-align:center; box-shadow:0 5px 10px rgba(0,0,0,.25);}
+  .section-quote{position:relative; margin:10px 2px 4px; padding:11px 14px; background-image:url(bg-pergamena-texture.png); background-size:220px; background-repeat:repeat; border:2px solid #a27d3e; border-radius:12px; color:#3c2a18; font-family:'Fraunces',serif; font-size:13px; text-align:center; box-shadow:0 5px 10px rgba(0,0,0,.25);}
+  .section-quote:before{content:""; position:absolute; top:-13px; left:-8px; width:62px; height:41px; background-image:url(deco-fregio-1.png); background-size:contain; background-repeat:no-repeat; pointer-events:none;}
   .classifica-name{flex:1; min-width:0;}
   .classifica-name .team-name{font-weight:600; font-size:14.5px;}
   .classifica-mine-tag{display:inline-block; margin-left:6px; font-size:10px; font-weight:700; color:var(--gold-strong); background:rgba(202,162,76,.16); border:1px solid var(--gold-dim); border-radius:999px; padding:1px 7px; vertical-align:middle;}
@@ -315,6 +316,7 @@
   .carte-group-empty{padding:14px 16px; text-align:center; color:var(--ink-faint); font-size:13px;}
 
   .chip-row{display:flex; align-items:center; gap:12px; padding:12px 14px; border-bottom:1px solid var(--line); cursor:pointer; -webkit-tap-highlight-color:transparent;}
+  .chip-row-avatar{width:34px; height:34px; object-fit:contain; flex:0 0 auto;}
   .chip-row:last-child{border-bottom:none;}
   .chip-row-name{flex:1; min-width:0;}
   .chip-row-points{font-weight:700; font-variant-numeric:tabular-nums; flex:0 0 auto;}
@@ -1594,8 +1596,14 @@
     }
   }
   /* ============ render: concorrenti ============ */
+  function concorrenteAvatarImg(id){
+    var hash = 0, s = String(id||"");
+    for (var i=0; i<s.length; i++){ hash = s.charCodeAt(i) + ((hash<<5)-hash); }
+    var idx = Math.abs(hash) % 6;
+    return 'char-conc-'+(idx+1)+'.png';
+  }
   function renderConcorrenti(){
-    var html = '<div class="section-head"><div><h2>Chef</h2><p class="section-sub">Tocca uno Chef per la scheda.</p></div></div>';
+    var html = '<div class="screen-head"><img src="ico-brigata.png" alt="" class="screen-head-icon"><div><h2>Chef</h2><p class="section-sub">Tocca uno Chef per la scheda.</p></div></div>';
     var rows = state.concorrenti.slice().sort(function(a,b){
       return concorrenteCumulativo(b.id)-concorrenteCumulativo(a.id) || String(a.nome).localeCompare(String(b.nome));
     });
@@ -1603,6 +1611,7 @@
     rows.forEach(function(c){
       var open = state._expandedConc===c.id;
       html += '<div class="chip-row" data-conc-row="'+c.id+'">'
+        + '<img class="chip-row-avatar" src="'+concorrenteAvatarImg(c.id)+'" alt=""'+(c.eliminato?' style="opacity:.4;filter:grayscale(1);"':'')+'>'
         + '<div class="chip-row-name">'+esc(c.nome)+(c.eliminato?' <span class="badge warn">Eliminato</span>':' <span class="badge ok">In gara</span>')+'</div>'
         + '<div class="chip-row-points">'+fmtNum(concorrenteCumulativo(c.id))+'</div>'
         + '<div class="chip-row-chevron">'+(open?'⌃':'›')+'</div>'
