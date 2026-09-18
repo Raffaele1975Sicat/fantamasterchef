@@ -1846,7 +1846,7 @@
     return '<div id="card-detail-modal" class="'+(open?'open':'')+'">'
       + '<div class="card-detail-backdrop" data-modal-close></div>'
       + '<div class="card-detail-sheet parchment-panel">'
-      + '<button type="button" class="card-detail-close" data-modal-close aria-label="Chiudi">✕</button>'
+      + '<button type="button" class="card-detail-close" data-modal-close aria-label="Chiudi" style="background:transparent;border:none;padding:0;"><img src="ico-chiudi.png" alt="" style="width:32px;height:32px;object-fit:contain;"></button>'
       + inner
       + '</div></div>';
   }
@@ -2080,7 +2080,7 @@
       var rm = chatFindMsg(state._chatReplyTo);
       if (rm){
         var rsnippet = rm.testo ? (rm.testo.length>60 ? rm.testo.slice(0,60)+"…" : rm.testo) : "📷 foto";
-        html += '<div id="chat-reply-bar"><span>↩ Rispondendo a '+esc(chatProfileName(rm.author_id))+': '+esc(rsnippet)+'</span><span style="cursor:pointer;" id="chat-reply-cancel">✕</span></div>';
+        html += '<div id="chat-reply-bar"><span>↩ Rispondendo a '+esc(chatProfileName(rm.author_id))+': '+esc(rsnippet)+'</span><span style="cursor:pointer;" id="chat-reply-cancel"><img src="ico-chiudi.png" alt="" style="width:18px;height:18px;object-fit:contain;vertical-align:middle;"></span></div>';
       }
     }
     html += '<div id="chat-input-bar">'
