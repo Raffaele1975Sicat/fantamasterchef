@@ -504,19 +504,19 @@
 
 
 
-.home-v3 .home-profile-badge{position:absolute;right:18px;top:18px;z-index:10;display:flex;align-items:center;gap:8px;padding:5px 12px 5px 5px;background:rgba(28,17,9,.82);border:2px solid rgba(232,194,106,.75);border-radius:999px;color:#fff3d6;box-shadow:0 5px 14px rgba(0,0,0,.45);backdrop-filter:blur(3px);}
-.home-v3 .home-profile-badge img{width:62px;height:62px;border-radius:50%;object-fit:cover;border:2px solid #e8c26a;background:#3a2110;}
-.avatar-edit-wrap{position:relative;cursor:pointer;-webkit-tap-highlight-color:transparent;}
-.avatar-edit-pin{position:absolute;right:-2px;bottom:-2px;width:17px;height:17px;border-radius:50%;background:var(--gold);color:#2a1a08;font-size:10px;display:flex;align-items:center;justify-content:center;border:1.5px solid #2a1a08;}
-.home-v3 .home-profile-badge div{display:flex;flex-direction:column;line-height:1.02;min-width:72px;}
-.home-v3 .home-profile-badge small{font-family:'Work Sans',sans-serif;font-size:10px;color:#e7d6b3;}
-.home-v3 .home-profile-badge b{font-family:'Fraunces',serif;font-size:17px;color:#fff5df;}
+.home-v3 .home-profile-strip{display:flex;align-items:center;gap:15px;margin:0 0 14px;padding:11px 16px;background:rgba(28,17,9,.55);border:1px solid rgba(232,194,106,.4);border-radius:16px;}
+.home-v3 .home-profile-strip img{width:84px;height:84px;border-radius:50%;object-fit:cover;border:3px solid #e8c26a;background:#3a2110;box-shadow:0 4px 10px rgba(0,0,0,.4);}
+.avatar-edit-wrap{position:relative;cursor:pointer;-webkit-tap-highlight-color:transparent;flex:0 0 auto;}
+.avatar-edit-pin{position:absolute;right:-1px;bottom:-1px;width:24px;height:24px;border-radius:50%;background:var(--gold);color:#2a1a08;font-size:13px;display:flex;align-items:center;justify-content:center;border:2px solid #2a1a08;}
+.home-v3 .home-profile-text{display:flex;flex-direction:column;line-height:1.15;}
+.home-v3 .home-profile-text small{font-family:'Work Sans',sans-serif;font-size:13px;color:#e7d6b3;}
+.home-v3 .home-profile-text b{font-family:'Fraunces',serif;font-size:23px;color:#fff5df;}
 @media(max-width:700px){
- .home-v3 .home-profile-badge{right:12px;top:11px;padding:4px 9px 4px 4px;gap:6px;}
- .home-v3 .home-profile-badge img{width:50px;height:50px;}
- .home-v3 .home-profile-badge div{min-width:54px;}
- .home-v3 .home-profile-badge small{font-size:8px;}
- .home-v3 .home-profile-badge b{font-size:12px;}
+ .home-v3 .home-profile-strip{padding:9px 13px;gap:12px;margin-bottom:12px;}
+ .home-v3 .home-profile-strip img{width:68px;height:68px;}
+ .avatar-edit-pin{width:20px;height:20px;font-size:11px;}
+ .home-v3 .home-profile-text small{font-size:11px;}
+ .home-v3 .home-profile-text b{font-size:19px;}
 }
 </style>
 
@@ -580,9 +580,9 @@
 <nav class="bottombar hidden" id="bottombar">
   <button data-tab="home"><img class="nav-ico" src="ico-home.png" alt="">Home</button>
   <button data-tab="carte"><img class="nav-ico" src="ico-carte.png" alt="">Carte</button>
-  <button data-tab="classifica"><img class="nav-ico" src="ico-trofeo.png" alt="">Classifica</button>
+  <button data-tab="classifica"><img class="nav-ico" src="ico-trofeo-badge.png" alt="">Classifica</button>
   <button data-tab="squadra"><img class="nav-ico" src="ico-brigata.png" alt="">Squadra</button>
-  <button data-tab="chat"><img class="nav-ico" src="ico-chat.png" alt="">Chat<span class="chat-badge hidden" id="chat-badge">0</span></button>
+  <button data-tab="chat"><img class="nav-ico" src="ico-chat-badge.png" alt="">Chat<span class="chat-badge hidden" id="chat-badge">0</span></button>
   <button type="button" id="more-nav-btn"><span class="nav-dots"><span></span><span></span><span></span></span>Altro</button>
   <div class="more-panel hidden" id="more-panel">
     <button data-tab="concorrenti"><img class="nav-ico" src="ico-info.png" alt="">Chef</button>
@@ -709,8 +709,8 @@
   function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
   // Banner illustrato grande in testa alle schermate secondarie: sostituisce
   // la vecchia iconcina rotonda con un'immagine protagonista, come in Home.
-  function heroBanner(img, title, sub, posY, corner){
-    return '<div class="screen-hero"><img src="'+img+'" alt="" style="object-position:center '+(posY||"center")+';">'
+  function heroBanner(img, title, sub, posY, corner, aspect){
+    return '<div class="screen-hero" style="aspect-ratio:'+(aspect||"790/385")+';"><img src="'+img+'" alt="" style="object-position:center '+(posY||"center")+';">'
       + '<div class="screen-hero-text"><h2>'+esc(title)+'</h2><p>'+esc(sub)+'</p></div>'
       + (corner ? '<div class="screen-hero-corner">'+corner+'</div>' : '') + '</div>';
   }
@@ -1372,14 +1372,14 @@
     var displayName = state.profile && state.profile.display_name ? esc(state.profile.display_name) : '';
     var html = '<div class="home-v3">';
     var myAvatarUrl = state.profile && state.profile.avatar_url;
-    html += '<div class="home-profile-badge"><div class="avatar-edit-wrap" id="my-avatar-badge" title="Cambia la tua foto"><img src="'+(myAvatarUrl?esc(myAvatarUrl):'char-profilo.png')+'" alt=""><span class="avatar-edit-pin">✎</span></div>'
-      + '<div><small>Ciao</small><b>'+ (displayName||'Chef') +'</b></div>'
-      + '<input type="file" accept="image/*" id="avatar-file-input" class="hidden">'
-      + '</div>';
     html += '<div class="kitchen-hero">'
       + '<div class="hero-sign-wrap"><img src="deco-insegna.png" alt="">'
       + '<div class="hero-sign-text"><h1>'+esc(state.meta.nome_lega||'Fanta MasterChef')+'</h1><small>Una Brigata di amici, un piatto alla volta.</small></div></div>'
       + '<img class="hero-mascotte" src="char-mascotte-base.png" alt="">'
+      + '</div>';
+    html += '<div class="home-profile-strip"><div class="avatar-edit-wrap" id="my-avatar-badge" title="Cambia la tua foto"><img src="'+(myAvatarUrl?esc(myAvatarUrl):'char-profilo.png')+'" alt=""><span class="avatar-edit-pin">✎</span></div>'
+      + '<div class="home-profile-text"><small>Ciao,</small><b>'+ (displayName||'Chef') +'</b></div>'
+      + '<input type="file" accept="image/*" id="avatar-file-input" class="hidden">'
       + '</div>';
     html += '<div class="action-board"><div class="home-actions">'
       +'<div class="home-action" data-goto="carte"><div class="home-action-icon"><img src="ico-carte.png" alt=""></div><h3>Le tue Carte</h3><span>'+(team?remaining+'★ disponibili':'Scopri e colleziona')+'</span></div>'
@@ -1470,7 +1470,7 @@
     var standings = computeStandings();
     var started = state.episodes.some(function(e){ return e.confermata; });
     var prevPos = started ? standingsDelta() : {};
-    var html = heroBanner('hero-classifica.png', 'Classifica', 'Tocca una squadra per i dettagli.', 'center');
+    var html = heroBanner('hero-classifica.png', 'Classifica', 'Tocca una squadra per i dettagli.', 'center', null, '621/267');
     if (!started){
       html += '<div class="card empty" style="text-align:center;"><img src="char-vuoto.png" alt="" class="hero-illus sm">La stagione non è ancora iniziata: la classifica apparirà dopo la prima puntata confermata.</div>';
     } else {
@@ -1588,7 +1588,7 @@
     var editing = !!state._editingBrigata;
 
     // 1) essenziale: nome squadra + numeri chiave, un solo colpo d'occhio
-    var html = heroBanner('char-brigata.png', 'Brigata', displayName(team), '55%');
+    var html = heroBanner('char-brigata.png', 'Brigata', displayName(team), '57%', null, '5/4');
     html += '<div class="stat-row">'
       + '<div class="stat-cell"><div class="section-sub">Posizione</div><div class="stat-val">'+(row?"#"+row.pos:"—")+'</div></div>'
       + '<div class="stat-cell"><div class="section-sub">Punti</div><div class="stat-val">'+(row?fmtNum(row.total):"0")+'</div></div>'
@@ -1792,7 +1792,7 @@
   /* ============ render: puntate ============ */
   function renderPuntate(){
     if (!state._puntateExpanded) state._puntateExpanded = {};
-    var html = heroBanner('char-dettaglio.png', 'Puntate', 'Risultati puntata per puntata.', '8%');
+    var html = heroBanner('char-dettaglio.png', 'Puntate', 'Risultati puntata per puntata.', 'top', null, '6/5');
     var episodes = state.episodes.filter(function(e){ return state.profile.is_admin || e.confermata; }).slice().sort(function(a,b){return b.numero-a.numero;});
     if (!episodes.length){ html += '<div class="card empty" style="text-align:center;"><img src="char-vuoto.png" alt="" class="hero-illus sm">Nessuna puntata ancora confermata.</div>'; }
     episodes.forEach(function(ep, idx){
@@ -1868,7 +1868,7 @@
     if (!state._carteGroupOpen) state._carteGroupOpen = {disponibili:true, utilizzate:false, bloccate:false};
 
     // 1) essenziale: quante Stelle ho
-    var html = heroBanner('char-carte.png', 'Carte', 'Tocca l\'immagine per vederla intera.', '18%');
+    var html = heroBanner('char-carte.png', 'Carte', 'Tocca l\'immagine per vederla intera.', '13%', null, '5/4');
     if (team){
       html += '<div class="card stars-card"><img src="ico-stelle.png" alt=""><div><div class="stars-label">Stelle disponibili</div><div class="stars-val">'+remaining+' / '+(team.stelle_acquistate||1)+'</div></div></div>';
     }
@@ -2166,7 +2166,7 @@
     });
 
     var chatNotifCorner = '<label class="chat-notif-toggle" title="Notifiche per gli avvisi importanti"><input type="checkbox" id="chat-notif-toggle" '+(state.profile.notifiche_attive?"checked":"")+'><span class="bell">🔔</span></label>';
-    var html = heroBanner('char-chat.png', 'Chat', 'Messaggi visibili 20 giorni', '22%', chatNotifCorner);
+    var html = heroBanner('char-chat.png', 'Chat', 'Messaggi visibili 20 giorni', 'center', chatNotifCorner, '700/589');
 
     html += '<div id="chat-wrap"><div id="chat-list">';
     if (!state.chatMessages.length){
@@ -2374,7 +2374,7 @@
   /* ============ render: regolamento ============ */
   function renderRegolamento(){
     var maxSpend = regola("costo_stella_eur",10) * regola("max_stelle",5);
-    var html = heroBanner('hero-regolamento.png', 'Regolamento', 'Tocca un argomento per aprirlo.', 'top');
+    var html = heroBanner('hero-regolamento.png', 'Regolamento', 'Tocca un argomento per aprirlo.', 'top', null, '4/3');
     html += '<details class="admin-disclosure" open><summary><span class="reg-topic"><img src="ico-trofeo.png" alt="" class="reg-topic-ico"><h3>Come si fanno i punti</h3></span><span class="chev">›</span></summary><div class="disclosure-body">'
       + '<p class="section-sub">Bonus: Mystery Box +'+regola("bonus_mystery_box",3)+' · Esterna +'+regola("bonus_esterna",4)+' · Cucina +'+regola("bonus_cucina",4)+' · Miglior piatto +'+regola("bonus_miglior_piatto",2)+'</p>'
       + '<p class="section-sub">Penalità: Grembiule Nero '+regola("penalita_nero",-3)+' · Persa Esterna '+regola("penalita_esterna",-2)+' (non cumulabili tra loro)</p>'
