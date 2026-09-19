@@ -173,11 +173,12 @@
     background-image:
       repeating-linear-gradient(90deg, rgba(0,0,0,.12) 0px, rgba(0,0,0,0) 2px, rgba(0,0,0,0) 18px, rgba(0,0,0,.07) 20px),
       linear-gradient(180deg,#2a1c0e,#150f08);}
-  .bottombar button{flex:1; background:none; border:none; color:var(--ink-faint); font-size:12.5px; font-weight:600; padding:8px 2px 10px; display:flex; flex-direction:column; align-items:center; gap:4px;}
+  .bottombar button{flex:1; background:none; border:none; color:var(--ink-faint); font-size:12.5px; font-weight:600; padding:11px 2px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;}
   .bottombar button.active{color:var(--gold-strong); text-shadow:0 0 8px rgba(232,194,106,.45);}
   .bottombar button .dot{width:6px; height:6px; border-radius:50%; background:currentColor;}
-  .bottombar button .nav-ico{width:36px; height:36px; object-fit:contain; opacity:.85;}
+  .bottombar button .nav-ico{width:50px; height:50px; object-fit:contain; opacity:.85;}
   .bottombar button.active .nav-ico{opacity:1; filter:drop-shadow(0 0 3px rgba(232,194,106,.5));}
+  .bottombar button .nav-ico-wrap{position:relative; display:inline-flex;}
   .nav-dots{display:flex; gap:3px; align-items:center; height:21px;}
   .nav-dots span{width:4px; height:4px; border-radius:50%; background:currentColor; opacity:.72;}
   .more-panel{position:absolute; bottom:100%; right:6px; margin-bottom:8px; background:var(--parchment); color:var(--ink-dark); border:1px solid #a98a4a; border-radius:12px; box-shadow:0 -8px 24px rgba(0,0,0,.5); padding:6px; display:flex; flex-direction:column; min-width:180px;}
@@ -321,13 +322,13 @@
   .card-item{background:linear-gradient(160deg, var(--panel) 0%, var(--panel2) 100%); border:1px solid var(--line); border-top:2px solid var(--gold-dim); border-radius:14px; padding:14px 16px; margin-bottom:12px; box-shadow:0 4px 10px rgba(0,0,0,.25);}
   .card-item.is-used{opacity:.82;}
   .card-item.is-blocked{border-top-color:var(--line);}
-  .card-item-head{display:flex; align-items:center; gap:14px; margin-bottom:10px;}
-  .card-item-thumb{width:80px; height:120px; object-fit:cover; object-position:top; border-radius:8px; flex:0 0 auto; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,.5);}
+  .card-item-head{display:flex; align-items:center; gap:16px; margin-bottom:10px;}
+  .card-item-thumb{width:118px; height:177px; object-fit:cover; object-position:top; border-radius:10px; flex:0 0 auto; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,.5);}
   .card-item.is-used .card-item-thumb{filter:saturate(.75) brightness(.82);}
   .card-item.is-blocked .card-item-thumb{filter:saturate(.55) brightness(.62);}
   .card-item-title{flex:1; min-width:0;}
-  .card-item-title h3{margin:0 0 3px; font-size:15.5px;}
-  .card-item-cost{font-family:'Fraunces',serif; color:var(--gold-strong); font-size:13.5px; white-space:nowrap; display:inline-flex; align-items:center; gap:4px; background:rgba(202,162,76,.12); border:1px solid var(--gold-dim); border-radius:999px; padding:2px 9px;}
+  .card-item-title h3{margin:0 0 8px; font-size:20px; line-height:1.15;}
+  .card-item-cost{font-family:'Fraunces',serif; color:var(--gold-strong); font-size:18px; font-weight:700; white-space:nowrap; display:inline-flex; align-items:center; gap:4px; background:rgba(202,162,76,.12); border:1px solid var(--gold-dim); border-radius:999px; padding:4px 13px;}
   .card-item-info{font-size:12.5px; color:var(--gold-strong); cursor:pointer; -webkit-tap-highlight-color:transparent; display:inline-block; margin-bottom:2px;}
   .card-item-desc{font-size:13px; color:var(--ink-dim); line-height:1.45; margin:8px 0 0; padding-top:10px; border-top:1px solid var(--line);}
   .carte-group{margin-bottom:16px;}
@@ -381,7 +382,9 @@
 
   @media (max-width: 389px){
     .card-item{padding:12px 13px;}
-    .card-item-thumb{width:64px; height:96px;}
+    .card-item-thumb{width:96px; height:144px;}
+    .card-item-title h3{font-size:17.5px;}
+    .card-item-cost{font-size:16px;}
     .stars-card{padding:12px 14px;}
     .screen-head-icon{width:38px; height:38px;}
     .ep-card{padding:12px 13px;}
@@ -416,7 +419,7 @@
   .card-detail-form select{width:100%; background:#fbf3de; border:1px solid #b99a5c; color:var(--ink-dark);}
   .card-detail-form label{color:#4a3a20;}
   .bottombar button{position:relative;}
-  .chat-badge{position:absolute; top:3px; right:12px; background:var(--penalty); color:#fff; font-size:9.5px; min-width:15px; height:15px; line-height:15px; text-align:center; border-radius:999px; padding:0 3px;}
+  .chat-badge{position:absolute; top:-3px; right:-6px; background:var(--penalty); color:#fff; font-size:9.5px; min-width:15px; height:15px; line-height:15px; text-align:center; border-radius:999px; padding:0 3px;}
   #chat-wrap{display:flex; flex-direction:column; height:calc(100vh - 210px); min-height:320px;}
   #chat-list{flex:1; overflow-y:auto; padding:4px 2px 10px; display:flex; flex-direction:column; gap:10px;}
   .chat-msg{max-width:84%; align-self:flex-start; display:flex; flex-direction:column;}
@@ -583,12 +586,12 @@
 </div>
 
 <nav class="bottombar hidden" id="bottombar">
-  <button data-tab="home"><img class="nav-ico" src="ico-home.png" alt="">Home</button>
-  <button data-tab="carte"><img class="nav-ico" src="ico-carte.png" alt="">Carte</button>
-  <button data-tab="classifica"><img class="nav-ico" src="ico-trofeo-badge.png" alt="">Classifica</button>
-  <button data-tab="squadra"><img class="nav-ico" src="ico-brigata.png" alt="">Squadra</button>
-  <button data-tab="chat"><img class="nav-ico" src="ico-chat-badge.png" alt="">Chat<span class="chat-badge hidden" id="chat-badge">0</span></button>
-  <button type="button" id="more-nav-btn"><span class="nav-dots"><span></span><span></span><span></span></span>Altro</button>
+  <button data-tab="home" aria-label="Home"><img class="nav-ico" src="ico-home.png" alt=""></button>
+  <button data-tab="carte" aria-label="Carte"><img class="nav-ico" src="ico-carte.png" alt=""></button>
+  <button data-tab="classifica" aria-label="Classifica"><img class="nav-ico" src="ico-trofeo-badge.png" alt=""></button>
+  <button data-tab="squadra" aria-label="Squadra"><img class="nav-ico" src="ico-brigata.png" alt=""></button>
+  <button data-tab="chat" aria-label="Chat"><span class="nav-ico-wrap"><img class="nav-ico" src="ico-chat-badge.png" alt=""><span class="chat-badge hidden" id="chat-badge">0</span></span></button>
+  <button type="button" id="more-nav-btn" aria-label="Altro"><span class="nav-dots"><span></span><span></span><span></span></span>Altro</button>
   <div class="more-panel hidden" id="more-panel">
     <button data-tab="concorrenti"><img class="nav-ico" src="ico-info.png" alt="">Chef</button>
     <button data-tab="puntate"><img class="nav-ico" src="ico-calendario.png" alt="">Puntate</button>
@@ -1896,10 +1899,10 @@
           } else {
             var win = cardWindowInfo(c.key);
             if (win.open){
-              actionHtml = '<button class="btn primary block" data-activate-card="'+esc(c.key)+'">Usa</button>';
+              actionHtml = '<button class="btn sm primary block" data-activate-card="'+esc(c.key)+'">Usa</button>';
               bucket = "disponibili";
             } else {
-              actionHtml = '<button class="btn ghost block" disabled>Non ancora utilizzabile</button>'
+              actionHtml = '<button class="btn sm ghost block" disabled>Non ancora utilizzabile</button>'
                 + '<p class="muted" style="font-size:12px;margin:6px 0 0;">'+esc(win.reasons.join(" · "))+'</p>';
               bucket = "bloccate";
             }
@@ -1915,7 +1918,7 @@
           bucket = "disponibili";
         } else {
           var afford = remaining >= Number(c.costo_stelle);
-          actionHtml = '<button class="btn '+(afford?'primary':'ghost')+' block" data-buy-card="'+esc(c.key)+'" '+(afford?'':'disabled title="Stelle insufficienti"')+'>Compra</button>'
+          actionHtml = '<button class="btn sm '+(afford?'primary':'ghost')+' block" data-buy-card="'+esc(c.key)+'" '+(afford?'':'disabled title="Stelle insufficienti"')+'>Compra</button>'
             + (afford ? '' : '<p class="muted" style="font-size:12px;margin:6px 0 0;">Stelle insufficienti per questo acquisto.</p>');
           bucket = afford ? "disponibili" : "bloccate";
         }
