@@ -81,6 +81,22 @@
   .hero-illus{width:100%; max-width:280px; display:block; margin:0 auto 14px; border-radius:12px; border:2px solid var(--gold); box-shadow:0 6px 18px rgba(0,0,0,.4); background:var(--wood-dark);}
   .hero-illus.sm{max-width:170px;}
   .empty img.hero-illus, .card.empty img.hero-illus{margin-bottom:10px;}
+  /* --- banner illustrato grande, in testa alle schermate secondarie (Carte, Classifica, Brigata, Chat, Regolamento, Puntate) --- */
+  .screen-hero{position:relative; width:100%; aspect-ratio:790/385; border:2px solid #a67a2a; border-radius:18px; overflow:hidden; margin-bottom:14px;
+    box-shadow:0 8px 18px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.08); background:var(--wood-dark); animation:heroPopIn .45s ease-out;}
+  .screen-hero img{width:100%; height:100%; object-fit:cover; display:block; animation:heroFloat 6s ease-in-out infinite;}
+  .screen-hero:after{content:""; position:absolute; inset:0; background:linear-gradient(to top, rgba(20,12,4,.86) 0%, rgba(20,12,4,.15) 46%, rgba(20,12,4,0) 68%); pointer-events:none;}
+  .screen-hero .screen-hero-text{position:absolute; left:16px; right:52px; bottom:11px; z-index:1;}
+  .screen-hero .screen-hero-text h2{margin:0; color:#fff3de; text-shadow:0 2px 6px rgba(0,0,0,.75);}
+  .screen-hero .screen-hero-text p{margin:3px 0 0; color:#e8d9bd; font-size:12.5px; text-shadow:0 1px 5px rgba(0,0,0,.8);}
+  .screen-hero .screen-hero-corner{position:absolute; right:10px; top:10px; z-index:1;}
+  @keyframes heroPopIn{from{opacity:0; transform:translateY(10px) scale(.98);} to{opacity:1; transform:none;}}
+  @keyframes heroFloat{0%,100%{transform:scale(1.035) translateY(0);} 50%{transform:scale(1.035) translateY(-5px);}}
+  @media(max-width:400px){ .screen-hero{margin-bottom:12px; border-radius:16px;} .screen-hero .screen-hero-text h2{font-size:19px;} }
+  @media(prefers-reduced-motion: reduce){ .screen-hero img, .tab-panel.active, .home-v3 .hero-mascotte, .classifica-confetti-strip{animation:none !important;} }
+  /* --- energia: le schermate entrano con un piccolo movimento invece di comparire di scatto --- */
+  .tab-panel.active{animation:panelIn .32s ease-out;}
+  @keyframes panelIn{from{opacity:0; transform:translateY(9px);} to{opacity:1; transform:none;}}
   .section-head h2{position:relative; display:inline-block;}
   .section-head h2::after{content:""; display:block; width:38px; height:3px; background:var(--gold); border-radius:3px; margin-top:5px;}
   .tabs-link{text-align:center; margin-top:12px; font-size:13.5px; color:var(--ink-faint);}
@@ -102,8 +118,10 @@
   .classifica-row-card.mine{border-color:var(--gold);}
   .classifica-row-card.pos-1{border:2px solid #9c7734; background-image:url(bg-legno-texture.png); background-size:200px; background-repeat:repeat; box-shadow:0 6px 18px rgba(0,0,0,.35);}
   .classifica-row-card.pos-1:before{content:""; position:absolute; inset:0; background:rgba(20,10,4,.4); pointer-events:none;}
-  .classifica-confetti-strip{display:block; width:100%; max-height:56px; object-fit:cover; object-position:top; margin:0 0 2px; opacity:.9; pointer-events:none;}
-  .classifica-leading-msg{text-align:center; color:var(--gold-strong); font-family:'Fraunces',serif; font-size:14px; font-weight:600; margin:0 0 10px;}
+  .classifica-confetti-strip{display:block; width:100%; max-height:56px; object-fit:cover; object-position:top; margin:0 0 2px; opacity:.9; pointer-events:none; animation:confettiDrift 3.2s ease-in-out infinite;}
+  .classifica-leading-msg{text-align:center; color:var(--gold-strong); font-family:'Fraunces',serif; font-size:14px; font-weight:600; margin:0 0 10px; animation:leadingPulse 2.4s ease-in-out infinite;}
+  @keyframes confettiDrift{0%,100%{transform:translateY(0);} 50%{transform:translateY(3px);}}
+  @keyframes leadingPulse{0%,100%{opacity:1;} 50%{opacity:.72;}}
   .classifica-row-card.pos-1 .classifica-row-head, .classifica-row-card.pos-1 .classifica-row-body{position:relative;}
   .classifica-row-card.pos-2, .classifica-row-card.pos-3{border-top:2px solid var(--gold-dim);}
   .classifica-row-head{display:flex; align-items:center; gap:12px; padding:13px 14px; cursor:pointer; -webkit-tap-highlight-color:transparent;}
@@ -112,7 +130,7 @@
   .classifica-num .medal-img{width:30px; height:30px; object-fit:contain; filter:drop-shadow(0 2px 4px rgba(0,0,0,.4));}
   .classifica-row-card.pos-1 .classifica-num .medal-img{width:36px; height:36px;}
   .classifica-num .plain{font-family:'Fraunces',serif; font-weight:700; color:var(--gold-strong); font-size:16px;}
-  .classifica-avatar{width:34px; height:34px; border-radius:50%; flex:0 0 auto; display:flex; align-items:center; justify-content:center; font-family:'Fraunces',serif; font-weight:700; font-size:14px; color:#fff3de; border:2px solid rgba(232,194,106,.55); box-shadow:0 2px 5px rgba(0,0,0,.35);}
+  .classifica-avatar{width:44px; height:44px; border-radius:50%; flex:0 0 auto; display:flex; align-items:center; justify-content:center; font-family:'Fraunces',serif; font-weight:700; font-size:17px; color:#fff3de; border:2px solid rgba(232,194,106,.55); box-shadow:0 2px 5px rgba(0,0,0,.35);}
   .classifica-row-card.pos-1 .classifica-avatar{border-color:#f3d98c;}
   /* --- frase calda in fondo a una schermata: stesso stile della Home, riutilizzabile ovunque --- */
   .section-quote{position:relative; margin:10px 2px 4px; padding:11px 14px; background-image:url(bg-pergamena-texture.png); background-size:220px; background-repeat:repeat; border:2px solid #a27d3e; border-radius:12px; color:#3c2a18; font-family:'Fraunces',serif; font-size:13px; text-align:center; box-shadow:0 5px 10px rgba(0,0,0,.25);}
@@ -338,6 +356,7 @@
   .chat-top-title h2{margin:0; font-size:17px;}
   .chat-top-title span{font-size:11px; color:var(--ink-faint);}
   .chat-notif-toggle{display:flex; align-items:center; gap:5px; font-size:18px; flex:0 0 auto; cursor:pointer; -webkit-tap-highlight-color:transparent; padding:6px; -webkit-tap-highlight-color:transparent;}
+  .screen-hero-corner .chat-notif-toggle{background:rgba(20,12,4,.6); border-radius:50%; padding:7px; border:1px solid rgba(232,194,106,.4);}
   .chat-notif-toggle input{margin:0;}
   .chat-notif-toggle input:not(:checked) ~ .bell{opacity:.35;}
 
@@ -426,7 +445,8 @@
 .home-v3 .hero-sign-text{position:absolute;left:15%;right:12%;top:28%;bottom:25%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#2b1a0d;}
 .home-v3 .hero-sign-text h1{font-family:'Fraunces',serif;font-size:clamp(13px,4.2vw,22px);line-height:1.05;margin:0 0 3px;}
 .home-v3 .hero-sign-text small{font-family:'Work Sans',sans-serif;font-weight:500;color:#5a3c22;font-size:clamp(7px,1.9vw,10.5px);line-height:1.15;}
-.home-v3 .hero-mascotte{position:absolute;right:6%;bottom:0;height:78%;filter:drop-shadow(-6px 4px 8px rgba(0,0,0,.4));}
+.home-v3 .hero-mascotte{position:absolute;right:6%;bottom:0;height:78%;filter:drop-shadow(-6px 4px 8px rgba(0,0,0,.4));animation:mascotteFloat 4.5s ease-in-out infinite;}
+@keyframes mascotteFloat{0%,100%{transform:translateY(0) rotate(0deg);} 50%{transform:translateY(-6px) rotate(-1.2deg);}}
 .home-v3 .action-board{padding:9px;margin:0 0 12px;background-image:url(bg-legno-texture.png);background-size:230px;background-repeat:repeat;border:2px solid #916b2e;border-radius:18px;box-shadow:0 8px 18px rgba(0,0,0,.34);}
 .home-v3 .home-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:0;padding:0;background:none;border:0;box-shadow:none;}
 .home-v3 .home-action{min-height:112px;height:112px;padding:10px 7px 8px;position:relative;background-image:url(bg-pergamena-texture.png);background-size:200px;background-repeat:repeat;border:2px solid #a27d3e;border-radius:12px;box-shadow:0 5px 9px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.75);}
@@ -485,7 +505,7 @@
 
 
 .home-v3 .home-profile-badge{position:absolute;right:18px;top:18px;z-index:10;display:flex;align-items:center;gap:8px;padding:5px 12px 5px 5px;background:rgba(28,17,9,.82);border:2px solid rgba(232,194,106,.75);border-radius:999px;color:#fff3d6;box-shadow:0 5px 14px rgba(0,0,0,.45);backdrop-filter:blur(3px);}
-.home-v3 .home-profile-badge img{width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid #e8c26a;background:#3a2110;}
+.home-v3 .home-profile-badge img{width:62px;height:62px;border-radius:50%;object-fit:cover;border:2px solid #e8c26a;background:#3a2110;}
 .avatar-edit-wrap{position:relative;cursor:pointer;-webkit-tap-highlight-color:transparent;}
 .avatar-edit-pin{position:absolute;right:-2px;bottom:-2px;width:17px;height:17px;border-radius:50%;background:var(--gold);color:#2a1a08;font-size:10px;display:flex;align-items:center;justify-content:center;border:1.5px solid #2a1a08;}
 .home-v3 .home-profile-badge div{display:flex;flex-direction:column;line-height:1.02;min-width:72px;}
@@ -493,7 +513,7 @@
 .home-v3 .home-profile-badge b{font-family:'Fraunces',serif;font-size:17px;color:#fff5df;}
 @media(max-width:700px){
  .home-v3 .home-profile-badge{right:12px;top:11px;padding:4px 9px 4px 4px;gap:6px;}
- .home-v3 .home-profile-badge img{width:38px;height:38px;}
+ .home-v3 .home-profile-badge img{width:50px;height:50px;}
  .home-v3 .home-profile-badge div{min-width:54px;}
  .home-v3 .home-profile-badge small{font-size:8px;}
  .home-v3 .home-profile-badge b{font-size:12px;}
@@ -687,6 +707,13 @@
     setTimeout(function(){ t.remove(); }, 4000);
   }
   function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+  // Banner illustrato grande in testa alle schermate secondarie: sostituisce
+  // la vecchia iconcina rotonda con un'immagine protagonista, come in Home.
+  function heroBanner(img, title, sub, posY, corner){
+    return '<div class="screen-hero"><img src="'+img+'" alt="" style="object-position:center '+(posY||"center")+';">'
+      + '<div class="screen-hero-text"><h2>'+esc(title)+'</h2><p>'+esc(sub)+'</p></div>'
+      + (corner ? '<div class="screen-hero-corner">'+corner+'</div>' : '') + '</div>';
+  }
   function byId(list, id){ for (var i=0;i<list.length;i++){ if (list[i].id===id) return list[i]; } return null; }
   function fmtDate(iso){
     if (!iso) return "";
@@ -1443,7 +1470,7 @@
     var standings = computeStandings();
     var started = state.episodes.some(function(e){ return e.confermata; });
     var prevPos = started ? standingsDelta() : {};
-    var html = '<div class="screen-head"><img src="ico-trofeo-badge.png" alt="" class="screen-head-icon"><div><h2>Classifica</h2><p class="section-sub">Tocca una squadra per i dettagli.</p></div></div>';
+    var html = heroBanner('hero-classifica.png', 'Classifica', 'Tocca una squadra per i dettagli.', 'center');
     if (!started){
       html += '<div class="card empty" style="text-align:center;"><img src="char-vuoto.png" alt="" class="hero-illus sm">La stagione non è ancora iniziata: la classifica apparirà dopo la prima puntata confermata.</div>';
     } else {
@@ -1561,7 +1588,7 @@
     var editing = !!state._editingBrigata;
 
     // 1) essenziale: nome squadra + numeri chiave, un solo colpo d'occhio
-    var html = '<div class="screen-head"><img src="char-brigata.png" alt="" class="screen-head-icon"><div><h2>Brigata</h2><p class="section-sub">'+esc(displayName(team))+'</p></div></div>';
+    var html = heroBanner('char-brigata.png', 'Brigata', displayName(team), '55%');
     html += '<div class="stat-row">'
       + '<div class="stat-cell"><div class="section-sub">Posizione</div><div class="stat-val">'+(row?"#"+row.pos:"—")+'</div></div>'
       + '<div class="stat-cell"><div class="section-sub">Punti</div><div class="stat-val">'+(row?fmtNum(row.total):"0")+'</div></div>'
@@ -1765,7 +1792,7 @@
   /* ============ render: puntate ============ */
   function renderPuntate(){
     if (!state._puntateExpanded) state._puntateExpanded = {};
-    var html = '<div class="screen-head"><img src="char-dettaglio.png" alt="" class="screen-head-icon"><div><h2>Puntate</h2><p class="section-sub">Risultati puntata per puntata.</p></div></div>';
+    var html = heroBanner('char-dettaglio.png', 'Puntate', 'Risultati puntata per puntata.', '8%');
     var episodes = state.episodes.filter(function(e){ return state.profile.is_admin || e.confermata; }).slice().sort(function(a,b){return b.numero-a.numero;});
     if (!episodes.length){ html += '<div class="card empty" style="text-align:center;"><img src="char-vuoto.png" alt="" class="hero-illus sm">Nessuna puntata ancora confermata.</div>'; }
     episodes.forEach(function(ep, idx){
@@ -1841,7 +1868,7 @@
     if (!state._carteGroupOpen) state._carteGroupOpen = {disponibili:true, utilizzate:false, bloccate:false};
 
     // 1) essenziale: quante Stelle ho
-    var html = '<div class="screen-head"><img src="char-carte.png" alt="" class="screen-head-icon"><div><h2>Carte</h2><p class="section-sub">Tocca l\'immagine per vederla intera.</p></div></div>';
+    var html = heroBanner('char-carte.png', 'Carte', 'Tocca l\'immagine per vederla intera.', '18%');
     if (team){
       html += '<div class="card stars-card"><img src="ico-stelle.png" alt=""><div><div class="stars-label">Stelle disponibili</div><div class="stars-val">'+remaining+' / '+(team.stelle_acquistate||1)+'</div></div></div>';
     }
@@ -2138,9 +2165,8 @@
       reactionsByMsg[r.message_id][r.emoji].push(r.profile_id);
     });
 
-    var html = '<div class="screen-head"><img src="char-chat.png" alt="" class="screen-head-icon"><div style="flex:1;min-width:0;"><h2>Chat</h2><p class="section-sub">Messaggi visibili 20 giorni</p></div>'
-      + '<label class="chat-notif-toggle" title="Notifiche per gli avvisi importanti"><input type="checkbox" id="chat-notif-toggle" '+(state.profile.notifiche_attive?"checked":"")+'><span class="bell">🔔</span></label>'
-      + '</div>';
+    var chatNotifCorner = '<label class="chat-notif-toggle" title="Notifiche per gli avvisi importanti"><input type="checkbox" id="chat-notif-toggle" '+(state.profile.notifiche_attive?"checked":"")+'><span class="bell">🔔</span></label>';
+    var html = heroBanner('char-chat.png', 'Chat', 'Messaggi visibili 20 giorni', '22%', chatNotifCorner);
 
     html += '<div id="chat-wrap"><div id="chat-list">';
     if (!state.chatMessages.length){
@@ -2348,7 +2374,7 @@
   /* ============ render: regolamento ============ */
   function renderRegolamento(){
     var maxSpend = regola("costo_stella_eur",10) * regola("max_stelle",5);
-    var html = '<div class="screen-head"><img src="hero-regolamento.png" alt="" class="screen-head-icon"><div><h2>Regolamento</h2><p class="section-sub">Tocca un argomento per aprirlo.</p></div></div>';
+    var html = heroBanner('hero-regolamento.png', 'Regolamento', 'Tocca un argomento per aprirlo.', 'top');
     html += '<details class="admin-disclosure" open><summary><span class="reg-topic"><img src="ico-trofeo.png" alt="" class="reg-topic-ico"><h3>Come si fanno i punti</h3></span><span class="chev">›</span></summary><div class="disclosure-body">'
       + '<p class="section-sub">Bonus: Mystery Box +'+regola("bonus_mystery_box",3)+' · Esterna +'+regola("bonus_esterna",4)+' · Cucina +'+regola("bonus_cucina",4)+' · Miglior piatto +'+regola("bonus_miglior_piatto",2)+'</p>'
       + '<p class="section-sub">Penalità: Grembiule Nero '+regola("penalita_nero",-3)+' · Persa Esterna '+regola("penalita_esterna",-2)+' (non cumulabili tra loro)</p>'
