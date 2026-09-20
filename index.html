@@ -912,13 +912,13 @@
     var e = eventFor(episodeId, concorrenteId);
     if (!e) return {bonus:0, penalty:0};
     var bonus = 0;
-    if (e.mystery_box) bonus += regola("bonus_mystery_box",3);
-    if (e.vince_esterna) bonus += regola("bonus_esterna",4);
+    if (e.mystery_box) bonus += regola("bonus_mystery_box",4);
+    if (e.vince_esterna) bonus += regola("bonus_esterna",2);
     if (e.vince_cucina) bonus += regola("bonus_cucina",4);
-    if (e.miglior_piatto) bonus += regola("bonus_miglior_piatto",2);
+    if (e.green_pin) bonus += regola("bonus_green_pin",1);
     var penalty = 0;
-    if (e.penalita==="nero") penalty = regola("penalita_nero",-3);
-    else if (e.penalita==="esterna") penalty = regola("penalita_esterna",-2);
+    if (e.penalita==="nero") penalty = regola("penalita_nero",-2);
+    else if (e.penalita==="esterna") penalty = regola("penalita_esterna",-1);
     return {bonus:bonus, penalty:penalty};
   }
   function findAct(episodeId, pred){
@@ -1783,7 +1783,7 @@
       running += bp.bonus + bp.penalty;
       series.push({y:running});
       if (!e) return '<tr><td>Puntata '+ep.numero+'</td><td colspan="2" class="muted">Non in gara / nessun dato</td><td class="num">'+fmtNum(0)+'</td></tr>';
-      var bonusStr = [e.mystery_box&&"Mystery Box", e.vince_esterna&&"Esterna", e.vince_cucina&&"Cucina", e.miglior_piatto&&"Miglior piatto"].filter(Boolean).join(", ") || "—";
+      var bonusStr = [e.mystery_box&&"Mystery Box", e.vince_esterna&&"Esterna", e.vince_cucina&&"Cucina", e.green_pin&&"Green Pin"].filter(Boolean).join(", ") || "—";
       var penStr = e.penalita==="nero" ? "Grembiule Nero" : (e.penalita==="esterna" ? "Persa Esterna" : "—");
       return '<tr><td>Puntata '+ep.numero+'</td><td>'+esc(bonusStr)+'</td><td>'+esc(penStr)+'</td><td class="num">'+fmtNum(bp.bonus+bp.penalty)+'</td></tr>';
     }).join("");
@@ -1812,7 +1812,7 @@
       var open = (stored===undefined) ? (idx===0) : stored;
 
       // 1) essenziale: cosa è successo in questa puntata, a colpo d'occhio
-      var mysteryBox=[], esterna=[], cucina=[], miglior=[], nero=[], persaEsterna=[];
+      var mysteryBox=[], esterna=[], cucina=[], greenPin=[], nero=[], persaEsterna=[];
       var rowsHtml = "";
       state.concorrenti.forEach(function(c){
         var e = eventFor(ep.id, c.id);
@@ -1820,11 +1820,11 @@
         if (e.mystery_box) mysteryBox.push(c.nome);
         if (e.vince_esterna) esterna.push(c.nome);
         if (e.vince_cucina) cucina.push(c.nome);
-        if (e.miglior_piatto) miglior.push(c.nome);
+        if (e.green_pin) greenPin.push(c.nome);
         if (e.penalita==="nero") nero.push(c.nome);
         if (e.penalita==="esterna") persaEsterna.push(c.nome);
         var bp = basePoints(ep.id, c.id);
-        var bonusStr = [e.mystery_box&&"Mystery Box", e.vince_esterna&&"Esterna", e.vince_cucina&&"Cucina", e.miglior_piatto&&"Miglior piatto"].filter(Boolean).join(", ") || "—";
+        var bonusStr = [e.mystery_box&&"Mystery Box", e.vince_esterna&&"Esterna", e.vince_cucina&&"Cucina", e.green_pin&&"Green Pin"].filter(Boolean).join(", ") || "—";
         var penStr = e.penalita==="nero"?"Grembiule Nero":(e.penalita==="esterna"?"Persa Esterna":"—");
         rowsHtml += '<tr><td>'+esc(c.nome)+'</td><td>'+esc(bonusStr)+'</td><td>'+esc(penStr)+'</td><td class="num">'+fmtNum(bp.bonus+bp.penalty)+'</td></tr>';
       });
@@ -1834,7 +1834,7 @@
       if (cucina.length) html += '<span class="chip">🏆 Cucina: '+esc(cucina.join(", "))+'</span>';
       if (esterna.length) html += '<span class="chip">🌍 Esterna: '+esc(esterna.join(", "))+'</span>';
       if (mysteryBox.length) html += '<span class="chip">📦 Mystery Box: '+esc(mysteryBox.join(", "))+'</span>';
-      if (miglior.length) html += '<span class="chip">🍽️ Miglior piatto: '+esc(miglior.join(", "))+'</span>';
+      if (greenPin.length) html += '<span class="chip">🟢 Green Pin: '+esc(greenPin.join(", "))+'</span>';
       if (nero.length) html += '<span class="chip">⚫ Grembiule Nero: '+esc(nero.join(", "))+'</span>';
       if (persaEsterna.length) html += '<span class="chip">❌ Persa Esterna: '+esc(persaEsterna.join(", "))+'</span>';
       if (!rowsHtml) html += '<span class="muted">Nessun punteggio inserito ancora.</span>';
@@ -2379,8 +2379,8 @@
     var maxSpend = regola("costo_stella_eur",10) * regola("max_stelle",5);
     var html = heroBanner('hero-regolamento.png', 'Regolamento', 'Tocca un argomento per aprirlo.', null, 'top');
     html += '<details class="admin-disclosure" open><summary><span class="reg-topic"><img src="ico-trofeo.png" alt="" class="reg-topic-ico"><h3>Come si fanno i punti</h3></span><span class="chev">›</span></summary><div class="disclosure-body">'
-      + '<p class="section-sub">Bonus: Mystery Box +'+regola("bonus_mystery_box",3)+' · Esterna +'+regola("bonus_esterna",4)+' · Cucina +'+regola("bonus_cucina",4)+' · Miglior piatto +'+regola("bonus_miglior_piatto",2)+'</p>'
-      + '<p class="section-sub">Penalità: Grembiule Nero '+regola("penalita_nero",-3)+' · Persa Esterna '+regola("penalita_esterna",-2)+' (non cumulabili tra loro)</p>'
+      + '<p class="section-sub">Bonus: Mystery Box (Golden Pin) +'+regola("bonus_mystery_box",4)+' · Green Pin +'+regola("bonus_green_pin",1)+' · Vinta Esterna +'+regola("bonus_esterna",2)+' · Cucina +'+regola("bonus_cucina",4)+'</p>'
+      + '<p class="section-sub">Penalità: Grembiule Nero '+regola("penalita_nero",-2)+' · Persa Esterna '+regola("penalita_esterna",-1)+' (non cumulabili tra loro)</p>'
       + '<p class="section-sub" style="margin-bottom:0;">Sono ammessi mezzi punti dove previsto dalle carte.</p></div></details>';
     html += '<details class="admin-disclosure"><summary><span class="reg-topic"><img src="ico-stelle.png" alt="" class="reg-topic-ico"><h3>Stelle</h3></span><span class="chev">›</span></summary><div class="disclosure-body">'
       + '<p class="section-sub" style="margin-bottom:0;">€'+regola("costo_stella_eur",10)+' = 1★. Massimo '+regola("max_stelle",5)+'★ (tetto €'+maxSpend+') per Stelle e Carte.</p></div></details>';
@@ -2577,7 +2577,7 @@
         + '<td><input type="checkbox" data-ev-mb="'+c.id+'" '+(ev&&ev.mystery_box?"checked":"")+'></td>'
         + '<td><input type="checkbox" data-ev-est="'+c.id+'" '+(ev&&ev.vince_esterna?"checked":"")+'></td>'
         + '<td><input type="checkbox" data-ev-cuc="'+c.id+'" '+(ev&&ev.vince_cucina?"checked":"")+'></td>'
-        + '<td><input type="checkbox" data-ev-mp="'+c.id+'" '+(ev&&ev.miglior_piatto?"checked":"")+'></td>'
+        + '<td><input type="checkbox" data-ev-gp="'+c.id+'" '+(ev&&ev.green_pin?"checked":"")+'></td>'
         + '<td><select data-ev-pen="'+c.id+'"><option value="">—</option><option value="nero" '+(ev&&ev.penalita==="nero"?"selected":"")+'>Nero</option><option value="esterna" '+(ev&&ev.penalita==="esterna"?"selected":"")+'>Esterna</option></select></td></tr>';
     }).join("");
     var nextNum = (state.episodes.reduce(function(m,e){return Math.max(m,e.numero);},0))+1;
@@ -2587,7 +2587,7 @@
       + '<label class="field"><span>Data</span><input type="date" id="a-ep-data" value="'+(editingEp&&editingEp.data?editingEp.data:"")+'"></label>'
       + '<label class="field"><span>Ora</span><input type="time" id="a-ep-ora" value="'+(editingEp&&editingEp.ora?String(editingEp.ora).slice(0,5):"")+'"></label>'
       + '</div>'
-      + '<div class="table-wrap"><table><thead><tr><th>Concorrente</th><th>Mystery</th><th>Esterna</th><th>Cucina</th><th>Piatto</th><th>Penalità</th></tr></thead><tbody>'+evRows+'</tbody></table></div>'
+      + '<div class="table-wrap"><table><thead><tr><th>Concorrente</th><th>Mystery</th><th>Esterna</th><th>Cucina</th><th>Green Pin</th><th>Penalità</th></tr></thead><tbody>'+evRows+'</tbody></table></div>'
       + '<div style="margin-top:10px;"><button class="btn sm" id="a-save-ep">'+(editingEp?"Salva modifiche":"Salva puntata (bozza)")+'</button> '
       + (editingEp?'<button class="btn sm ghost" id="a-cancel-ep">Annulla</button>':'')+'</div>',
       "admin-sec-nuova-puntata", !!editingEp
@@ -2611,7 +2611,7 @@
       "admin-sec-carte-attivazione"
     );
 
-    var settingsKeys = [["bonus_mystery_box","Bonus Mystery Box"],["bonus_esterna","Bonus Esterna"],["bonus_cucina","Bonus Cucina"],["bonus_miglior_piatto","Bonus Miglior Piatto"],["penalita_nero","Penalità Nero"],["penalita_esterna","Penalità Esterna"],["costo_stella_eur","Costo Stella (€)"],["max_stelle","Stelle massime"]];
+    var settingsKeys = [["bonus_mystery_box","Bonus Mystery Box (Golden Pin)"],["bonus_green_pin","Bonus Green Pin"],["bonus_esterna","Bonus Esterna (vittoria)"],["bonus_cucina","Bonus Cucina"],["penalita_nero","Penalità Nero"],["penalita_esterna","Penalità Esterna (sconfitta)"],["costo_stella_eur","Costo Stella (€)"],["max_stelle","Stelle massime"]];
     html += fieldset("Regolamento & Parametri", '<div class="field-row">'
       + settingsKeys.map(function(k){ return '<label class="field"><span>'+esc(k[1])+'</span><input type="number" data-setting="'+k[0]+'" value="'+regola(k[0])+'"></label>'; }).join("")
       + '</div><button class="btn sm" id="a-save-settings">Salva parametri</button>',
@@ -2834,7 +2834,7 @@
           mystery_box: document.querySelector('[data-ev-mb="'+c.id+'"]').checked,
           vince_esterna: document.querySelector('[data-ev-est="'+c.id+'"]').checked,
           vince_cucina: document.querySelector('[data-ev-cuc="'+c.id+'"]').checked,
-          miglior_piatto: document.querySelector('[data-ev-mp="'+c.id+'"]').checked,
+          green_pin: document.querySelector('[data-ev-gp="'+c.id+'"]').checked,
           penalita: document.querySelector('[data-ev-pen="'+c.id+'"]').value || null
         };
       });
