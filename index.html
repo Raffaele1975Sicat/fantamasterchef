@@ -612,6 +612,7 @@
     <button data-tab="concorrenti"><img class="nav-ico" src="ico-info.png" alt="">Chef</button>
     <button data-tab="puntate"><img class="nav-ico" src="ico-calendario.png" alt="">Puntate</button>
     <button data-tab="regolamento"><img class="nav-ico" src="ico-regolamento.png" alt="">Regole</button>
+    <button type="button" id="install-nav-btn"><img class="nav-ico" src="char-installa-ico.png" alt="" style="border-radius:50%;">Installa l'app</button>
     <button data-tab="admin" id="admin-nav-btn" style="display:none;"><img class="nav-ico" src="ico-impostazioni.png" alt="">Pannello Admin</button>
   </div>
 </nav>
@@ -619,20 +620,97 @@
 <div id="toast-root"></div>
 
 <script>
-/* ============ banner "aggiungi alla schermata Home" ============ */
+/* ============ banner/guida "aggiungi alla schermata Home" ============ */
+// Riconosce dispositivo e browser e mostra i passaggi giusti per ciascuno.
+// window.fmcShowInstallGuide() la riapre in qualsiasi momento (menu Altro).
 (function(){
   "use strict";
   function isStandalone(){
     return window.navigator.standalone === true || (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
   }
-  if (isStandalone()) return;
-  if (sessionStorage.getItem('installBannerDismissed')) return;
-
   var ua = navigator.userAgent.toLowerCase();
-  var isIOS = /iphone|ipad|ipod/.test(ua);
+  var isIOS = /iphone|ipad|ipod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   var isAndroid = /android/.test(ua);
+  var iosBrowser = !isIOS ? null : /fxios/.test(ua) ? 'firefox' : /crios/.test(ua) ? 'chrome' : /edgios/.test(ua) ? 'edge' : /safari/.test(ua) ? 'safari' : 'altro';
   var deferredPrompt = null;
   var shown = false;
+
+  function ls(get, k, v){ try { return get ? localStorage.getItem(k) : localStorage.setItem(k, v); } catch(e){ return null; } }
+  function ss(get, k, v){ try { return get ? sessionStorage.getItem(k) : sessionStorage.setItem(k, v); } catch(e){ return null; } }
+
+  function cleanUrl(){ return location.origin + location.pathname; }
+
+  function step(n, html){ return '<div class="step-row"><span class="step-num">'+n+'</span><span class="step-text">'+html+'</span></div>'; }
+
+  function stepsHtml(){
+    if (isIOS){
+      if (iosBrowser === 'safari') return ''
+        + step(1, 'Tocca <b>Condividi</b> (il quadrato con la freccia in su ⬆️). Se non lo vedi, tocca prima <b>"…"</b> in basso a destra e poi <b>Condividi</b>.')
+        + step(2, 'Scorri l\'elenco e tocca <b>"Aggiungi alla schermata Home"</b>.')
+        + step(3, 'Tocca <b>"Aggiungi"</b> in alto a destra. Fatto!');
+      if (iosBrowser === 'firefox') return ''
+        + step(1, 'Tocca l\'icona <b>Condividi</b> ⬆️ <b>in alto a sinistra</b>, dentro la barra dell\'indirizzo.')
+        + step(2, 'Scorri l\'elenco e tocca <b>"Aggiungi alla schermata Home"</b>.')
+        + step(3, 'Tocca <b>"Aggiungi"</b>. Fatto!');
+      if (iosBrowser === 'chrome' || iosBrowser === 'edge') return ''
+        + step(1, 'Tocca l\'icona <b>Condividi</b> ⬆️ nella barra dell\'indirizzo (in alto a destra).')
+        + step(2, 'Scorri l\'elenco e tocca <b>"Aggiungi alla schermata Home"</b>.')
+        + step(3, 'Tocca <b>"Aggiungi"</b>. Fatto!');
+      return ''
+        + step(1, 'Questa pagina è aperta dentro un\'altra app. Tocca <b>"Copia link"</b> qui sotto.')
+        + step(2, 'Apri <b>Safari</b>, incolla il link nella barra in alto e vai.')
+        + step(3, 'Tocca <b>Condividi</b> ⬆️ → <b>"Aggiungi alla schermata Home"</b> → <b>"Aggiungi"</b>.');
+    }
+    if (isAndroid) return ''
+      + step(1, 'Tocca il menu del browser: i <b>tre puntini ⋮</b> in alto a destra (su Samsung: le tre lineette ≡ in basso).')
+      + step(2, 'Tocca <b>"Aggiungi a schermata Home"</b> oppure <b>"Installa app"</b>.')
+      + step(3, 'Conferma con <b>"Aggiungi"</b> / <b>"Installa"</b>. Fatto!');
+    return step(1, 'Apri questo indirizzo dal <b>telefono</b>: lì potrai aggiungerlo alla schermata Home come una vera app.');
+  }
+
+  function openGuide(force){
+    var old = document.getElementById('install-guide-modal');
+    if (old) old.remove();
+    var b = document.getElementById('install-banner'); if (b) b.remove();
+    shown = true;
+    var m = document.createElement('div');
+    m.id = 'install-guide-modal';
+    var installBtn = deferredPrompt ? '<button type="button" class="btn primary" style="width:100%;margin-bottom:8px;" id="guide-install-now">📲 Installa adesso</button>' : '';
+    m.innerHTML = '<div class="card-detail-backdrop" data-guide-close></div>'
+      + '<div class="card-detail-sheet parchment-panel">'
+      + '<button type="button" class="card-detail-close" data-guide-close aria-label="Chiudi" style="background:transparent;border:none;padding:0;"><img src="ico-chiudi.png" alt="" style="width:32px;height:32px;object-fit:contain;"></button>'
+      + '<img src="char-installa.png" alt="" class="install-guide-img">'
+      + '<h3>Porta Fanta MasterChef sempre con te!</h3>'
+      + '<p class="card-detail-cost">Un\'icona sulla tua Home, come una vera app. Ci vogliono 10 secondi.</p>'
+      + installBtn
+      + stepsHtml()
+      + (isIOS ? '<p class="card-detail-cost" style="font-size:12.5px;">Quando apri l\'icona la prima volta ti chiederà di nuovo <b>username e password</b>: è normale.</p>' : '')
+      + '<button type="button" class="btn ghost" style="width:100%;margin:6px 0 8px;" id="guide-copy-link">🔗 Copia link</button>'
+      + (isIOS && iosBrowser !== 'safari' ? '<p class="card-detail-cost" style="font-size:12.5px;">Non trovi la voce? Copia il link, aprilo in <b>Safari</b> e segui gli stessi passaggi da lì.</p>' : '')
+      + '<button type="button" class="btn primary" style="width:100%;" data-guide-close>Ho capito!</button>'
+      + '</div>';
+    document.body.appendChild(m);
+    m.querySelectorAll('[data-guide-close]').forEach(function(el){
+      el.addEventListener('click', function(){ m.remove(); ls(false, 'installGuideSeen', '1'); });
+    });
+    var copyBtn = document.getElementById('guide-copy-link');
+    copyBtn.addEventListener('click', function(){
+      var url = cleanUrl();
+      function ok(){ copyBtn.textContent = '✅ Link copiato!'; }
+      if (navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(url).then(ok, function(){ window.prompt('Copia questo link:', url); });
+      } else { window.prompt('Copia questo link:', url); }
+    });
+    var nowBtn = document.getElementById('guide-install-now');
+    if (nowBtn){
+      nowBtn.addEventListener('click', function(){
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.finally(function(){ deferredPrompt = null; m.remove(); ls(false, 'installGuideSeen', '1'); });
+      });
+    }
+  }
+  window.fmcShowInstallGuide = function(){ openGuide(true); };
+  window.fmcIsStandalone = isStandalone;
 
   function showBanner(msg, onInstallClick){
     if (shown) return;
@@ -640,69 +718,48 @@
     var b = document.createElement('div');
     b.id = 'install-banner';
     b.innerHTML = '<div class="install-banner-inner"><img src="char-installa-ico.png" alt="" class="install-banner-ico"><span>'+msg+'</span>'
-      + (onInstallClick ? '<button class="btn sm primary" id="install-btn">Installa</button>' : '')
+      + '<button class="btn sm primary" id="install-btn">'+(onInstallClick ? 'Installa' : 'Come si fa?')+'</button>'
       + '<button class="btn sm ghost" id="install-dismiss">Chiudi</button></div>';
     document.body.appendChild(b);
     document.getElementById('install-dismiss').addEventListener('click', function(){
       b.remove();
-      sessionStorage.setItem('installBannerDismissed','1');
+      ss(false, 'installBannerDismissed', '1');
     });
-    if (onInstallClick){
-      document.getElementById('install-btn').addEventListener('click', onInstallClick);
-    }
+    document.getElementById('install-btn').addEventListener('click', onInstallClick || function(){ openGuide(true); });
   }
 
-  function showInstallGuide(){
-    if (shown) return;
-    shown = true;
-    var m = document.createElement('div');
-    m.id = 'install-guide-modal';
-    m.innerHTML = '<div class="card-detail-backdrop" data-guide-close></div>'
-      + '<div class="card-detail-sheet parchment-panel">'
-      + '<button type="button" class="card-detail-close" data-guide-close aria-label="Chiudi" style="background:transparent;border:none;padding:0;"><img src="ico-chiudi.png" alt="" style="width:32px;height:32px;object-fit:contain;"></button>'
-      + '<img src="char-installa.png" alt="" class="install-guide-img">'
-      + '<h3>Porta Fanta MasterChef sempre con te!</h3>'
-      + '<p class="card-detail-cost">Un\'icona sulla tua Home, come una vera app.</p>'
-      + '<div class="step-row"><span class="step-num">1</span><span class="step-text">Tocca <b>Condividi</b> nella barra di Safari (il quadrato con la freccia in su).</span></div>'
-      + '<div class="step-row"><span class="step-num">2</span><span class="step-text">Scorri e scegli <b>"Aggiungi alla schermata Home"</b>.</span></div>'
-      + '<div class="step-row" style="margin-bottom:16px;"><span class="step-num">3</span><span class="step-text">Fatto! Da ora lo trovi sempre lì, come una vera app.</span></div>'
-      + '<button type="button" class="btn primary" style="width:100%;" data-guide-close>Ho capito!</button>'
-      + '</div>';
-    document.body.appendChild(m);
-    m.querySelectorAll('[data-guide-close]').forEach(function(el){
-      el.addEventListener('click', function(){
-        m.remove();
-        localStorage.setItem('installGuideSeen','1');
+  window.addEventListener('beforeinstallprompt', function(e){
+    e.preventDefault();
+    deferredPrompt = e;
+    if (isStandalone() || ss(true, 'installBannerDismissed')) return;
+    if (document.getElementById('app') && document.getElementById('app').classList.contains('hidden')) return;
+    showBanner('📲 Aggiungi Fanta MasterChef alla schermata Home per trovarlo sempre.', function(){
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.finally(function(){
+        deferredPrompt = null;
+        var el = document.getElementById('install-banner');
+        if (el) el.remove();
       });
     });
-  }
+  });
 
-  if (isIOS){
-    if (!localStorage.getItem('installGuideSeen')){
-      showInstallGuide();
-    } else {
-      showBanner('📲 Per trovarlo sempre: tocca <b>Condividi</b> (il quadrato con la freccia in su) e poi <b>"Aggiungi alla schermata Home"</b>.');
-    }
-  } else {
-    window.addEventListener('beforeinstallprompt', function(e){
-      e.preventDefault();
-      deferredPrompt = e;
-      showBanner('📲 Aggiungi Fanta MasterChef alla schermata Home per trovarlo sempre.', function(){
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.finally(function(){
-          var el = document.getElementById('install-banner');
-          if (el) el.remove();
-        });
-      });
-    });
-    if (isAndroid){
+  // Comparsa automatica solo DOPO l'accesso (chiamata da onAuthed): prima ci si
+  // registra dal link d'invito, poi si mette l'icona sulla Home.
+  window.fmcMaybePromptInstall = function(){
+    if (isStandalone() || shown) return;
+    if (ss(true, 'installBannerDismissed')) return;
+    if (isIOS){
+      if (!ls(true, 'installGuideSeen')) {
+        setTimeout(function(){ openGuide(false); }, 1500);
+      } else {
+        showBanner('📲 Non hai ancora l\'icona sulla Home? Ti mostro come si fa.');
+      }
+    } else if (isAndroid){
       setTimeout(function(){
-        if (!shown){
-          showBanner('📲 Per trovarlo sempre: apri il menu ⋮ del browser e scegli <b>"Aggiungi a schermata Home"</b>.');
-        }
+        if (!shown){ showBanner('📲 Aggiungi Fanta MasterChef alla schermata Home per trovarlo sempre.'); }
       }, 2500);
     }
-  }
+  };
 })();
 
 (function(){
@@ -937,6 +994,7 @@
       var loadingEl = document.getElementById("loading-overlay");
       if (loadingEl) loadingEl.classList.remove("hidden");
       loadEverything();
+      if (window.fmcMaybePromptInstall) window.fmcMaybePromptInstall();
     });
   }
 
@@ -1456,6 +1514,15 @@
     if (e.target.closest("#more-panel") || e.target.closest("#more-nav-btn")) return;
     panel.classList.add("hidden");
   });
+  (function(){
+    var instBtn = document.getElementById("install-nav-btn");
+    if (!instBtn) return;
+    if (window.fmcIsStandalone && window.fmcIsStandalone()){ instBtn.style.display = "none"; return; }
+    instBtn.addEventListener("click", function(){
+      document.getElementById("more-panel").classList.add("hidden");
+      if (window.fmcShowInstallGuide) window.fmcShowInstallGuide();
+    });
+  })();
 
   /* ============ render: home / classifica ============ */
   // La Home è il centro dell'app: 1) chi sono, 2) accesso alle funzioni
