@@ -52,6 +52,9 @@
   #auth-screen .field input{background:rgba(255,255,255,.55); border:1px solid #b99a5c; color:#2b1a0d;}
   #auth-screen .tabs-link{color:#6b4a26;}
   #auth-screen .tabs-link span{color:#8a5a1e;}
+  #auth-screen .tabs-link a{color:#7a3e12; font-weight:700; text-decoration:underline;}
+  #auth-screen .auth-register-btn{display:block; text-align:center; padding:13px 16px; border:2px solid #7a3e12; border-radius:12px; color:#7a3e12; background:rgba(255,255,255,.35); font-weight:700; font-size:16px; text-decoration:none;}
+  #auth-screen .auth-register-btn:active{background:rgba(122,62,18,.15);}
   .auth-quote{text-align:center; font-family:'Fraunces',serif; font-size:12.5px; color:#5a3c22; margin:14px 0 0;}
   @media (max-width:360px){ .auth-board{padding:22px 16px 18px;} }
   .card{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:20px;}
@@ -554,7 +557,8 @@
         <div class="field"><label>Password</label><input type="password" id="login-password" autocomplete="current-password"></div>
         <button class="btn primary block" id="login-btn">Accedi</button>
         <p class="err hidden" id="login-error"></p>
-        <p class="tabs-link">Prima volta? <a href="#" id="show-register">Crea il tuo account</a></p>
+        <p class="tabs-link" style="margin-top:18px;margin-bottom:6px;">Prima volta qui?</p>
+        <a href="#" id="show-register" class="auth-register-btn">Crea il tuo account</a>
         <p class="tabs-link">Password o account smarriti? Chiedi all'Admin della lega.</p>
       </div>
       <div id="register-form" class="hidden">
