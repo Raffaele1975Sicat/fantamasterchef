@@ -2078,6 +2078,13 @@
               + '<button class="btn sm ghost" id="ombra-cancel">Annulla</button></div></div>')
             : '<span class="muted">Nessuno Chef disponibile</span>';
           bucket = "disponibili";
+        } else if (c.key==="chef_ombra" && (brigataLocked(team) || !state.concorrenti.some(function(x){ return !x.eliminato; }))){
+          var ombraMsg = brigataLocked(team)
+            ? "Lo Chef Ombra si acquista e si sceglie insieme alla Brigata: la scadenza è passata."
+            : "Disponibile quando la Masterclass sarà formata, insieme alla scelta della Brigata.";
+          actionHtml = '<button class="btn sm ghost block" disabled>Compra</button>'
+            + '<p class="muted" style="font-size:12px;margin:6px 0 0;">'+esc(ombraMsg)+'</p>';
+          bucket = "bloccate";
         } else {
           var afford = remaining >= Number(c.costo_stelle);
           actionHtml = '<button class="btn sm '+(afford?'primary':'ghost')+' block" data-buy-card="'+esc(c.key)+'" '+(afford?'':'disabled title="Stelle insufficienti"')+'>Compra</button>'
@@ -2545,7 +2552,7 @@
     html += '<details class="admin-disclosure"><summary><span class="reg-topic"><img src="ico-stelle.png" alt="" class="reg-topic-ico"><h3>Stelle</h3></span><span class="chev">›</span></summary><div class="disclosure-body">'
       + '<p class="section-sub" style="margin-bottom:0;">€'+regola("costo_stella_eur",10)+' = 1★. Massimo '+regola("max_stelle",5)+'★ (tetto €'+maxSpend+') per Stelle e Carte.</p></div></details>';
     html += '<details class="admin-disclosure"><summary><span class="reg-topic"><img src="ico-lucchetto.png" alt="" class="reg-topic-ico"><h3>Chef Ombra</h3></span><span class="chev">›</span></summary><div class="disclosure-body">'
-      + '<p class="section-sub" style="margin-bottom:0;">Quarto Chef segreto, costa 2★. Punti calcolati da subito ma mostrati e conteggiati in classifica solo al 31/01/2027.</p></div></details>';
+      + '<p class="section-sub" style="margin-bottom:0;">Quarto Chef segreto, facoltativo, costa 2★. Si acquista e si sceglie insieme alla Brigata, tra la formazione della Masterclass e la scadenza della Brigata; poi non si cambia più. Punti calcolati da subito ma mostrati e conteggiati in classifica solo al 31/01/2027.</p></div></details>';
     document.getElementById("panel-regolamento").innerHTML = html;
   }
 
