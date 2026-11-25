@@ -554,7 +554,19 @@
         <div class="field"><label>Password</label><input type="password" id="login-password" autocomplete="current-password"></div>
         <button class="btn primary block" id="login-btn">Accedi</button>
         <p class="err hidden" id="login-error"></p>
-        <p class="tabs-link">Account smarrito o nuovo? Chiedi all'Admin della lega.</p>
+        <p class="tabs-link">Prima volta? <a href="#" id="show-register">Crea il tuo account</a></p>
+        <p class="tabs-link">Password o account smarriti? Chiedi all'Admin della lega.</p>
+      </div>
+      <div id="register-form" class="hidden">
+        <div class="field"><label>Codice invito</label><input type="text" id="reg-invite" autocapitalize="characters" autocorrect="off"></div>
+        <div class="field"><label>Username (per accedere)</label><input type="text" id="reg-username" autocomplete="username" autocapitalize="none" autocorrect="off" placeholder="3-20 caratteri, senza spazi"></div>
+        <div class="field"><label>Il tuo nome (come ti vedono gli altri)</label><input type="text" id="reg-display" autocomplete="nickname" placeholder="facoltativo"></div>
+        <div class="field"><label>Nome squadra</label><input type="text" id="reg-team" maxlength="40"></div>
+        <div class="field"><label>Password</label><input type="password" id="reg-password" autocomplete="new-password" placeholder="almeno 6 caratteri"></div>
+        <div class="field"><label>Ripeti password</label><input type="password" id="reg-password2" autocomplete="new-password"></div>
+        <button class="btn primary block" id="register-btn">Crea account ed entra</button>
+        <p class="err hidden" id="register-error"></p>
+        <p class="tabs-link">Hai già un account? <a href="#" id="show-login">Accedi</a></p>
       </div>
       <p class="auth-quote">"La cucina è più bella quando la si condivide." ♥</p>
     </div>
@@ -833,6 +845,83 @@
       if (illusEl) illusEl.src = "char-errore.png";
     });
   });
+
+  /* ---- auto-registrazione con codice invito (Edge Function self-register) ---- */
+  (function(){
+    var loginForm = document.getElementById("login-form");
+    var regForm = document.getElementById("register-form");
+    var titleEl = document.querySelector("#auth-screen .auth-board h2");
+    var subEl = document.querySelector("#auth-screen .auth-sub");
+    function showRegister(){
+      loginForm.classList.add("hidden"); regForm.classList.remove("hidden");
+      if (titleEl) titleEl.textContent = "Benvenuto, Chef!";
+      if (subEl) subEl.textContent = "Crea il tuo account e la tua squadra";
+    }
+    function showLogin(){
+      regForm.classList.add("hidden"); loginForm.classList.remove("hidden");
+      if (titleEl) titleEl.textContent = "Bentornato, Chef!";
+      if (subEl) subEl.textContent = "Accedi con le tue credenziali";
+    }
+    document.getElementById("show-register").addEventListener("click", function(e){ e.preventDefault(); showRegister(); });
+    document.getElementById("show-login").addEventListener("click", function(e){ e.preventDefault(); showLogin(); });
+
+    // link d'invito: ...?invito=CODICE apre direttamente la registrazione col codice compilato
+    try {
+      var inv = new URLSearchParams(location.search).get("invito");
+      if (inv){ document.getElementById("reg-invite").value = inv; showRegister(); }
+    } catch(e){}
+
+    document.getElementById("register-btn").addEventListener("click", function(){
+      var errEl = document.getElementById("register-error");
+      var illusEl = document.getElementById("auth-illus");
+      function fail(msg){
+        errEl.textContent = msg; errEl.classList.remove("hidden");
+        if (illusEl) illusEl.src = "char-errore.png";
+      }
+      errEl.classList.add("hidden");
+      if (illusEl) illusEl.src = "char-login.png";
+      var data = {
+        invite_code: document.getElementById("reg-invite").value.trim(),
+        username: document.getElementById("reg-username").value.trim(),
+        display_name: document.getElementById("reg-display").value.trim(),
+        team_name: document.getElementById("reg-team").value.trim(),
+        password: document.getElementById("reg-password").value
+      };
+      var pw2 = document.getElementById("reg-password2").value;
+      if (!data.invite_code) return fail("Inserisci il codice invito.");
+      if (!/^[A-Za-z0-9._-]{3,20}$/.test(data.username)) return fail("Username: 3-20 caratteri, solo lettere, numeri, punto, trattino o underscore (niente spazi).");
+      if (!data.team_name) return fail("Inserisci il nome della squadra.");
+      if (data.password.length < 6) return fail("La password deve avere almeno 6 caratteri.");
+      if (data.password !== pw2) return fail("Le due password non coincidono.");
+      var btn = document.getElementById("register-btn");
+      btn.disabled = true;
+      fetch(SUPABASE_URL + "/functions/v1/self-register", {
+        method: "POST",
+        headers: {"Content-Type":"application/json", "apikey":SUPABASE_KEY, "Authorization":"Bearer "+SUPABASE_KEY},
+        body: JSON.stringify(data)
+      }).then(function(r){
+        return r.json().then(function(body){ return {status:r.status, body:body}; });
+      }).then(function(res){
+        btn.disabled = false;
+        if (!res.body || !res.body.ok){
+          return fail((res.body && res.body.error) || "Registrazione non riuscita.");
+        }
+        if (!res.body.session){
+          // account creato ma login automatico non riuscito: si passa al login normale
+          showLogin();
+          document.getElementById("login-username").value = data.username;
+          return;
+        }
+        if (history.replaceState){ history.replaceState(null, "", location.pathname); }
+        sb.auth.setSession({access_token: res.body.session.access_token, refresh_token: res.body.session.refresh_token}).then(function(){
+          onAuthed();
+        });
+      }).catch(function(){
+        btn.disabled = false;
+        fail("Registrazione non riuscita. Controlla la connessione e riprova.");
+      });
+    });
+  })();
 
   document.getElementById("logout-btn").addEventListener("click", function(){
     sb.auth.signOut().then(function(){ location.reload(); });
