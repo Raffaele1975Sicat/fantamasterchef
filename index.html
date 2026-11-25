@@ -176,12 +176,12 @@
     background-image:
       repeating-linear-gradient(90deg, rgba(0,0,0,.12) 0px, rgba(0,0,0,0) 2px, rgba(0,0,0,0) 18px, rgba(0,0,0,.07) 20px),
       linear-gradient(180deg,#2a1c0e,#150f08);}
-  .bottombar button{position:relative; flex:1; background:none; border:none; color:var(--ink-faint); font-size:12.5px; font-weight:600; padding:11px 2px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; overflow:visible;}
+  .bottombar button{position:relative; flex:1; background:none; border:none; color:var(--ink-faint); font-size:12.5px; font-weight:600; padding:7px 2px 9px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; overflow:visible;}
   .bottombar button.active{color:var(--gold-strong); text-shadow:0 0 8px rgba(232,194,106,.45);}
   .bottombar button.active::before{content:""; position:absolute; top:3px; left:50%; transform:translateX(-50%); width:58px; height:58px; border-radius:16px; background:radial-gradient(circle, rgba(232,194,106,.3) 0%, rgba(232,194,106,0) 72%); pointer-events:none; z-index:0;}
   .bottombar button.active::after{content:""; position:absolute; bottom:1px; left:50%; transform:translateX(-50%); width:26px; height:3px; border-radius:999px; background:var(--gold-strong); box-shadow:0 0 8px 1px rgba(232,194,106,.85); z-index:2;}
   .bottombar button .dot{width:6px; height:6px; border-radius:50%; background:currentColor;}
-  .bottombar button .nav-ico{width:50px; height:50px; object-fit:contain; opacity:.85; position:relative; z-index:1;}
+  .bottombar button .nav-ico{width:46px; height:46px; object-fit:contain; opacity:.85; position:relative; z-index:1;}
   .bottombar button.active .nav-ico{opacity:1; filter:drop-shadow(0 0 3px rgba(232,194,106,.5));}
   .bottombar button .nav-ico-wrap{position:relative; z-index:1; display:inline-flex;}
   .bottombar button.active .nav-dots{position:relative; z-index:1;}
@@ -189,14 +189,15 @@
   .nav-dots span{width:4px; height:4px; border-radius:50%; background:currentColor; opacity:.72;}
   .more-panel{position:absolute; bottom:100%; right:6px; margin-bottom:8px; background:var(--parchment); color:var(--ink-dark); border:1px solid #a98a4a; border-radius:12px; box-shadow:0 -8px 24px rgba(0,0,0,.5); padding:6px; display:flex; flex-direction:column; min-width:180px;}
   .more-panel button{flex:none; flex-direction:row; justify-content:flex-start; gap:10px; padding:11px 12px; font-size:13.5px; border-radius:8px; color:var(--ink-dark); font-weight:600;}
-  .more-panel button .nav-ico{width:20px; height:20px; object-fit:contain;}
+  .more-panel button .nav-ico{width:34px; height:34px; object-fit:contain;}
+  .bottombar .nav-label{font-size:10.5px; font-weight:700; letter-spacing:.02em; line-height:1; margin-top:-1px; position:relative; z-index:1;}
+  .bottombar button.active .nav-label{color:var(--gold-strong);}
   .more-panel button:active{background:rgba(122,90,30,.15);}
   .empty{padding:30px 16px; text-align:center; color:var(--ink-faint);}
   #toast-root{position:fixed; top:14px; left:50%; transform:translateX(-50%); z-index:99; display:flex; flex-direction:column; gap:8px;}
   .toast{background:#2a2313; border:1px solid var(--gold); color:var(--ink); padding:10px 16px; border-radius:9px; font-size:13.5px; box-shadow:0 6px 20px rgba(0,0,0,.4);}
   #loading-overlay{position:fixed; inset:0; z-index:150; background:var(--wood-dark); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px;}
-  #loading-overlay img{width:120px; height:120px; object-fit:contain; animation:loading-spin 1.6s linear infinite;}
-  #loading-overlay span{color:var(--gold-strong); font-family:'Fraunces',serif; font-size:15px; letter-spacing:.02em;}
+  #loading-overlay img{width:100%; height:100%; object-fit:cover; object-position:center 40%;}
   @keyframes loading-spin{from{transform:rotate(0deg);} to{transform:rotate(360deg);}}
   .banner{background:var(--panel2); border:1px solid var(--line); border-radius:10px; padding:10px 14px; margin-bottom:14px; font-size:13.5px; display:flex; justify-content:space-between; align-items:center; gap:10px;}
   .banner.warn{border-color:var(--penalty);}
@@ -209,7 +210,7 @@
   .greet-row h1{font-size:19px; margin:0;}
   .notice{background:linear-gradient(160deg, var(--parchment) 0%, var(--parchment2) 100%); color:var(--ink-dark); border:1px solid #b99a5c; border-radius:12px; padding:12px 14px; margin-bottom:16px; box-shadow:0 5px 14px rgba(0,0,0,.3); position:relative;}
   .notice-head{display:flex; align-items:center; gap:8px; font-size:13.5px; font-weight:700; color:#7a4a1e; margin-bottom:2px;}
-  .notice-icon{width:20px; height:20px; object-fit:cover; border-radius:50%; flex:0 0 auto;}
+  .notice-icon{width:34px; height:34px; object-fit:cover; border-radius:50%; flex:0 0 auto;}
   .notice-item{display:flex; justify-content:space-between; gap:10px; font-size:13px; padding:6px 0 6px 28px; border-top:1px solid #cdb27e;}
   .notice-when{color:#8a7550; white-space:nowrap; font-size:12px;}
   .my-team-card{display:flex; align-items:center; gap:12px; padding:14px 16px; margin-bottom:20px; cursor:pointer; -webkit-tap-highlight-color:transparent; border-left:4px solid var(--gold); background:linear-gradient(100deg, rgba(202,162,76,.12), var(--panel) 55%);}
@@ -227,7 +228,7 @@
   .action-card::after{content:""; position:absolute; top:7px; right:9px; width:5px; height:5px; border-radius:50%; background:var(--gold-dim); box-shadow:0 1px 1px rgba(0,0,0,.5);}
   .action-card:active{background:var(--panel2); border-color:var(--gold-dim);}
   .action-icon-wrap{width:42px; height:42px; border-radius:50%; background:radial-gradient(circle at 35% 30%, #6a4527, var(--wood-dark) 72%); border:2px solid var(--gold); display:flex; align-items:center; justify-content:center; flex:0 0 auto; box-shadow:0 2px 6px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.1);}
-  .action-icon-wrap img{width:21px; height:21px; object-fit:contain;}
+  .action-icon-wrap img{width:30px; height:30px; object-fit:contain;}
   .action-card h3{margin:0; font-size:14.5px;}
   .action-card span{font-size:11.5px; color:var(--ink-faint); line-height:1.3;}
   .stat-row{display:flex; margin-bottom:18px; border:1px solid var(--line); border-radius:14px; overflow:hidden;}
@@ -247,9 +248,22 @@
   .brigata-head img{width:44px; height:44px; object-fit:cover; border-radius:50%; border:2px solid var(--gold); flex:0 0 auto;}
   .brigata-head h3{margin:0; font-size:15px;}
   .brigata-chips{display:flex; flex-wrap:wrap; gap:6px 8px; margin-bottom:4px;}
+  .figurine-grid{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; margin:4px 0 10px;}
+  .figurina{position:relative; text-align:center; padding:8px 4px 7px; border-radius:11px; background-image:url(bg-pergamena-texture.png); background-size:180px; border:2px solid #a27d3e; box-shadow:0 4px 8px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.6); color:#2b1a0d;}
+  .figurina img{width:100%; max-width:74px; aspect-ratio:1/1; object-fit:cover; border-radius:50%; border:2px solid #a27d3e; background:#3a2414; display:block; margin:0 auto 5px;}
+  .figurina b{display:block; font-family:'Fraunces',serif; font-size:12.5px; line-height:1.1; min-height:2.2em; display:flex; align-items:center; justify-content:center; overflow-wrap:anywhere;}
+  .figurina .fig-pts{display:inline-block; margin-top:4px; font-size:11.5px; font-weight:700; padding:1px 7px; border-radius:999px; background:rgba(43,26,13,.85); color:#f3d98c;}
+  .figurina.is-out img{filter:grayscale(1); opacity:.55;}
+  .figurina.is-out .fig-tag{position:absolute; top:5px; left:50%; transform:translateX(-50%); font-size:8.5px; font-weight:800; letter-spacing:.04em; text-transform:uppercase; background:#9b2c1f; color:#fff; padding:1px 6px; border-radius:999px;}
+  .figurina.is-empty{opacity:.7; border-style:dashed;}
+  .figurina.is-empty .fig-plus{width:100%; max-width:74px; aspect-ratio:1/1; border-radius:50%; margin:0 auto 5px; display:flex; align-items:center; justify-content:center; font-size:30px; color:#a27d3e; border:2px dashed #a27d3e;}
+  .figurina.is-ombra{background:linear-gradient(170deg,#2b1d14,#120b06); border-color:var(--gold); color:#f3d98c;}
+  .figurina.is-ombra b{color:#f3d98c;}
+  .figurina.is-ombra small{display:block; font-size:9.5px; color:#cdb98e; margin-top:2px; line-height:1.15;}
+  @media(max-width:360px){ .figurina b{font-size:11px;} }
   .brigata-chips .chip{margin:0; padding:6px 12px; font-size:13px;}
   .status-line{display:flex; align-items:flex-start; gap:7px; font-size:12.5px; color:var(--ink-faint); margin:10px 0 0;}
-  .status-line img{width:14px; height:14px; object-fit:contain; flex:0 0 auto; margin-top:2px;}
+  .status-line img{width:22px; height:22px; object-fit:contain; flex:0 0 auto; margin-top:0;}
   header.topbar .btn.sm{padding:11px 14px; min-height:44px;}
 
   /* --- sistema grafico globale: legno / pergamena / oro --- */
@@ -297,7 +311,7 @@
     .action-grid{gap:9px; margin-bottom:15px;}
     .action-card{padding:11px;}
     .action-icon-wrap{width:36px; height:36px;}
-    .action-icon-wrap img{width:18px; height:18px;}
+    .action-icon-wrap img{width:26px; height:26px;}
     .home-hero{margin-bottom:13px;}
     .home-hero-img{width:78px;}
     .home-hero-text{padding:10px 12px;}
@@ -371,13 +385,15 @@
   .screen-hero-corner .chat-notif-toggle{background:rgba(20,12,4,.6); border-radius:50%; padding:7px; border:1px solid rgba(232,194,106,.4);}
   .chat-notif-toggle input{margin:0;}
   .chat-notif-toggle input:not(:checked) ~ .bell{opacity:.35;}
+  .chat-notif-toggle img.bell{width:30px; height:30px; object-fit:contain;}
+  .chat-notif-toggle input:not(:checked) ~ img.bell{filter:grayscale(1);}
 
   details.admin-disclosure{background:var(--panel); border:1px solid var(--line); border-radius:14px; margin-bottom:12px; overflow:hidden;}
   details.admin-disclosure summary{list-style:none; cursor:pointer; display:flex; align-items:center; justify-content:space-between; gap:10px; padding:14px 16px; -webkit-tap-highlight-color:transparent;}
   details.admin-disclosure summary::-webkit-details-marker{display:none;}
   details.admin-disclosure summary h3{margin:0; font-size:14.5px;}
   .reg-topic{display:flex; align-items:center; gap:9px; min-width:0;}
-  .reg-topic-ico{width:22px; height:22px; object-fit:contain; flex:0 0 auto;}
+  .reg-topic-ico{width:34px; height:34px; object-fit:contain; flex:0 0 auto;}
   details.admin-disclosure summary .chev{color:var(--gold-strong); font-size:15px; transition:transform .2s ease; flex:0 0 auto;}
   details.admin-disclosure[open] summary .chev{transform:rotate(90deg);}
   details.admin-disclosure summary{border-bottom:1px solid transparent;}
@@ -436,6 +452,16 @@
   .chat-meta{font-size:11px; color:var(--ink-faint); margin:2px 6px;}
   .chat-reply-preview{border-left:2px solid var(--gold-strong); padding-left:8px; margin-bottom:4px; font-size:12px; color:var(--ink-faint);}
   .chat-img{max-width:220px; max-height:260px; border-radius:8px; display:block; margin-top:4px; cursor:pointer; object-fit:cover;}
+  .chat-line{display:flex; align-items:flex-start; gap:8px; max-width:92%; align-self:flex-start;}
+  .chat-line.mine{align-self:flex-end; flex-direction:row-reverse;}
+  .chat-line .chat-msg{max-width:100%; align-self:auto; min-width:0;}
+  .chat-ava{width:38px; height:38px; flex:0 0 38px; border-radius:50%; object-fit:cover; border:2px solid var(--gold); background:var(--wood-dark); margin-top:16px; box-shadow:0 2px 5px rgba(0,0,0,.4);}
+  .chat-avviso img.avv-ico{width:20px; height:20px; object-fit:contain; vertical-align:-5px; margin-right:4px;}
+  .chat-card-play{align-self:center; display:flex; align-items:center; gap:11px; max-width:94%; padding:9px 13px 9px 9px; border-radius:14px; background-image:url(bg-pergamena-texture.png); background-size:200px; border:2px solid #a27d3e; box-shadow:0 4px 9px rgba(0,0,0,.35); color:#2b1a0d;}
+  .chat-card-play img{width:54px; height:auto; border-radius:6px; box-shadow:0 3px 6px rgba(0,0,0,.4); transform:rotate(-4deg); flex:0 0 auto;}
+  .chat-card-play .ccp-kicker{display:block; font-size:10px; font-weight:800; letter-spacing:.07em; text-transform:uppercase; color:#9b2c1f;}
+  .chat-card-play .ccp-text{font-size:13.5px; line-height:1.3; font-weight:600;}
+  .chat-card-play .chat-meta{margin:3px 0 0; color:#6b5232;}
   .chat-avviso{align-self:center; text-align:center; font-size:12.5px; color:var(--gold-strong); background:rgba(202,162,76,.1); border:1px solid var(--line); border-radius:999px; padding:6px 14px; max-width:92%;}
   .chat-reactions{display:flex; gap:4px; flex-wrap:wrap; margin-top:4px;}
   .chat-react-btn{background:var(--panel2); border:1px solid var(--line); border-radius:999px; font-size:11.5px; padding:1px 7px; cursor:pointer; color:var(--ink);}
@@ -465,14 +491,14 @@
 .home-v3 .action-board{padding:9px;margin:0 0 12px;background-image:url(bg-legno-texture.png);background-size:230px;background-repeat:repeat;border:2px solid #916b2e;border-radius:18px;box-shadow:0 8px 18px rgba(0,0,0,.34);}
 .home-v3 .home-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:0;padding:0;background:none;border:0;box-shadow:none;}
 .home-v3 .home-action{min-height:112px;height:112px;padding:10px 7px 8px;position:relative;background-image:url(bg-pergamena-texture.png);background-size:200px;background-repeat:repeat;border:2px solid #a27d3e;border-radius:12px;box-shadow:0 5px 9px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.75);}
-.home-v3 .home-action{display:grid;grid-template-columns:52px 1fr 30px;grid-template-rows:auto auto;column-gap:8px;align-items:center;text-align:left;cursor:pointer;color:#2b1a0d;}
+.home-v3 .home-action{display:grid;grid-template-columns:62px 1fr 26px;grid-template-rows:auto auto;column-gap:8px;align-items:center;text-align:left;cursor:pointer;color:#2b1a0d;}
 .home-v3 .home-action-icon{grid-column:1;grid-row:1 / span 2;margin:0;}
 .home-v3 .home-action h3{grid-column:2;grid-row:1;align-self:end;color:#2b1a0d;}
 .home-v3 .home-action span{grid-column:2;grid-row:2;align-self:start;color:#62472b;}
 .home-v3 .home-action:after{content:'›';grid-column:3;grid-row:1 / span 2;justify-self:center;align-self:center;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 35% 28%,#8a5c2d,#3a2110 72%);border:2px solid #c09642;box-shadow:0 3px 6px rgba(0,0,0,.32);color:#fff4d7;font-size:22px;line-height:1;}
 .home-v3 .home-action:before{content:"";position:absolute;inset:5px;border:1px dashed rgba(106,73,34,.28);border-radius:8px;pointer-events:none;}
-.home-v3 .home-action-icon{width:52px;height:52px;margin-bottom:2px;background:none;border:0;box-shadow:none;z-index:1;}
-.home-v3 .home-action-icon img{width:52px;height:52px;object-fit:contain;filter:drop-shadow(0 4px 6px rgba(0,0,0,.4));}
+.home-v3 .home-action-icon{width:60px;height:60px;margin-bottom:2px;background:none;border:0;box-shadow:none;z-index:1;}
+.home-v3 .home-action-icon img{width:60px;height:60px;object-fit:contain;filter:drop-shadow(0 4px 6px rgba(0,0,0,.4));}
 .home-v3 .home-action h3{font-family:'Fraunces',serif;font-size:16px;line-height:1.05;margin:0 0 3px;z-index:1;}
 .home-v3 .home-action span{font-size:10.5px;line-height:1.18;color:#62472b;z-index:1;}
 .home-v3 .home-lower{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:0 0 10px;}
@@ -487,9 +513,20 @@
 .home-v3 .home-wood > div[style]{position:relative;padding:10px 10px !important;}
 .home-v3 .home-team-strip{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:10px;}
 .home-v3 .home-chef-pill{display:flex;align-items:center;gap:6px;padding:6px 11px;border-radius:999px;background:rgba(20,10,4,.55);border:1px solid rgba(232,194,106,.4);font-size:12.5px;color:#f5e6c4;}
+.home-v3 .countdown-card{display:flex;align-items:center;gap:12px;margin:0 0 12px;padding:11px 13px;border-radius:14px;background-image:url(bg-pergamena-texture.png);background-size:220px;border:2px solid #a27d3e;box-shadow:0 5px 10px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.7);color:#2b1a0d;}
+.home-v3 .cd-cal{flex:0 0 66px;text-align:center;border-radius:10px;overflow:hidden;background:#fffaf0;border:2px solid #7a3e12;box-shadow:0 3px 6px rgba(0,0,0,.25);}
+.home-v3 .cd-cal small{display:block;background:#b3261e;color:#fff;font-size:10.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:2px 0;}
+.home-v3 .cd-cal b{display:block;font-family:'Fraunces',serif;font-size:30px;line-height:1.05;padding-top:2px;}
+.home-v3 .cd-cal span{display:block;font-size:10.5px;font-weight:700;text-transform:uppercase;padding-bottom:3px;color:#5b4427;}
+.home-v3 .cd-body{flex:1;min-width:0;}
+.home-v3 .cd-body h3{margin:0;font-family:'Fraunces',serif;font-size:17px;line-height:1.1;}
+.home-v3 .cd-body p{margin:2px 0 0;font-size:12px;color:#5b4427;}
+.home-v3 .cd-timer{display:flex;align-items:center;gap:6px;margin-top:6px;font-weight:800;font-size:17px;color:#9b2c1f;}
+.home-v3 .cd-timer img{width:22px;height:22px;object-fit:contain;}
 .home-v3 .home-stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
 .home-v3 .home-stat{display:flex;align-items:center;padding:8px 9px;border-radius:9px;gap:6px;background:rgba(20,10,4,.55);border:1px solid rgba(232,194,106,.3);box-shadow:inset 0 1px 0 rgba(255,255,255,.05);}
-.home-v3 .home-stat-ico{font-size:18px;width:23px;}
+.home-v3 .home-stat-ico{font-size:24px;width:34px;flex:0 0 34px;text-align:center;}
+.home-v3 .home-stat-ico img{width:34px;height:34px;object-fit:contain;filter:drop-shadow(0 2px 3px rgba(0,0,0,.4));}
 .home-v3 .home-stat b{font-size:16px;color:#f3d98c;}
 .home-v3 .home-stat span{font-size:9.5px;color:#e2d2ac;}
 .home-v3 .home-quote{margin:0 4px 4px;padding:9px 10px;background-image:url(bg-pergamena-texture.png);background-size:220px;background-repeat:repeat;border:2px solid #a27d3e;border-radius:11px;color:#3c2a18;font-family:'Fraunces',serif;font-size:12.5px;box-shadow:0 5px 10px rgba(0,0,0,.25);}
@@ -504,10 +541,10 @@
  .home-v3 .action-board{padding:7px;border-radius:16px;margin-bottom:10px;}
  .home-v3 .home-actions{gap:7px;}
  .home-v3 .home-action{min-height:104px;height:104px;padding:8px 5px 7px;}
- .home-v3 .home-action{grid-template-columns:46px 1fr 26px;column-gap:7px;}
- .home-v3 .home-action:after{width:24px;height:24px;font-size:20px;}
- .home-v3 .home-action-icon{width:46px;height:46px;margin-bottom:2px;}
- .home-v3 .home-action-icon img{width:46px;height:46px;}
+ .home-v3 .home-action{grid-template-columns:54px minmax(0,1fr) 20px;column-gap:5px;}
+ .home-v3 .home-action:after{width:20px;height:20px;font-size:17px;}
+ .home-v3 .home-action-icon{width:54px;height:54px;margin-bottom:2px;}
+ .home-v3 .home-action-icon img{width:54px;height:54px;}
  .home-v3 .home-action h3{font-size:15px;}
  .home-v3 .home-action span{font-size:10px;}
  .home-v3 .home-lower{grid-template-columns:1fr;gap:8px;margin-bottom:8px;}
@@ -578,8 +615,7 @@
 </div>
 
 <div id="loading-overlay" class="hidden">
-  <img src="char-loading.png" alt="">
-  <span>Sto apparecchiando…</span>
+  <img src="loading-brigata.jpg" alt="Stiamo preparando qualcosa di speciale…">
 </div>
 
 <div id="app" class="hidden">
@@ -588,7 +624,7 @@
       <img src="icon-96.png" alt="" style="height:32px;width:32px;border-radius:8px;flex:0 0 auto;">
       <div><span class="eyebrow" id="season-label-display">Stagione 2026/2027</span><h1 id="league-name-display">Fanta MasterChef</h1></div>
     </div>
-    <button class="btn ghost sm" id="logout-btn" style="display:flex;align-items:center;gap:6px;"><img src="ico-logout.png" alt="" style="width:16px;height:16px;object-fit:contain;">Esci</button>
+    <button class="btn ghost sm" id="logout-btn" style="display:flex;align-items:center;gap:6px;"><img src="ico-logout.png" alt="" style="width:20px;height:20px;object-fit:contain;">Esci</button>
   </header>
   <main>
     <div id="notices-host"></div>
@@ -606,11 +642,11 @@
 </div>
 
 <nav class="bottombar hidden" id="bottombar">
-  <button data-tab="home" aria-label="Home"><img class="nav-ico" src="ico-home.png" alt=""></button>
-  <button data-tab="carte" aria-label="Carte"><img class="nav-ico" src="ico-carte.png" alt=""></button>
-  <button data-tab="classifica" aria-label="Classifica"><img class="nav-ico" src="ico-trofeo-badge.png" alt=""></button>
-  <button data-tab="squadra" aria-label="Squadra"><img class="nav-ico" src="ico-brigata.png" alt=""></button>
-  <button data-tab="chat" aria-label="Chat"><span class="nav-ico-wrap"><img class="nav-ico" src="ico-chat-badge.png" alt=""><span class="chat-badge hidden" id="chat-badge">0</span></span></button>
+  <button data-tab="home" aria-label="Home"><img class="nav-ico" src="nav-home.png" alt=""><span class="nav-label">Home</span></button>
+  <button data-tab="carte" aria-label="Carte"><img class="nav-ico" src="nav-carte.png" alt=""><span class="nav-label">Carte</span></button>
+  <button data-tab="classifica" aria-label="Classifica"><img class="nav-ico" src="nav-classifica.png" alt=""><span class="nav-label">Classifica</span></button>
+  <button data-tab="squadra" aria-label="Squadra"><img class="nav-ico" src="ico-brigata.png" alt=""><span class="nav-label">Brigata</span></button>
+  <button data-tab="chat" aria-label="Chat"><span class="nav-ico-wrap"><img class="nav-ico" src="ico-chat-badge.png" alt=""><span class="chat-badge hidden" id="chat-badge">0</span></span><span class="nav-label">Chat</span></button>
   <button type="button" id="more-nav-btn" aria-label="Altro"><span class="nav-dots"><span></span><span></span><span></span></span>Altro</button>
   <div class="more-panel hidden" id="more-panel">
     <button data-tab="concorrenti"><img class="nav-ico" src="ico-info.png" alt="">Chef</button>
@@ -1363,7 +1399,7 @@
     return base;
   }
   function epSortKey(ep){
-    return new Date(ep.data + "T" + (ep.ora ? ep.ora : "00:00") + ":00");
+    return new Date(ep.data + "T" + (ep.ora ? String(ep.ora).slice(0,5) : "00:00") + ":00");
   }
   function computeScadenze(){
     var items = [];
@@ -1553,11 +1589,12 @@
       + '<div class="home-profile-text"><small>Ciao,</small><b>'+ (displayName||'Chef') +'</b></div>'
       + '<input type="file" accept="image/*" id="avatar-file-input" class="hidden">'
       + '</div>';
+    html += countdownHtml(team, brigata, nextDraft);
     html += '<div class="action-board"><div class="home-actions">'
-      +'<div class="home-action" data-goto="carte"><div class="home-action-icon"><img src="ico-carte.png" alt=""></div><h3>Le tue Carte</h3><span>'+(team?remaining+'★ disponibili':'Scopri e colleziona')+'</span></div>'
-      +'<div class="home-action" data-goto="classifica"><div class="home-action-icon"><img src="ico-trofeo.png" alt=""></div><h3>Classifica</h3><span>'+(myRow?('Sei #'+myRow.pos+' · '+fmtNum(myRow.total)+' punti'):'Vedi come va la lega')+'</span></div>'
+      +'<div class="home-action" data-goto="carte"><div class="home-action-icon"><img src="nav-carte.png" alt=""></div><h3>Le tue Carte</h3><span>'+(team?remaining+'★ disponibili':'Scopri e colleziona')+'</span></div>'
+      +'<div class="home-action" data-goto="classifica"><div class="home-action-icon"><img src="nav-classifica.png" alt=""></div><h3>Classifica</h3><span>'+(myRow?('Sei #'+myRow.pos+' · '+fmtNum(myRow.total)+' punti'):'Vedi come va la lega')+'</span></div>'
       +'<div class="home-action" data-goto="squadra"><div class="home-action-icon"><img src="ico-brigata.png" alt=""></div><h3>La Brigata</h3><span>'+(brigata.length?brigata.length+'/3 Chef scelti':'Costruisci la squadra')+'</span></div>'
-      +'<div class="home-action" data-goto="chat"><div class="home-action-icon"><img src="ico-chat.png" alt=""></div><h3>Chat</h3><span>Parla con la Brigata</span></div>'
+      +'<div class="home-action" data-goto="chat"><div class="home-action-icon"><img src="ico-chat-glossy.png" alt=""></div><h3>Chat</h3><span>Parla con la Brigata</span></div>'
       +'</div></div>';
     html += scadenzeHtml(computeScadenze());
     html += '<div class="home-lower"><div class="home-paper"><div class="home-paper-head">Prossima sfida</div><div class="home-paper-body">';
@@ -1572,10 +1609,47 @@
     html+='</div></div><div class="home-wood"><div class="home-wood-head">'+(team?'La tua Brigata':'La tua squadra')+'</div><div style="padding:11px 12px;">';
     if(brigata.length){ html+='<div class="home-team-strip">'; brigata.slice(0,3).forEach(function(tc){ html+='<div class="home-chef-pill"><span>👨‍🍳</span><b>'+esc(concorrenteName(tc.concorrente_id))+'</b></div>'; }); html+='</div>'; }
     else html+='<div style="font-size:12px;color:var(--ink-dim);margin-bottom:9px;">Non hai ancora impostato la tua Brigata.</div>';
-    html+='<div class="home-stat-grid"><div class="home-stat"><div class="home-stat-ico">🏆</div><div><b>'+(myRow?'#'+myRow.pos:'—')+'</b><span>posizione</span></div></div><div class="home-stat"><div class="home-stat-ico">⭐</div><div><b>'+remaining+'</b><span>stelle disponibili</span></div></div><div class="home-stat"><div class="home-stat-ico">🍴</div><div><b>'+confirmed.length+'</b><span>puntate giocate</span></div></div><div class="home-stat"><div class="home-stat-ico">🃏</div><div><b>'+myCards+'</b><span>carte acquistate</span></div></div></div></div></div></div>';
+    html+='<div class="home-stat-grid"><div class="home-stat"><div class="home-stat-ico"><img src="ico-trofeo-glossy.png" alt=""></div><div><b>'+(myRow?'#'+myRow.pos:'—')+'</b><span>posizione</span></div></div><div class="home-stat"><div class="home-stat-ico"><img src="ico-stelle.png" alt=""></div><div><b>'+remaining+'</b><span>stelle disponibili</span></div></div><div class="home-stat"><div class="home-stat-ico">🍴</div><div><b>'+confirmed.length+'</b><span>puntate giocate</span></div></div><div class="home-stat"><div class="home-stat-ico"><img src="nav-carte.png" alt=""></div><div><b>'+myCards+'</b><span>carte acquistate</span></div></div></div></div></div></div>';
     html+='<div class="home-pot-deco"><img src="deco-vaso.png" alt=""></div>';
     html+='<div class="home-quote">“La cucina è più bella quando la si condivide.” ♥</div></div>';
     document.getElementById('panel-home').innerHTML=html; bindHomeEvents();
+  }
+  // Conto alla rovescia verso la prossima data chiave per il giocatore:
+  // scadenza della Brigata (se ancora da completare), prossima puntata,
+  // oppure, prima che ci siano puntate in calendario, il debutto della stagione.
+  var SEASON_PREMIERE = new Date("2026-12-10T21:15:00");
+  function nextKeyDate(team, brigata, nextDraft){
+    var now = new Date();
+    if (team && brigata.length < 3 && !brigataLocked(team)){
+      var dl = brigataDeadlineFor(team);
+      if (dl && !isNaN(dl) && dl > now) return {title:"Scegli la tua Brigata", sub:"I tuoi 3 Chef (e l'eventuale Ombra) entro questa data", when:dl, kicker:"Scadenza"};
+    }
+    if (nextDraft){
+      var w = epSortKey(nextDraft);
+      if (!isNaN(w) && w > now) return {title:"Prossima puntata", sub:"Puntata "+nextDraft.numero+" · gioca le carte prima della diretta", when:w, kicker:"In onda"};
+    }
+    if (SEASON_PREMIERE > now) return {title:"MasterChef Italia riparte", sub:"Prima serata su Sky e NOW: si forma la Masterclass", when:SEASON_PREMIERE, kicker:"Si parte"};
+    return null;
+  }
+  function fmtCountdown(ms){
+    if (ms <= 0) return "Ci siamo!";
+    var m = Math.floor(ms/60000), d = Math.floor(m/1440), h = Math.floor((m%1440)/60), mi = m%60;
+    return (d?d+"g ":"") + (d||h?h+"h ":"") + mi+"m";
+  }
+  function countdownHtml(team, brigata, nextDraft){
+    if (window._fmcCountdownTimer){ clearInterval(window._fmcCountdownTimer); window._fmcCountdownTimer = null; }
+    var k = nextKeyDate(team, brigata, nextDraft);
+    if (!k) return "";
+    var w = k.when;
+    var html = '<div class="countdown-card"><div class="cd-cal"><small>'+esc(w.toLocaleDateString('it-IT',{weekday:'short'}))+'</small><b>'+w.getDate()+'</b><span>'+esc(w.toLocaleDateString('it-IT',{month:'short'}))+'</span></div>'
+      + '<div class="cd-body"><h3>'+esc(k.title)+'</h3><p>'+esc(k.sub)+'</p>'
+      + '<div class="cd-timer"><img src="ico-notifiche.png" alt=""><span id="cd-timer-val" data-when="'+w.getTime()+'">'+fmtCountdown(w - new Date())+'</span></div></div></div>';
+    window._fmcCountdownTimer = setInterval(function(){
+      var el = document.getElementById("cd-timer-val");
+      if (!el){ clearInterval(window._fmcCountdownTimer); window._fmcCountdownTimer = null; return; }
+      el.textContent = fmtCountdown(Number(el.getAttribute("data-when")) - new Date());
+    }, 30000);
+    return html;
   }
   function bindHomeEvents(){
     document.querySelectorAll("[data-goto]").forEach(function(el){
@@ -1770,19 +1844,30 @@
     // 2) azione principale di questa schermata: la Brigata
     html += '<div class="card" style="padding:16px 16px 15px; margin-bottom:16px;">'
       + '<div class="brigata-head"><img src="char-brigata.jpg" alt="">'
-      + '<h3>I tuoi 3 Chef'+(locked?' <img src="ico-lucchetto.png" alt="" style="width:13px;height:13px;object-fit:contain;vertical-align:middle;margin-left:2px;">':'')+'</h3></div>';
-    html += '<div class="brigata-chips">';
-    if (brigata.length){
-      brigata.forEach(function(tc){
-        var cc = byId(state.concorrenti, tc.concorrente_id);
-        var elimTag = (cc && cc.eliminato) ? ' <span class="badge warn" style="font-size:9px;">Eliminato</span>' : '';
-        html += '<span class="chip">'+esc(concorrenteName(tc.concorrente_id))+' <span class="muted">'+fmtNum(concorrenteCumulativo(tc.concorrente_id))+'</span>'+elimTag+'</span>';
-      });
-    } else { html += '<span class="muted">Non hai ancora scelto la tua Brigata.</span>'; }
-    html += '</div>';
-    if (ombra){
-      html += '<div style="margin-top:2px;"><span class="chip ombra">Chef Ombra: '+(state.meta.ombra_svelato?esc(concorrenteName(ombra.concorrente_id)):"segreto, lo sai solo tu")+'</span></div>';
+      + '<h3>I tuoi 3 Chef'+(locked?' <img src="ico-lucchetto.png" alt="" style="width:19px;height:19px;object-fit:contain;vertical-align:middle;margin-left:2px;">':'')+'</h3></div>';
+    html += '<div class="figurine-grid">';
+    var shown = brigata.slice(0,3);
+    shown.forEach(function(tc){
+      var cc = byId(state.concorrenti, tc.concorrente_id);
+      var out = !!(cc && cc.eliminato);
+      html += '<div class="figurina'+(out?' is-out':'')+'">'
+        + (out?'<span class="fig-tag">Eliminato</span>':'')
+        + '<img src="'+concorrenteAvatarImg(tc.concorrente_id)+'" alt="">'
+        + '<b>'+esc(concorrenteName(tc.concorrente_id))+'</b>'
+        + '<span class="fig-pts">'+fmtNum(concorrenteCumulativo(tc.concorrente_id))+' pt</span></div>';
+    });
+    for (var fi = shown.length; fi < 3; fi++){
+      html += '<div class="figurina is-empty"><div class="fig-plus">+</div><b>Da scegliere</b></div>';
     }
+    if (ombra){
+      html += '<div class="figurina is-ombra"><img src="avatar-lo-chef-ombra.png" alt="">'
+        + '<b>'+(state.meta.ombra_svelato?esc(concorrenteName(ombra.concorrente_id)):'Chef Ombra')+'</b>'
+        + (state.meta.ombra_svelato?'<span class="fig-pts">'+fmtNum(concorrenteCumulativo(ombra.concorrente_id))+' pt</span>':'<small>Segreto: lo sai solo tu<br>('+esc(concorrenteName(ombra.concorrente_id))+')</small>')
+        + '</div>';
+    } else {
+      html += '<div class="figurina is-ombra is-empty"><div class="fig-plus" style="color:#e8c26a;border-color:#e8c26a;">?</div><b>Chef Ombra</b><small>Facoltativo</small></div>';
+    }
+    html += '</div>';
     if (locked){
       html += '<p class="status-line"><img src="ico-lucchetto.png" alt=""><span>Brigata bloccata'+(dl?(' dal '+esc(fmtDeadline(dl))):'')+'. Per un cambio eccezionale contatta l\'Admin.</span></p>';
     } else {
@@ -1907,8 +1992,8 @@
   function concorrenteAvatarImg(id){
     var hash = 0, s = String(id||"");
     for (var i=0; i<s.length; i++){ hash = s.charCodeAt(i) + ((hash<<5)-hash); }
-    var idx = Math.abs(hash) % 6;
-    return 'char-conc-'+(idx+1)+'.png';
+    var set = ['avatar-lo-chef.png','avatar-il-fenomeno.png','avatar-la-stratega.png','avatar-il-buongustaio.png','avatar-il-giudice.png','avatar-il-combinaguai.png','avatar-il-pessimista.png'];
+    return set[Math.abs(hash) % set.length];
   }
   function renderConcorrenti(){
     var html = '<div class="screen-head"><img src="ico-brigata.png" alt="" class="screen-head-icon"><div><h2>Chef</h2><p class="section-sub">Tocca uno Chef per la scheda.</p></div></div>';
@@ -2051,12 +2136,12 @@
       if (team){
         var owned = myPurchases.some(function(p){ return p.card_key===c.key; });
         if (owned && c.key==="chef_ombra"){
-          actionHtml = '<span class="badge ok"><img src="ico-check-glossy.png" alt="" style="width:13px;height:13px;object-fit:contain;vertical-align:-2px;margin-right:3px;">Posseduta</span>';
+          actionHtml = '<span class="badge ok"><img src="ico-check-glossy.png" alt="" style="width:19px;height:19px;object-fit:contain;vertical-align:-2px;margin-right:3px;">Posseduta</span>';
           bucket = "utilizzate";
         } else if (owned){
           var myAct = state.activations.filter(function(a){ return a.team_id===team.id && a.card_key===c.key; })[0];
           if (myAct){
-            actionHtml = '<span class="badge ok"><img src="ico-check-glossy.png" alt="" style="width:13px;height:13px;object-fit:contain;vertical-align:-2px;margin-right:3px;">Utilizzata</span>' + activationSummary(myAct);
+            actionHtml = '<span class="badge ok"><img src="ico-check-glossy.png" alt="" style="width:19px;height:19px;object-fit:contain;vertical-align:-2px;margin-right:3px;">Utilizzata</span>' + activationSummary(myAct);
             bucket = "utilizzate";
           } else {
             var win = cardWindowInfo(c.key);
@@ -2320,6 +2405,19 @@
     var p = state.profiles.filter(function(x){ return x.id===id; })[0];
     return p ? p.display_name : "Qualcuno";
   }
+  function chatProfileAvatar(id){
+    var p = state.profiles.filter(function(x){ return x.id===id; })[0];
+    return (p && p.avatar_url) ? p.avatar_url : 'char-profilo.png';
+  }
+  // Riconosce gli avvisi automatici "X ha giocato "Carta" su ..." per mostrarli con l'immagine della carta.
+  function chatCardFromText(t){
+    if (!t || t.indexOf(' ha giocato "') === -1) return null;
+    for (var i=0; i<state.cardTypes.length; i++){
+      var c = state.cardTypes[i];
+      if (c.key !== 'chef_ombra' && CARD_IMG[c.key] && t.indexOf('"'+c.label+'"') !== -1) return c;
+    }
+    return null;
+  }
   function chatFindMsg(id){ return state.chatMessages.filter(function(m){ return m.id===id; })[0]; }
   function chatImageUrl(path){ return sb.storage.from("chat-media").getPublicUrl(path).data.publicUrl; }
 
@@ -2335,7 +2433,7 @@
       reactionsByMsg[r.message_id][r.emoji].push(r.profile_id);
     });
 
-    var chatNotifCorner = '<label class="chat-notif-toggle" title="Notifiche per gli avvisi importanti"><input type="checkbox" id="chat-notif-toggle" '+(state.profile.notifiche_attive?"checked":"")+'><span class="bell">🔔</span></label>';
+    var chatNotifCorner = '<label class="chat-notif-toggle" title="Notifiche per gli avvisi importanti"><input type="checkbox" id="chat-notif-toggle" '+(state.profile.notifiche_attive?"checked":"")+'><img class="bell" src="ico-notifiche.png" alt="Notifiche"></label>';
     var html = heroBanner('char-chat.jpg', 'Chat', 'Il pettegolezzo di cucina si conserva 20 giorni, poi sparisce.', chatNotifCorner, '20%');
 
     html += '<div id="chat-wrap"><div id="chat-list">';
@@ -2344,11 +2442,17 @@
     }
     state.chatMessages.forEach(function(m){
       if (m.is_avviso){
-        html += '<div class="chat-avviso">📣 '+esc(m.testo)+'<div class="chat-meta" style="margin:2px 0 0;">'+fmtDateTime(m.created_at)+'</div></div>';
+        var playedCard = chatCardFromText(m.testo);
+        if (playedCard){
+          html += '<div class="chat-card-play"><img src="'+CARD_IMG[playedCard.key]+'" alt=""><div><span class="ccp-kicker">Carta giocata!</span><div class="ccp-text">'+esc(m.testo)+'</div><div class="chat-meta">'+fmtDateTime(m.created_at)+'</div></div></div>';
+        } else {
+          html += '<div class="chat-avviso"><img class="avv-ico" src="ico-notifiche.png" alt="">'+esc(m.testo)+'<div class="chat-meta" style="margin:2px 0 0;">'+fmtDateTime(m.created_at)+'</div></div>';
+        }
         return;
       }
       var mine = m.author_id===state.profile.id;
       var replyMsg = m.reply_to_id ? chatFindMsg(m.reply_to_id) : null;
+      html += '<div class="chat-line'+(mine?" mine":"")+'"><img class="chat-ava" src="'+esc(chatProfileAvatar(m.author_id))+'" alt="">';
       html += '<div class="chat-msg'+(mine?" mine":"")+'" data-msg-id="'+m.id+'">';
       html += '<div class="chat-meta">'+esc(chatProfileName(m.author_id))+' · '+fmtDateTime(m.created_at)+'</div>';
       html += '<div class="chat-bubble">';
@@ -2377,7 +2481,7 @@
       if (state._reactingMsg===m.id){
         html += '<div class="chat-emoji-row">' + CHAT_EMOJIS.map(function(em){ return '<button type="button" data-toggle-react="'+m.id+'|'+em+'">'+em+'</button>'; }).join("") + '</div>';
       }
-      html += '</div>';
+      html += '</div></div>';
     });
     html += '</div>';
 
@@ -2390,7 +2494,7 @@
     }
     html += '<div id="chat-input-bar">'
       + '<input type="file" accept="image/*" id="chat-photo-input" class="hidden">'
-      + '<button class="btn sm ghost" id="chat-photo-btn" type="button" title="Allega una foto"><img src="ico-fotocamera.png" alt="" style="width:16px;height:16px;object-fit:contain;vertical-align:middle;"></button>'
+      + '<button class="btn sm ghost" id="chat-photo-btn" type="button" title="Allega una foto"><img src="ico-fotocamera.png" alt="" style="width:22px;height:22px;object-fit:contain;vertical-align:middle;"></button>'
       + '<textarea id="chat-text-input" placeholder="Scrivi un messaggio…" rows="1"></textarea>'
       + '<button class="btn sm primary" id="chat-send-btn" type="button">Invia</button>'
       + '</div>';
@@ -2808,14 +2912,14 @@
       var ep = byId(state.episodes, a.episode_id);
       var t = byId(state.teams, a.team_id);
       var ct = state.cardTypes.filter(function(c){return c.key===a.card_key;})[0];
-      return '<div class="banner"><span>'+(ep?"Puntata "+ep.numero:"—")+' — '+esc(t?displayName(t):"?")+' — '+esc(ct?ct.label:a.card_key)+'</span><button class="btn sm ghost" data-remove-act="'+a.id+'" style="display:inline-flex;align-items:center;gap:5px;"><img src="ico-cestino.png" alt="" style="width:14px;height:14px;object-fit:contain;">Annulla</button></div>';
+      return '<div class="banner"><span>'+(ep?"Puntata "+ep.numero:"—")+' — '+esc(t?displayName(t):"?")+' — '+esc(ct?ct.label:a.card_key)+'</span><button class="btn sm ghost" data-remove-act="'+a.id+'" style="display:inline-flex;align-items:center;gap:5px;"><img src="ico-cestino.png" alt="" style="width:20px;height:20px;object-fit:contain;">Annulla</button></div>';
     }).join("") || '<p class="section-sub">Nessuna attivazione registrata.</p>';
     var purRows = state.purchases.slice().map(function(p){
       var t = byId(state.teams, p.team_id);
       var ct = state.cardTypes.filter(function(c){return c.key===p.card_key;})[0];
       var hasAct = state.activations.some(function(a){ return a.team_id===p.team_id && a.card_key===p.card_key; });
       return '<div class="banner"><span>'+esc(t?displayName(t):"?")+' — '+esc(ct?ct.label:p.card_key)+'</span>'
-        + (hasAct ? '<span class="muted" style="font-size:12px;">Già attivata: annulla prima quella</span>' : '<button class="btn sm ghost" data-remove-purchase="'+p.id+'" style="display:inline-flex;align-items:center;gap:5px;"><img src="ico-cestino.png" alt="" style="width:14px;height:14px;object-fit:contain;">Annulla acquisto</button>')
+        + (hasAct ? '<span class="muted" style="font-size:12px;">Già attivata: annulla prima quella</span>' : '<button class="btn sm ghost" data-remove-purchase="'+p.id+'" style="display:inline-flex;align-items:center;gap:5px;"><img src="ico-cestino.png" alt="" style="width:20px;height:20px;object-fit:contain;">Annulla acquisto</button>')
         + '</div>';
     }).join("") || '<p class="section-sub">Nessun acquisto registrato.</p>';
     html += fieldset("Strumenti Admin", ''

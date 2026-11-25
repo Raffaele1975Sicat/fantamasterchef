@@ -2,7 +2,7 @@
  * Foundation only: registration is intentionally added separately to index.html.
  */
 
-const CACHE_VERSION = 'fm-cache-v1';
+const CACHE_VERSION = 'fm-cache-v2';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
