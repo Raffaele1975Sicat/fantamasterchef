@@ -565,6 +565,13 @@
 .home-v3 .home-profile-text{display:flex;flex-direction:column;line-height:1.15;}
 .home-v3 .home-profile-text small{font-family:'Work Sans',sans-serif;font-size:13px;color:#e7d6b3;}
 .home-v3 .home-profile-text b{font-family:'Fraunces',serif;font-size:23px;color:#fff5df;}
+.home-v3 .home-profile-text{min-width:0;flex:1;}
+.home-v3 .photo-cta{display:block;margin-top:4px;font-size:12px;color:#f3d98c;font-weight:600;}
+.home-v3 .photo-help{margin-top:5px;font-size:12px;color:#e2d2ac;}
+.home-v3 .photo-help summary{cursor:pointer;color:#e8c26a;text-decoration:underline;list-style:none;}
+.home-v3 .photo-help summary::-webkit-details-marker{display:none;}
+.home-v3 .photo-help p{margin:5px 0 0;line-height:1.35;}
+.home-v3 .home-profile-text .photo-help b, .home-v3 .home-profile-text .photo-help p b{font-family:inherit !important;font-size:12px !important;font-weight:700;color:#f3d98c;}
 @media(max-width:700px){
  .home-v3 .home-profile-strip{padding:9px 13px;gap:12px;margin-bottom:12px;}
  .home-v3 .home-profile-strip img{width:68px;height:68px;}
@@ -1592,7 +1599,10 @@
       + '<img class="hero-mascotte" src="char-mascotte-base.png" alt="">'
       + '</div>';
     html += '<div class="home-profile-strip"><div class="avatar-edit-wrap" id="my-avatar-badge" title="Cambia la tua foto"><img src="'+(myAvatarUrl?esc(myAvatarUrl):'char-profilo.png')+'" alt=""><span class="avatar-edit-pin">✎</span></div>'
-      + '<div class="home-profile-text"><small>Ciao,</small><b>'+ (displayName||'Chef') +'</b></div>'
+      + '<div class="home-profile-text"><small>Ciao,</small><b>'+ (displayName||'Chef') +'</b>'
+      + (myAvatarUrl ? '' : '<span class="photo-cta">📷 Tocca la foto per metterne una tua</span>')
+      + '<details class="photo-help"><summary>Come cambio la foto?</summary><p>Tocca la tua foto e scegli <b>Fototeca</b>. Se l\'immagine ti è arrivata su <b>WhatsApp</b>: aprila, tocca <b>Condividi</b> (in basso a sinistra) e poi <b>"Salva immagine"</b>; così finisce nella Fototeca. Dal computer puoi scegliere un file da qualsiasi cartella.</p></details>'
+      + '</div>'
       + '<input type="file" accept="image/*" id="avatar-file-input" class="hidden">'
       + '</div>';
     html += countdownHtml(team, brigata, nextDraft);
