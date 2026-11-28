@@ -1698,6 +1698,9 @@
           var canvas = document.createElement("canvas");
           canvas.width = maxSize; canvas.height = maxSize;
           var ctx = canvas.getContext("2d");
+          // sfondo pieno: i PNG trasparenti, salvati in JPEG, diventerebbero neri
+          ctx.fillStyle = "#2b1d12";
+          ctx.fillRect(0, 0, maxSize, maxSize);
           ctx.drawImage(img, sx, sy, side, side, 0, 0, maxSize, maxSize);
           canvas.toBlob(function(blob){
             if (blob) resolve(blob); else reject(new Error("Conversione immagine non riuscita."));
