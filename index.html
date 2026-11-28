@@ -1995,6 +1995,8 @@
   }
   /* ============ render: concorrenti ============ */
   function concorrenteAvatarImg(id){
+    var withPhoto = byId(state.concorrenti, id);
+    if (withPhoto && withPhoto.foto_url) return withPhoto.foto_url;
     var hash = 0, s = String(id||"");
     for (var i=0; i<s.length; i++){ hash = s.charCodeAt(i) + ((hash<<5)-hash); }
     var set = ['avatar-lo-chef.png','avatar-il-fenomeno.png','avatar-la-stratega.png','avatar-il-buongustaio.png','avatar-il-giudice.png','avatar-il-combinaguai.png','avatar-il-pessimista.png'];
@@ -2786,8 +2788,11 @@
     );
 
     var concList = state.concorrenti.map(function(c){
-      return '<div class="banner"><span>'+esc(c.nome)+(c.eliminato?' <span class="badge warn">Eliminato</span>':'')+'</span>'
-        + '<span><button class="btn sm ghost" data-toggle-elim="'+c.id+'">'+(c.eliminato?"Riammetti":"Elimina")+'</button></span></div>';
+      return '<div class="banner"><span style="display:flex;align-items:center;gap:10px;"><img src="'+esc(concorrenteAvatarImg(c.id))+'" alt="" style="width:40px;height:40px;border-radius:50%;object-fit:cover;border:2px solid var(--gold);flex:0 0 40px;">'+esc(c.nome)+(c.eliminato?' <span class="badge warn">Eliminato</span>':'')+'</span>'
+        + '<span style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;">'
+        + '<button class="btn sm ghost" data-conc-photo="'+c.id+'">'+(c.foto_url?"Cambia foto":"Foto")+'</button>'
+        + (c.foto_url?'<button class="btn sm ghost" data-conc-photo-del="'+c.id+'">Togli foto</button>':'')
+        + '<button class="btn sm ghost" data-toggle-elim="'+c.id+'">'+(c.eliminato?"Riammetti":"Elimina")+'</button></span></div>';
     }).join("");
     html += fieldset("Concorrenti", concList
       + '<div class="field-row"><input id="a-new-conc" placeholder="Nome concorrente" style="flex:1;"><button class="btn sm" id="a-add-conc">Aggiungi</button></div>',
@@ -3026,6 +3031,35 @@
     g("a-add-conc") && g("a-add-conc").addEventListener("click", function(){
       var name = g("a-new-conc").value.trim(); if (!name) return;
       sb.from("concorrenti").insert({nome:name}).then(afterWrite("Concorrente aggiunto."));
+    });
+    // Foto dei concorrenti (solo Admin): ritagliata al centro, compressa, salvata in avatars/concorrenti/<id>.jpg
+    document.querySelectorAll("[data-conc-photo]").forEach(function(b){
+      b.addEventListener("click", function(){
+        var cid = b.getAttribute("data-conc-photo");
+        var inp = document.createElement("input");
+        inp.type = "file"; inp.accept = "image/*";
+        inp.addEventListener("change", function(){
+          var file = inp.files && inp.files[0];
+          if (!file) return;
+          if (!/^image\//.test(file.type)){ toast("Scegli una foto (immagine)."); return; }
+          toast("Caricamento foto…");
+          var path = "concorrenti/" + cid + ".jpg";
+          resizeImageToBlob(file, 480, 0.85).then(function(blob){
+            return sb.storage.from("avatars").upload(path, blob, {upsert:true, contentType:"image/jpeg"});
+          }).then(function(res){
+            if (res.error) throw res.error;
+            var url = sb.storage.from("avatars").getPublicUrl(path).data.publicUrl + "?t=" + Date.now();
+            return sb.from("concorrenti").update({foto_url:url}).eq("id", cid);
+          }).then(afterWrite("Foto del concorrente aggiornata!"))
+            .catch(function(err){ toast("Caricamento non riuscito: " + (err&&err.message?err.message:err)); });
+        });
+        inp.click();
+      });
+    });
+    document.querySelectorAll("[data-conc-photo-del]").forEach(function(b){
+      b.addEventListener("click", function(){
+        sb.from("concorrenti").update({foto_url:null}).eq("id", b.getAttribute("data-conc-photo-del")).then(afterWrite("Foto tolta: torna la caricatura."));
+      });
     });
     document.querySelectorAll("[data-toggle-elim]").forEach(function(b){
       b.addEventListener("click", function(){
